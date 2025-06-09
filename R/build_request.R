@@ -1,21 +1,26 @@
 #' Build request version 2
 #'
-#' @param server character: in case we have more than one server
+#' @param dlw_url character: in case we have more than one url.
+#' @param server character: in case we have more than one server. default GMD
 #' @param api_version character: API version
 #' @param endpoint character: dlw  API endpoint
 #' @param ... other parameters
 #'
 #' @return httr2 request
-#'
-build_request <- function(server,
+build_request <- function(dlw_url = NULL,
+                          server = NULL,
                           api_version = getOption("dlw.default_api_version"),
                           endpoint,
                           ...) {
 
+  # endpoint <- "FileInformation/GetFileInfo"
 
-
-  base_url <- select_base_url(server = server)
-  params <- list(...)
+  base_url    <- select_base_url(dlw_url = dlw_url)
+  base_server <- select_base_server(server = server)
+  params <- list(...) |>
+    append(Server = base_server)
+  # params <- list(Server = "GMD", Country = "VNM",
+  #           Collection = "GMD", Year = 2018)
 
   req <- httr2::request(base_url) |>
     httr2::req_url_path_append(api_version) |>
@@ -26,10 +31,12 @@ build_request <- function(server,
     httr2::req_cache(tools::R_user_dir("dlw", which = "cache"),
                      use_on_error = TRUE,
                      debug = TRUE) # |>
-    # httr2::req_user_agent(pipr_user_agent) |>
+
+  # To add later
+    # httr2::req_user_agent(dlw_user_agent) |>
     # httr2::req_error(body = parse_error_body) |>
     # httr2::req_retry(
-    #   is_transient = pip_is_transient,
+    #   is_transient = dlw_is_transient,
     #   after = retry_after,
     #   max_seconds = 60
     # )

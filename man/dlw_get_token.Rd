@@ -6,6 +6,9 @@
 \usage{
 dlw_get_token(prompt_if_missing = TRUE)
 }
+\arguments{
+\item{prompt_if_missing}{logical: whether to be prompted to store token}
+}
 \description{
 Retrieve Datalibweb API token, prompt if missing/expired
 }

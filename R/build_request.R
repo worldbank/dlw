@@ -20,6 +20,7 @@ build_request <- function(server,
   req <- httr2::request(base_url) |>
     httr2::req_url_path_append(api_version) |>
     httr2::req_url_path_append(endpoint) |>
+    httr2::req_auth_bearer_token(dlw_get_token()) |>
     # .multi = "comma" works fine without applying fix_params
     httr2::req_url_query(!!!params, .multi = "comma") |>
     httr2::req_cache(tools::R_user_dir("dlw", which = "cache"),

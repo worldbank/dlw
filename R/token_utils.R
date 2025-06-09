@@ -38,7 +38,7 @@ dlw_set_token <- function(token) {
 #'
 #' @param prompt_if_missing logical: whether to be prompted to store token
 #'
-#' @retur invisible token
+#' @return invisible token
 #' @export
 dlw_get_token <- function(prompt_if_missing = TRUE) {
   # Try to get the token

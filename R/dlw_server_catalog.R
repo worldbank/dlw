@@ -20,7 +20,7 @@ dlw_server_catalog <- function(server = NULL,
                               verbose = getOption("dlw.verbose")
                               ) {
   endpoint <- "ServerCatalog"
-  base_server <- select_base_server(server = server)
+  base_server <- select_server(server = server)
 
   key <- paste(endpoint, base_server, sep = "_")
 

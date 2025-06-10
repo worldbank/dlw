@@ -23,4 +23,6 @@ Imports:
     keyring,
     rlang
 Suggests: 
+    testthat (>= 3.0.0),
     usethis
+Config/testthat/edition: 3

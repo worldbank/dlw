@@ -27,7 +27,7 @@ select_base_url <- function(dlw_url) {
 #' @param server character: c("GMD"). Defaults to NULL (ie. GMD).
 #' @return character
 #' @noRd
-select_base_server <- function(server) {
+select_server <- function(server) {
   if (!is.null(server)) {
     match.arg(server, c("GMD", "x"))
     if (server %in% c("x")) {

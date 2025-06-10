@@ -4,7 +4,7 @@ Title: What the Package Does (Title Case)
 Version: 0.1.0
 Authors@R: person("R.Andres", "Castaneda",
                             email = "acastanedaa@worldbank.org",
-                            role = c("aut", "cre")
+                            role = c("aut", "cre"))
 Description: More about what it does (maybe more than one line).
     Continuation lines should be indented.
 License: MIT + file LICENSE
@@ -17,6 +17,8 @@ Depends:
 RoxygenNote: 7.3.2
 Imports: 
     cli,
+    collapse,
+    data.table,
     httr2,
     keyring
 Suggests: 

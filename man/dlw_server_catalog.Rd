@@ -4,7 +4,11 @@
 \alias{dlw_server_catalog}
 \title{Server catalog}
 \usage{
-dlw_server_catalog(server = NULL)
+dlw_server_catalog(
+  server = NULL,
+  dlw_url = NULL,
+  api_version = getOption("dlw.default_api_version")
+)
 }
 \arguments{
 \item{server}{character: in case we have more than one server. default GMD}

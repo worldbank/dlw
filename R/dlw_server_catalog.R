@@ -31,7 +31,7 @@ dlw_server_catalog <- function(server = NULL,
 
   req <- build_request(dlw_url = dlw_url,
                        api_version = api_version,
-                       endpoint,
+                       endpoint = endpoint,
                        Server = base_server)
   ctl <- req |>
     httr2::req_perform() |>

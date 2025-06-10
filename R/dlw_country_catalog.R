@@ -1,14 +1,45 @@
-dlw_country_catalog <- function(country_code) {
-  endpoint <- "CountryCatalog"
+#' Get country catalog
+#'
+#' @param country_code character: ISO3 code
+#' @param internal logical: for internal use ONLY.
+#' @inheritParams dlw_server_catalog
+#'
+#' @returns data.table with country catalog
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' dlw_country_catalog("COL")
+#' }
+dlw_country_catalog <- function(country_code,
+                                internal = FALSE,
+                                dlw_url = NULL,
+                                api_version = getOption("dlw.default_api_version"),
+                                force = FALSE,
+                                verbose = getOption("dlw.verbose")) {
+  if (internal) {
+    endpoint <- "CountryCatalogInternal"
+  } else {
+    endpoint <- "CountryCatalog"
+  }
 
+  key <- paste(endpoint, country_code , sep = "_")
+
+  ctl <- get_from_dlwenv(key, verbose)
+
+  # Early return
+  if (!is.null(ctl) && force == FALSE) return(ctl)
+
+  endpoint <- c(endpoint, country_code)
   req <- build_request(dlw_url = dlw_url,
                        api_version = api_version,
-                       endpoint = endpoint,
-                       country = country_code)
-  req <- request(url) |>
-    req_url_path_append(endpoint) |>
-    req_url_path_append(country_code) |>
-    req_auth_bearer_token(key_get("datalibweb"))
+                       endpoint = endpoint)
+  ctl <- req |>
+    httr2::req_perform() |>
+    httr2::resp_body_string() |>
+    fread(data.table = TRUE)
 
-  req |> req_perform() |> resp_body_string() |> read_csv(show_col_types = FALSE)
+  set_in_dlwenv(key, ctl, verbose)
+
+  ctl
 }

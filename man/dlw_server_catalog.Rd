@@ -7,11 +7,22 @@
 dlw_server_catalog(
   server = NULL,
   dlw_url = NULL,
-  api_version = getOption("dlw.default_api_version")
+  api_version = getOption("dlw.default_api_version"),
+  force = FALSE,
+  verbose = getOption("dlw.verbose")
 )
 }
 \arguments{
-\item{server}{character: in case we have more than one server. default GMD}
+\item{server}{character: in case we have more than one server. default is  GMD}
+
+\item{dlw_url}{character: in case we have more than one url.}
+
+\item{api_version}{character: API version}
+
+\item{force}{logical: If TRUE, it will query the API regardless of whether
+there is version available in .dlwenv}
+
+\item{verbose}{logical: whether to display info}
 }
 \value{
 dataframe with

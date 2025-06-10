@@ -11,19 +11,15 @@ build_request <- function(dlw_url = NULL,
                           endpoint,
                           ...) {
 
-  # endpoint <- "FileInformation/GetFileInfo"
-
   base_url    <- select_base_url(dlw_url = dlw_url)
   params <- list(...)
-  # params <- list(Server = "GMD", Country = "VNM",
-  #           Collection = "GMD", Year = 2018)
 
   req <- httr2::request(base_url) |>
     httr2::req_url_path_append(api_version) |>
     httr2::req_url_path_append(endpoint) |>
     httr2::req_auth_bearer_token(dlw_get_token())
 
-  if (!is.null(params)) {
+  if (length(params) > 0) {
     req <- req |>
     httr2::req_url_query(!!!params, .multi = "comma") |>
     httr2::req_cache(tools::R_user_dir("dlw", which = "cache"),

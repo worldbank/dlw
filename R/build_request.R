@@ -23,7 +23,7 @@ build_request <- function(dlw_url = NULL,
     httr2::req_url_path_append(endpoint) |>
     httr2::req_auth_bearer_token(dlw_get_token())
 
-  if (is.null(params)) {
+  if (!is.null(params)) {
     req <- req |>
     httr2::req_url_query(!!!params, .multi = "comma") |>
     httr2::req_cache(tools::R_user_dir("dlw", which = "cache"),

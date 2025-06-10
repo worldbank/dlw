@@ -6,7 +6,6 @@
 \usage{
 build_request(
   dlw_url = NULL,
-  server = NULL,
   api_version = getOption("dlw.default_api_version"),
   endpoint,
   ...
@@ -14,8 +13,6 @@ build_request(
 }
 \arguments{
 \item{dlw_url}{character: in case we have more than one url.}
-
-\item{server}{character: in case we have more than one server. default GMD}
 
 \item{api_version}{character: API version}
 

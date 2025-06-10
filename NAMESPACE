@@ -2,4 +2,5 @@
 
 export(dlw_get_token)
 export(dlw_remove_token)
+export(dlw_server_catalog)
 export(dlw_set_token)

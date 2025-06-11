@@ -35,7 +35,7 @@ dlw_country_catalog <- function(country_code,
                        api_version = api_version,
                        endpoint = endpoint)
   ctl <- req |>
-    httr2::req_perform() |>
+    handle_resp() |>
     httr2::resp_body_string() |>
     fread(data.table = TRUE)
 

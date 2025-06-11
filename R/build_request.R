@@ -40,3 +40,51 @@ build_request <- function(dlw_url = NULL,
   return(req)
 
 }
+
+
+#' perform httr2::req_perform and handle errors properly
+#'
+#' @param req A httr2 request object.
+#'
+#' @returns an HTTP response.
+#' @export
+handle_resp <- function(req) {
+  out <- tryCatch(
+    expr = {
+        httr2::req_perform(req)
+    }, # end of expr section
+    httr2_failure = \(e) {
+      cli::cli_abort(" the connection is dropped or the server doesn't exist")
+
+    },
+    error = \(e) {
+      resp <- httr2::last_response()
+      status <- resp$status_code
+      if (status == 401) {
+        cli::cli_abort("DatalibWeb Token invalid.
+                    Go to {.href [Datalibweb](http://datalibweb/)} website, generate a new token,
+                    and then use {.code dlw::dlw_set_token()}")
+      } else {
+        cli::cli_abort("Error with the DLW request", conditionMessage(e))
+      }
+
+    },
+    # httr2_http_401 = \(e) {
+    #   cli::cli_abort("DatalibWeb Token invalid.
+    #                 Go to {.href [Datalibweb](http://datalibweb/)} website, generate a new token,
+    #                 and then use {.code dlw::dlw_set_token()}")
+    # }, # End of invalit Token
+    warning = \(w) {
+      w
+    }, # end of warning section
+
+    finally = {
+      # Do this at the end before quitting the tryCatch structure...
+    } # end of finally section
+
+  ) # End of trycatch
+
+  out
+}
+
+

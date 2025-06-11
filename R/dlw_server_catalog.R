@@ -34,7 +34,7 @@ dlw_server_catalog <- function(server = NULL,
                        endpoint = endpoint,
                        Server = base_server)
   ctl <- req |>
-    httr2::req_perform() |>
+    handle_resp() |>
     httr2::resp_body_string() |>
     fread(data.table = TRUE)
 

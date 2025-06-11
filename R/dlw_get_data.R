@@ -14,20 +14,15 @@
 #'
 #' @examples
 dlw_get_data <- function(country_code,
-                         year = NULL,
                          server = NULL,
-                         survey  = NULL,
-                         module = NULL,
-                         fileName = NULL,
-                         verbose =  getOption("dlw.verbose")
+                         verbose =  getOption("dlw.verbose"),
+                         skip_filter = FALSE,
+                         ...
                          ) {
 
-  ctl <- dlw_server_inventory(server = server,
-                             country = country_code,
-                             year = year,
-                             module = module,
-                             survey = survey,
-                             fileName = fileName)
+  ctl <- dlw_server_inventory(country = country_code,
+                             server = server,
+                             ...)
 
   calls <- data_calls(ctl = ctl,
                       country_code = country_code)
@@ -55,7 +50,24 @@ dlw_get_data <- function(country_code,
 }
 
 
-dlw_get_gmd <- function() {
+dlw_get_gmd <- function(country_code,
+                        year = NULL,
+                        survey  = NULL,
+                        module = NULL,
+                        fileName = NULL,
+                        vermast = NULL,
+                        veralt = NULL,
+                        verbose =  getOption("dlw.verbose")) {
+
+
+  ctl <- dlw_server_inventory(country = country_code,
+                              server = "GMD",
+                              year = year,
+                              module = module,
+                              survey = survey,
+                              fileName = fileName,
+                              vermast  = vermast,
+                              veralt   = veralt)
 
 }
 
@@ -65,6 +77,7 @@ dlw_get_gmd <- function() {
 #' @inheritParams dlw_get_data
 #' @param country character. same as `country_code` in [dlw_get_data] but with
 #'   the purpose of easy programming. Not meant to be used by final user.
+#' @param ... additional filtering arguments (e.g., year, module, survey, fileName)
 #'
 #' @returns filter server catalog from [dlw_server_catalog]
 #' @export
@@ -74,14 +87,13 @@ dlw_get_gmd <- function() {
 #' dlw_server_inventory("COL", 2010)
 #' }
 dlw_server_inventory <- function(country,
-                                 year = NULL,
-                                 module = NULL,
                                  server = NULL,
-                                 survey  = NULL,
-                                 fileName = NULL) {
+                                 ...) {
 
-  # Get all arguments and their values as a named list
-  args      <- as.list(environment())
+  # Capture ... arguments as a list
+  dots <- list(...)
+  # Combine country and ... into a single list of arguments
+  args <- c(list(country = country), dots)
   # get names of arguments that are not null
   args_info <- Filter(Negate(is.null), args) |>
     names()

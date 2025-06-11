@@ -38,11 +38,43 @@ dlw_server_catalog <- function(server = NULL,
     httr2::resp_body_string() |>
     fread(data.table = TRUE)
 
-  ctl[, filename := basename(FilePath)
-      ][,
-    module := gsub("(.*_)([^_]+)(\\..+)$", "\\2", filename)]
+  ctl[, FileName := basename(FilePath)]
+
+  # Add vars per server
+  if (base_server == "GMD") {
+    add_gmd_vars(ctl)
+  } else {
+    ctl[, Module := gsub("(.*_)([^_]+)(\\..+)$", "\\2", filename)]
+  }
 
   set_in_dlwenv(key, ctl, verbose)
 
   ctl
+}
+
+#' Add GMD vars to GMD server catalog
+#'
+#' @param ctl data.table of server catalog raw
+#'
+#' @returns data.table with more variables
+#' @keywords internal
+add_gmd_vars <- function(ctl) {
+  vars <- c(
+    "Country_code",
+    "Survey_year",
+    "Survey_acronym",
+    "Vermast",
+    "M",
+    "Veralt",
+    "A",
+    "Collection",
+    "Module",
+    "ext"
+  )
+
+  ctl[,
+    (vars) := tstrsplit(FileName, split = "_|[.]", fill = NA)
+  ][,
+    c("M", "A") := NULL]
+
 }

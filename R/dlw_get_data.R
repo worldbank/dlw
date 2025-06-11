@@ -3,11 +3,10 @@
 #'
 #' @param server
 #' @param country_code
-#' @param year
-#' @param module
-#' @param survey
-#' @param fileName
 #' @param verbose
+#' @param skip_filter
+#' @param ... additional filtering arguments (e.g.,survey_year, survey_acronym,
+#'   vermast, veralt, collection, module)
 #'
 #' @returns
 #' @export
@@ -52,8 +51,8 @@ dlw_get_data <- function(country_code,
 
 dlw_get_gmd <- function(country_code,
                         year = NULL,
-                        survey  = NULL,
                         module = NULL,
+                        survey  = NULL,
                         fileName = NULL,
                         vermast = NULL,
                         veralt = NULL,
@@ -68,7 +67,7 @@ dlw_get_gmd <- function(country_code,
                               fileName = fileName,
                               vermast  = vermast,
                               veralt   = veralt)
-
+  ctl
 }
 
 
@@ -110,7 +109,7 @@ dlw_server_inventory <- function(country,
     # convert to expression
     rlang::parse_expr()
 
-  ctl[rlang::eval_tidy(cnds)] |>
+  ctl[rlang::eval_tidy(cnds, data = args)] |>
     funique()
 }
 

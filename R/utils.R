@@ -22,22 +22,51 @@ select_base_url <- function(dlw_url) {
 
 #' Select base server
 #'
-#' Helper function to switch base URLs depending on DLW server being used
+#' Helper function to select server
 #'
 #' @param server character: c("GMD"). Defaults to NULL (ie. GMD).
 #' @return character
-#' @noRd
-select_server <- function(server) {
-  if (!is.null(server)) {
-    match.arg(server, c("GMD", "x"))
-    if (server %in% c("x")) {
-      cli::cli_abort("server {.code {server}} has not been setup yet")
-    }
+#' @keywords internal
+select_server <- function(server = NULL) {
+  if (is.null(server)) {
+    return("GMD")
   }
 
-  if (is.null(server) || server == "GMD") {
-    base_server <- "GMD"
+  # we should add some conditions to notify the user when server is not
+  # available.
+  server
+}
+
+
+#' Select base collection
+#'
+#' Helper function to select collection argument for endpoint based on server
+#'
+#' @rdname select_server
+select_collection <- function(server = NULL) {
+  if (is.null(server)) {
+    return("GMD")
   }
 
-  return(base_server)
+  # we should add some conditions to notify the user when server is not
+  # available.
+  server
+}
+
+
+
+
+
+
+
+#' capitalize first letter in each word
+#'
+#' @param s character
+#'
+#' @returns first letter of each work in s capitalized
+#' @keywords internal
+simpleCap <- function(s) {
+  s <- strsplit(s, " ")[[1]]
+  paste(toupper(substring(s, 1, 1)), substring(s, 2),
+        sep = "", collapse = " ")
 }

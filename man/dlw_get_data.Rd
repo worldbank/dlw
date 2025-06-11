@@ -4,10 +4,17 @@
 \alias{dlw_get_data}
 \title{get data from datalibweb}
 \usage{
-dlw_get_data(server = NULL, country_code, year, collection, module)
+dlw_get_data(
+  country_code,
+  year = NULL,
+  server = NULL,
+  survey = NULL,
+  module = NULL,
+  verbose = getOption("dlw.verbose")
+)
 }
 \arguments{
-\item{module}{}
+\item{survey}{}
 }
 \description{
 get data from datalibweb

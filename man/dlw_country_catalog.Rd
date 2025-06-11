@@ -6,17 +6,15 @@
 \usage{
 dlw_country_catalog(
   country_code,
-  internal = FALSE,
   dlw_url = NULL,
   api_version = getOption("dlw.default_api_version"),
   force = FALSE,
+  internal = FALSE,
   verbose = getOption("dlw.verbose")
 )
 }
 \arguments{
 \item{country_code}{character: ISO3 code}
-
-\item{internal}{logical: for internal use ONLY.}
 
 \item{dlw_url}{character: in case we have more than one url.}
 
@@ -24,6 +22,8 @@ dlw_country_catalog(
 
 \item{force}{logical: If TRUE, it will query the API regardless of whether
 there is version available in .dlwenv}
+
+\item{internal}{logical: for internal use ONLY.}
 
 \item{verbose}{logical: whether to display info}
 }

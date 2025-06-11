@@ -12,10 +12,10 @@
 #' dlw_country_catalog("COL")
 #' }
 dlw_country_catalog <- function(country_code,
-                                internal = FALSE,
                                 dlw_url = NULL,
                                 api_version = getOption("dlw.default_api_version"),
                                 force = FALSE,
+                                internal = FALSE,
                                 verbose = getOption("dlw.verbose")) {
   if (internal) {
     endpoint <- "CountryCatalogInternal"

@@ -40,12 +40,7 @@ dlw_server_catalog <- function(server = NULL,
 
   ctl[, FileName := basename(FilePath)]
 
-  # Add vars per server
-  if (base_server == "GMD") {
-    add_gmd_vars(ctl)
-  } else {
-    ctl[, Module := gsub("(.*_)([^_]+)(\\..+)$", "\\2", filename)]
-  }
+  add_gmd_vars(ctl)
 
   set_in_dlwenv(key, ctl, verbose)
 
@@ -72,8 +67,9 @@ add_gmd_vars <- function(ctl) {
     "ext"
   )
 
-  ctl[,
-    (vars) := tstrsplit(FileName, split = "_|[.]", fill = NA)
+  ptt <- "^[A-Z]{3}_[0-9]{4}_[^_]+_[Vv][0-9]{2}_M_[Vv][0-9]{2}_A_[^_]+_[^_]+\\.[A-Za-z]+$"
+  ctl[grepl(ptt, FileName),
+      (vars) := tstrsplit(FileName, split = "_|[.]", fill = NA)
   ][,
     c("M", "A") := NULL]
 

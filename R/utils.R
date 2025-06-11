@@ -53,12 +53,6 @@ select_collection <- function(server = NULL) {
   server
 }
 
-
-
-
-
-
-
 #' capitalize first letter in each word
 #'
 #' @param s character
@@ -69,4 +63,113 @@ simpleCap <- function(s) {
   s <- strsplit(s, " ")[[1]]
   paste(toupper(substring(s, 1, 1)), substring(s, 2),
         sep = "", collapse = " ")
+}
+
+
+
+# Define a constructor for your call list
+as.dlw_call_list <- function(x) {
+  class(x) <- c("dlw_call_list", class(x))
+  x
+}
+
+# # S3 print method using cli
+# print.dlw_call_list <- function(x, ...) {
+#   cli::cli_h1("dlw_get_data Calls")
+#   for (i in seq_along(x)) {
+#     call_str <- deparse(x[[i]])
+#     cli::cli_div(theme = list(span.emph = list(color = "cyan")))
+#     cli::cli_text("{.emph Call {i}}:")
+#     cli::cli_code(call_str)
+#     cli::cli_end()
+#   }
+#   invisible(x)
+# }
+
+#
+# print.dlw_call_list <- function(x, ...) {
+#   cli::cli_h1("dlw_get_data Calls")
+#   for (i in seq_along(x)) {
+#     call_str <-paste(rlang::expr_deparse(x[[i]], width =  60), collapse = "\n")
+#     cli::cli_div(theme = list(span.emph = list(color = "cyan")))
+#     cli::cli_text("{.emph Call {i}}:")
+#     cli::cli_code(call_str)
+#     cli::cli_end()
+#   }
+#   invisible(x)
+# }
+
+# print.dlw_call_list <- function(x, ...) {
+#   cli::cli_h1("dlw_get_data Calls")
+#   for (i in seq_along(x)) {
+#     call_obj <- x[[i]]
+#     fn_name <- as.character(call_obj[[1]])
+#     args <- as.list(call_obj)[-1]
+#     cli::cli_div(theme = list(span.emph = list(color = "cyan")))
+#     cli::cli_text("{.emph Call {i}}:")
+#     cli::cli_code(paste0(fn_name, "("))
+#     for (j in seq_along(args)) {
+#       arg_name <- names(args)[j]
+#       arg_val <- rlang::expr_deparse(args[[j]])
+#       comma <- if (j < length(args)) "," else ""
+#       cli::cli_code(paste0("  ", arg_name, " = ", arg_val, comma, "\n"))
+#     }
+#     cli::cli_code(")")
+#     cli::cli_end()
+#   }
+#   invisible(x)
+# }
+
+
+# print.dlw_call_list <- function(x, ...) {
+#   cli::cli_h1("dlw_get_data Calls")
+#   for (i in seq_along(x)) {
+#     call_obj <- x[[i]]
+#     fn_name <- as.character(call_obj[[1]])
+#     args <- as.list(call_obj)[-1]
+#     arg_names <- names(args)
+#     cli::cli_div(theme = list(span.emph = list(color = "cyan")))
+#     cli::cli_text("{.emph Call {i}}:")
+#     cli::cli_text("{.code {fn_name}(}")
+#     for (j in seq_along(args)) {
+#       arg_name <- arg_names[j]
+#       arg_val <- rlang::expr_deparse(args[[j]])
+#       comma <- if (j < length(args)) "," else ""
+#       cli::cli_text("  {.code {arg_name} = {arg_val}{comma}}")
+#     }
+#     cli::cli_text("{.code )}")
+#     cli::cli_end()
+#   }
+#   invisible(x)
+# }
+
+
+print.dlw_call_list <- function(x, ...) {
+  cli::cli_h1("dlw_get_data Calls")
+  for (i in seq_along(x)) {
+    call_obj <- x[[i]]
+    fn_name <- as.character(call_obj[[1]])
+    args <- as.list(call_obj)[-1]
+    arg_names <- names(args)
+    # Build code lines as a character vector
+    code_lines <- c(
+      paste0(fn_name, "("),
+      vapply(
+        seq_along(args),
+        function(j) {
+          arg_name <- arg_names[j]
+          arg_val <- rlang::expr_deparse(args[[j]])
+          comma <- if (j < length(args)) "," else ""
+          paste0("  ", arg_name, " = ", arg_val, comma)
+        },
+        character(1)
+      ),
+      ")"
+    )
+    cli::cli_div(theme = list(span.emph = list(color = "cyan")))
+    cli::cli_text("{.emph Call {i}}:")
+    cli::cli_code(code_lines)
+    cli::cli_end()
+  }
+  invisible(x)
 }

@@ -2,6 +2,7 @@
 
 export(dlw_country_catalog)
 export(dlw_get_data)
+export(dlw_get_gmd)
 export(dlw_get_token)
 export(dlw_remove_token)
 export(dlw_server_catalog)

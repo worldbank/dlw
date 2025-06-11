@@ -40,11 +40,37 @@ dlw_get_data <- function(country_code,
 }
 
 
+#' Get GMD data.
+#'
+#' This is a wrapper of dlw_get_data. It just build the calls to dlw_get_data,
+#' for ease of use.
+#'
+#' @param country_code character: ISO3
+#' @param year numeric: four digit year
+#' @param module character: module of GMD collection (e.g., ALL, GPWG, L)
+#' @param survey character: survey acronyn
+#' @param filename character: File name
+#' @param vermast  character: Version of the master data in the form "vXX" where
+#'   X is a number of two digits like "01" or "02".
+#' @param veralt character: Version of the alternative  data in the form "vXX"
+#'   where X is a number of two digits like "01" or "02".
+#' @param latest logical. If TRUE and  `vermast` and `veralt` are NULL and then,
+#'   it will use the most recent data.
+#' @param verbose logical. to display info.
+#'
+#' @returns If the call is unique, it will return the data. If not, it will
+#'   return the posibilities for the user to choose.
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#'   dlw_get_gmd("COL", 2010, "GPWG")
+#' }
 dlw_get_gmd <- function(country_code,
                         year = NULL,
                         module = NULL,
                         survey  = NULL,
-                        fileName = NULL,
+                        filename = NULL,
                         vermast = NULL,
                         veralt = NULL,
                         latest = TRUE,
@@ -56,7 +82,7 @@ dlw_get_gmd <- function(country_code,
                               year = year,
                               module = module,
                               survey = survey,
-                              fileName = fileName,
+                              fileName = filename,
                               vermast  = vermast,
                               veralt   = veralt)
 
@@ -139,7 +165,7 @@ gmd_calls <- function(ctl,
       collection = ctl$Collection[i]
     )
   }
-  calls
+  as.dlw_call_list(calls)
 }
 
 

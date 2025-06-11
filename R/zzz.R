@@ -1,8 +1,8 @@
 op.dlw <- list(
   dlw.verbose         = TRUE,
   dlw.default_api_version = "v1",
-  dlw.output_method   = cli::ansi_has_hyperlink_support()
-
+  dlw.output_method   = cli::ansi_has_hyperlink_support(),
+  cli.ignore_unknown_rstudio_theme = TRUE
 )
 
 

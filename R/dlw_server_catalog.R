@@ -38,6 +38,10 @@ dlw_server_catalog <- function(server = NULL,
     httr2::resp_body_string() |>
     fread(data.table = TRUE)
 
+  ctl[, filename := basename(FilePath)
+      ][,
+    module := gsub("(.*_)([^_]+)(\\..+)$", "\\2", filename)]
+
   set_in_dlwenv(key, ctl, verbose)
 
   ctl

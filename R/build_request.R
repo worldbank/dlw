@@ -9,10 +9,10 @@
 build_request <- function(dlw_url = NULL,
                           api_version = getOption("dlw.default_api_version"),
                           endpoint,
+                          method = "GET",
                           ...) {
-
-  base_url    <- select_base_url(dlw_url = dlw_url)
-  params <- list(...)
+  base_url <- select_base_url(dlw_url = dlw_url)
+  params   <- list(...)
 
   req <- httr2::request(base_url) |>
     httr2::req_url_path_append(api_version) |>
@@ -20,8 +20,12 @@ build_request <- function(dlw_url = NULL,
     httr2::req_auth_bearer_token(dlw_get_token())
 
   if (length(params) > 0) {
+
+    get_or_post <- query_or_form(method = method)
+
     req <- req |>
-    httr2::req_url_query(!!!params, .multi = "comma") |>
+    # httr2::req_url_query(!!!params, .multi = "comma") |>
+    get_or_post(!!!params, .multi = "comma") |>
     httr2::req_cache(tools::R_user_dir("dlw", which = "cache"),
                      use_on_error = TRUE,
                      debug = TRUE) # |>
@@ -58,8 +62,11 @@ handle_resp <- function(req) {
 
     },
     error = \(e) {
+      # I had to do it this way because, for some reason, the datalibweb API is
+      # not returning the right code in the response, so I could not use the
+      # handle httr2_http_401 of httr2
       resp <- httr2::last_response()
-      status <- resp$status_code
+      status <- httr2::resp_status(resp)
       if (status == 401) {
         cli::cli_abort("DatalibWeb Token invalid.
                     Go to {.href [Datalibweb](http://datalibweb/)} website, generate a new token,
@@ -88,3 +95,19 @@ handle_resp <- function(req) {
 }
 
 
+#' select between query or form according to method
+#'
+#' @inheritParams build_request
+#'
+#' @returns correspongin httr2 function
+#' @keywords internal
+query_or_form <- function(method = c("GET", "POST")) {
+  method <- toupper(method)
+  if (method == "GET") {
+    return(httr2::req_url_query)
+  } else if (method == "POST") {
+    return(httr2::req_body_form)
+  } else {
+    cli::cli_abort("Only 'GET' and 'POST' methods are supported for parameter placement.")
+  }
+}

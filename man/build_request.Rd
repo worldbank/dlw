@@ -8,6 +8,7 @@ build_request(
   dlw_url = NULL,
   api_version = getOption("dlw.default_api_version"),
   endpoint,
+  method = "GET",
   ...
 )
 }

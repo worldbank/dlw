@@ -4,19 +4,13 @@
 \alias{dlw_server_inventory}
 \title{filter server catolog to show inventory by country and other variables}
 \usage{
-dlw_server_inventory(
-  country,
-  year = NULL,
-  module = NULL,
-  server = NULL,
-  survey = NULL
-)
+dlw_server_inventory(country, server = NULL, ...)
 }
 \arguments{
 \item{country}{character. same as `country_code` in [dlw_get_data] but with
 the purpose of easy programming. Not meant to be used by final user.}
 
-\item{survey}{}
+\item{...}{additional filtering arguments (e.g., year, module, survey, fileName)}
 }
 \value{
 filter server catalog from [dlw_server_catalog]

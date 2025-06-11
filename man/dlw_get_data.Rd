@@ -6,15 +6,15 @@
 \usage{
 dlw_get_data(
   country_code,
-  year = NULL,
   server = NULL,
-  survey = NULL,
-  module = NULL,
-  verbose = getOption("dlw.verbose")
+  verbose = getOption("dlw.verbose"),
+  filter = TRUE,
+  ...
 )
 }
 \arguments{
-\item{survey}{}
+\item{...}{additional filtering arguments (e.g.,survey_year, survey_acronym,
+vermast, veralt, collection, module)}
 }
 \description{
 get data from datalibweb

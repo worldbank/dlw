@@ -4,7 +4,7 @@
 #' @param server
 #' @param country_code
 #' @param verbose
-#' @param skip_filter
+#' @param filter
 #' @param ... additional filtering arguments (e.g.,survey_year, survey_acronym,
 #'   vermast, veralt, collection, module)
 #'
@@ -15,35 +15,26 @@
 dlw_get_data <- function(country_code,
                          server = NULL,
                          verbose =  getOption("dlw.verbose"),
-                         skip_filter = FALSE,
+                         filter = TRUE,
                          ...
                          ) {
-
-  ctl <- dlw_server_inventory(country = country_code,
-                             server = server,
-                             ...)
-
-  calls <- data_calls(ctl = ctl,
-                      country_code = country_code)
-
-
-
+  # Capture ... arguments as a list
+  dots <- list(...)
+  # Combine country and ... into a single list of arguments
   endpoint <- "FileInformation/GetFileInfo"
+  args <- c(list(Country = country_code,
+                 method = "POST",
+                 Server = server,
+                 endpoint = endpoint),
+            dots)
 
-  collection <- select_collection(server = server)
-  req <- build_request(endpoint = endpoint,
-                       method = "POST",
-                       Server = server,
-                       Country = country_code,
-                       Collection = collection,
-                       Folder = module,
-                       Year = year)
+  req <- do.call("build_request", args)
 
   resp <- req |>
-    req_perform()   |>
-    resp_body_string() |>
-    gsub("\r\n|\r", "\n", x = _) |>
-    fread(text = _, data.table = TRUE)
+    httr2::req_perform()   |>
+    httr2::resp_body_raw() |>
+    haven::read_dta() |>
+    setDT()
 
   resp
 }
@@ -56,6 +47,7 @@ dlw_get_gmd <- function(country_code,
                         fileName = NULL,
                         vermast = NULL,
                         veralt = NULL,
+                        latest = TRUE,
                         verbose =  getOption("dlw.verbose")) {
 
 
@@ -67,7 +59,14 @@ dlw_get_gmd <- function(country_code,
                               fileName = fileName,
                               vermast  = vermast,
                               veralt   = veralt)
-  ctl
+
+  if (is.null(vermast) & is.null(veralt) & latest == TRUE) {
+    ctl <- ctl[Vermast == max(Vermast, na.rm = TRUE)
+               ][Veralt == max(Veralt, na.rm = TRUE)]
+  }
+  calls <- gmd_calls(ctl = ctl,
+                      country_code = country_code)
+  calls
 }
 
 
@@ -123,7 +122,7 @@ dlw_server_inventory <- function(country,
 #'
 #' @returns list of possible calls
 #' @keywords internal
-data_calls <- function(ctl,
+gmd_calls <- function(ctl,
                        country_code) {
   # For each row in ctl, build a call to dlw_get_data with the right parameters
   calls <- vector("list", nrow(ctl))
@@ -135,7 +134,9 @@ data_calls <- function(ctl,
       year = ctl$Year[i],
       server = ctl$ServerAlias[i],
       survey = ctl$Survey[i],
-      module = ctl$Module[i]
+      module = ctl$Module[i],
+      filename = ctl$FileName[i],
+      collection = ctl$Collection[i]
     )
   }
   calls

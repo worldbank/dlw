@@ -92,7 +92,12 @@ dlw_get_gmd <- function(country_code,
   }
   calls <- gmd_calls(ctl = ctl,
                       country_code = country_code)
-  calls
+  if (length(calls) > 1) {
+    cli::cli_alert("your arguments do not uniquely identify a dataset. So you need execute one of the following:")
+    return(calls)
+  }
+  print(calls)
+  rlang::eval_tidy(calls[[1]])
 }
 
 

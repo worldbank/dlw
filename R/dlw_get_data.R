@@ -74,6 +74,7 @@ dlw_get_data <- function(country_code,
 #' @param latest logical. If TRUE and  `vermast` and `veralt` are NULL and then,
 #'   it will use the most recent data.
 #' @param verbose logical. to display info.
+#' @inheritDotParams dlw_get_dta local local_dir local_overwrite
 #'
 #' @returns If the call is unique, it will return the data. If not, it will
 #'   return the posibilities for the user to choose.
@@ -91,10 +92,7 @@ dlw_get_gmd <- function(country_code,
                         vermast = NULL,
                         veralt = NULL,
                         latest = TRUE,
-                        local_dir = getOption("dlw.local_dir"),
-                        local = fs::is_dir(local_dir),
-                        local_overwrite = FALSE,
-                        verbose =  getOption("dlw.verbose")) {
+                        ...) {
 
 
   ctl <- dlw_server_inventory(country = country_code,
@@ -111,11 +109,13 @@ dlw_get_gmd <- function(country_code,
                ][Veralt == max(Veralt, na.rm = TRUE)]
   }
   calls <- gmd_calls(ctl = ctl,
-                     country_code = country_code)
+                     country_code = country_code,
+                     ...)
+
   if (length(calls) > 1) {
     cli::cli_alert("your arguments do not uniquely identify a dataset. So you need execute one of the following:")
     print(calls)
-    return(calls)
+    return(invisible(calls))
   }
   print(calls)
   rlang::eval_tidy(calls[[1]])

@@ -94,6 +94,7 @@ dlw_get_gmd <- function(country_code,
                       country_code = country_code)
   if (length(calls) > 1) {
     cli::cli_alert("your arguments do not uniquely identify a dataset. So you need execute one of the following:")
+    print(calls)
     return(calls)
   }
   print(calls)
@@ -122,7 +123,15 @@ dlw_server_inventory <- function(country,
   # Capture ... arguments as a list
   dots <- list(...)
   # Combine country and ... into a single list of arguments
-  args <- c(list(country = country), dots)
+  args <- c(list(country = country), dots) |>
+    lapply(\(.) {
+      if (is.character(.)) {
+        toupper(.)
+      } else {
+        .
+      }
+    })
+
   # get names of arguments that are not null
   args_info <- Filter(Negate(is.null), args) |>
     names()

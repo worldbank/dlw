@@ -31,25 +31,41 @@ pak::pak("worldbank/dlw")
 remotes::github_install("worldbank/dlw")
 ```
 
-## Example
+## Usage
+```{r}
+library(dlw)
+```
 
-This is a basic example which shows you how to solve a common problem:
+### Token
+To begin working with `{dlw}`, you must provide your datalibweb API token using the `dlw_set_token()` function. 
+
+You can obtain or renew your token by visiting the [datalibweb page](https://datalibweb2.worldbank.org/) and following the instructions there. Once you have your token, set it in your R session as follows:
+
+```{r, eval = FALSE}
+dlw_set_token("your_token_here")
+```
+
+### server catalob
+After setting your token, you can download the catalog for the corresponding server using `dlw_server_catalog()`. By default, this downloads the "GMD" catalog:
+
+```r
+dlw_server_catalog()
+```
+
+The downloaded catalog is saved for the current session in a hidden environment within the `{dlw}` package, allowing for easy and efficient access in subsequent operations.
 
 ```{r example}
-library(dlw)
-## basic example code
+# Set your token first
+# dlw_set_token("your_token_here")
+# Download the default catalog (GMD)
+ctl <- dlw_server_catalog()
 ```
 
-What is special about using `README.Rmd` instead of just `README.md`? You can include R chunks like so:
+The `{dlw}` package returns results as `data.table` objects, enabling lightning-fast data manipulation and filtering using concise syntax. For example, you can instantly list all available files for Colombia in 2010 in module "ALL" of the GMD collection with a single line of code:
 
-```{r cars}
-summary(cars)
+```{r}
+ctl[Country_code == "COL" & Module == "ALL" & Survey_year == 2010, 
+  .(FileName, Vermast, Veralt )]
 ```
 
-
-
-```{r pressure, echo = FALSE}
-plot(pressure)
-```
-
-In that case, don't forget to commit and push the resulting figure files, so they display on GitHub and CRAN.
+### Downloading files

@@ -9,6 +9,9 @@ dlw_get_data(
   server = NULL,
   verbose = getOption("dlw.verbose"),
   filter = TRUE,
+  local_dir = Sys.getenv("DLW_local_data"),
+  local = fs::is_dir(local_dir),
+  local_overwrite = FALSE,
   ...
 )
 }

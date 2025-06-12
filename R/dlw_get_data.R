@@ -4,9 +4,11 @@
 #' @param server
 #' @param country_code
 #' @param verbose
-#' @param filter
 #' @param ... additional filtering arguments (e.g.,survey_year, survey_acronym,
 #'   vermast, veralt, collection, module)
+#' @param local_dir
+#' @param local
+#' @param local_overwrite
 #'
 #' @returns
 #' @export
@@ -15,7 +17,9 @@
 dlw_get_data <- function(country_code,
                          server = NULL,
                          verbose =  getOption("dlw.verbose"),
-                         filter = TRUE,
+                         local_dir = getOption("dlw.local_dir"),
+                         local = fs::is_dir(local_dir),
+                         local_overwrite = FALSE,
                          ...
                          ) {
   # Capture ... arguments as a list
@@ -28,13 +32,26 @@ dlw_get_data <- function(country_code,
                  endpoint = endpoint),
             dots)
 
+  filename <- dots$filename
+  if (local == TRUE && local_overwrite == FALSE) {
+    resp <- load_from_local(local_dir = local_dir,
+                            filename = filename)
+    if (!is.null(resp)) return(resp)
+  }
+
   req <- do.call("build_request", args)
 
   resp <- req |>
     httr2::req_perform()   |>
     httr2::resp_body_raw() |>
+    # this part should be changed to read generic data from other formats
     haven::read_dta() |>
     setDT()
+
+
+  if (local == TRUE) {
+    save_to_local(x = resp, local_dir = local_dir, filename = filename)
+  }
 
   resp
 }
@@ -74,6 +91,9 @@ dlw_get_gmd <- function(country_code,
                         vermast = NULL,
                         veralt = NULL,
                         latest = TRUE,
+                        local_dir = getOption("dlw.local_dir"),
+                        local = fs::is_dir(local_dir),
+                        local_overwrite = FALSE,
                         verbose =  getOption("dlw.verbose")) {
 
 
@@ -91,7 +111,7 @@ dlw_get_gmd <- function(country_code,
                ][Veralt == max(Veralt, na.rm = TRUE)]
   }
   calls <- gmd_calls(ctl = ctl,
-                      country_code = country_code)
+                     country_code = country_code)
   if (length(calls) > 1) {
     cli::cli_alert("your arguments do not uniquely identify a dataset. So you need execute one of the following:")
     print(calls)
@@ -149,7 +169,7 @@ dlw_server_inventory <- function(country,
     rlang::parse_expr()
 
   ctl[rlang::eval_tidy(cnds, data = args)] |>
-    funique()
+    unique()
 }
 
 
@@ -163,21 +183,25 @@ dlw_server_inventory <- function(country,
 #' @returns list of possible calls
 #' @keywords internal
 gmd_calls <- function(ctl,
-                       country_code) {
+                      country_code,
+                      ...) {
   # For each row in ctl, build a call to dlw_get_data with the right parameters
   calls <- vector("list", nrow(ctl))
-
+  dots <- list(...)
   for (i in seq_len(nrow(ctl))) {
-    calls[[i]] <- call(
-      "dlw_get_data",
-      country_code = country_code,
-      year = ctl$Year[i],
-      server = ctl$ServerAlias[i],
-      survey = ctl$Survey[i],
-      module = ctl$Module[i],
-      filename = ctl$FileName[i],
-      collection = ctl$Collection[i]
-    )
+
+    l <- c(list(country_code = country_code,
+                year = ctl$Year[i],
+                server = ctl$ServerAlias[i],
+                survey = ctl$Survey[i],
+                module = ctl$Module[i],
+                filename = ctl$FileName[i],
+                collection = ctl$Collection[i]),
+           dots)
+
+    calls[[i]] <- c(quote(dlw_get_data), l) |>
+      as.call()
+
   }
   as.dlw_call_list(calls)
 }
@@ -200,3 +224,47 @@ gmd_calls <- function(ctl,
 #     fread(text = _, data.table = TRUE)
 #   resp
 # }
+
+
+
+#' Load from local drive
+#'
+#' @param local_dir local directory
+#' @param filename  File name. "dta" format for now
+#'
+#' @returns data in `fs::path(local_dir, filename)` or NULL if file does not
+#'   exist
+#'   @keywords internal
+load_from_local <- function(local_dir, filename) {
+  if (fs::is_dir(local_dir)) {
+    fn <- fs::path(local_dir, filename)
+    if (fs::file_exists(fn)) {
+      resp <- haven::read_dta(fn) |>
+        setDT()
+      return(resp)
+    } else {
+      return(NULL)
+    }
+  } else {
+    cli::cli_abort("directory {.file  {local_dir}} does nto exist")
+  }
+}
+
+
+#' save to local drive
+#'
+#' @param x data in "dta" formar for now
+#' @param local_dir  local directory
+#' @param filename  filename. dta for now
+#'
+#' @returns  invisible(TRUE)
+#' @keywords internal
+save_to_local <- function(x, local_dir, filename){
+  if (fs::is_dir(local_dir)) {
+    fn <- fs::path(local_dir, filename)
+    haven::write_dta(data = x, path = fn)
+  } else {
+    cli::cli_abort("directory {.file  {local_dir}} does nto exist")
+  }
+  invisible(TRUE)
+}

@@ -1,7 +1,4 @@
-# Constants for keyring and service
-.dlw_keyring <- "datalibweb"
-.dlw_service <- "datalibweb"
-
+# data is comming from R/data.R
 #' Store Datalibweb API token securely
 #' @param token The API token as a string
 #' @export
@@ -85,12 +82,12 @@ dlw_remove_token <- function() {
 #' confirm wither the token is working correctly
 #'
 #' @inheritParams build_request
-#'
+#' @inheritParams dlw_country_catalog
 #' @returns TRUE if all goes well
 #' @export
 #'
 #' @examples
-#' \dontrun {
+#' \dontrun{
 #' dlw_test_token()
 #' }
 dlw_test_token <- function(dlw_url = NULL,

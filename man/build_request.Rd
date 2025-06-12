@@ -19,6 +19,9 @@ build_request(
 
 \item{endpoint}{character: dlw  API endpoint}
 
+\item{method}{character: method of http request. Either "GET" or "POST".
+Default is "GET".}
+
 \item{...}{other parameters}
 }
 \value{

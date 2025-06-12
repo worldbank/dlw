@@ -1,6 +1,6 @@
 Package: dlw
 Type: Package
-Title: What the Package Does (Title Case)
+Title: R Client for the internal Datalibweb API of the World Bank
 Version: 0.1.0
 Authors@R: person("R.Andres", "Castaneda",
                             email = "acastanedaa@worldbank.org",
@@ -10,19 +10,20 @@ Description: More about what it does (maybe more than one line).
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
-URL: https://github.com/randrescastaneda/dlw
-BugReports: https://github.com/randrescastaneda/dlw/issues
+URL: https://github.com/worldbank/dlw
+BugReports: https://github.com/worldbank/dlw/issues
 Depends: 
     R (>= 3.5)
 RoxygenNote: 7.3.2
 Imports: 
     cli,
-    collapse,
     data.table,
+    fs,
+    haven,
     httr2,
     keyring,
     rlang
 Suggests: 
+    usethis,
     testthat (>= 3.0.0),
-    usethis
 Config/testthat/edition: 3

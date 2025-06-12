@@ -11,8 +11,7 @@ get_dlwenv <- function() {
 
 #' Get for a specific key from .dlwenv
 #'
-#' @param key A character string representing the key
-#'
+#' @inheritParams set_in_dlwenv
 #' @return The value associated with the key in .dlwenv
 #' @export
 #'
@@ -32,6 +31,7 @@ get_from_dlwenv <- function(key, verbose =  getOption("dlw.verbose")) {
 #'
 #' @param key A character string representing the key
 #' @param value The value to store in .dlwenv
+#' @inheritParams dlw_country_catalog
 #'
 #' @return The assigned value (invisibly)
 #' @export

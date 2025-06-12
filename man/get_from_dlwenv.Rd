@@ -8,6 +8,8 @@ get_from_dlwenv(key, verbose = getOption("dlw.verbose"))
 }
 \arguments{
 \item{key}{A character string representing the key}
+
+\item{verbose}{logical: whether to display info}
 }
 \value{
 The value associated with the key in .dlwenv

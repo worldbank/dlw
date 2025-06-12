@@ -1,0 +1,55 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# dlw
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+`{dlw}` is an R client of the internal [datalibweb](https://datalibweb2.worldbank.org/) API of the World Bank. Datalibweb is a data system designed to enable users to seamlessly access microdata and documentation in the World Bank. Users can access the most up-to-date and historical versions of harmonized data collections and raw/non-harmonized data for subsequent analysis
+
+## Installation
+
+You can install the development version of dlw from [GitHub](https://github.com/) with:
+
+``` r
+# install.packages("pak")
+pak::pak("worldbank/dlw")
+# or
+remotes::github_install("worldbank/dlw")
+```
+
+## Example
+
+This is a basic example which shows you how to solve a common problem:
+
+```{r example}
+library(dlw)
+## basic example code
+```
+
+What is special about using `README.Rmd` instead of just `README.md`? You can include R chunks like so:
+
+```{r cars}
+summary(cars)
+```
+
+
+
+```{r pressure, echo = FALSE}
+plot(pressure)
+```
+
+In that case, don't forget to commit and push the resulting figure files, so they display on GitHub and CRAN.

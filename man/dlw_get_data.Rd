@@ -15,11 +15,39 @@ dlw_get_data(
 )
 }
 \arguments{
-\item{local_overwrite}{}
+\item{country_code}{character: ISO3 code}
+
+\item{server}{character: in case we have more than one server. default is  GMD}
+
+\item{verbose}{logical: whether to display info}
+
+\item{local_dir}{character: Local directory to save data. Default available
+in option dlw.local_dir which is set initially as "".}
+
+\item{local}{logical: whether or not to save and read data locally. default
+is TRUE if `local_dir` exists.}
+
+\item{local_overwrite}{logical. Whether to overwrite any saved data. Default
+is FALSE}
 
 \item{...}{additional filtering arguments (e.g.,survey_year, survey_acronym,
 vermast, veralt, collection, module)}
 }
+\value{
+data base request as data.table
+}
 \description{
 get data from datalibweb
+}
+\examples{
+\dontrun{
+  dlw_get_data(
+    country_code = "COL",
+    year = 2010L,
+    server = "GMD",
+    survey = "GEIH",
+    module = "GPWG",
+    filename = "COL_2010_GEIH_V02_M_V09_A_GMD_GPWG.dta",
+    collection = "GMD")
+}
 }

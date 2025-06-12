@@ -7,3 +7,20 @@
 ## usethis namespace: end
 NULL
 .datatable.aware = TRUE
+
+
+utils::globalVariables(
+  c(
+    ".",
+    ".I",
+    ".N",
+    ".SD",
+    ".",
+    "!!",
+    ":=",
+    "FileName",
+    "FilePath",
+    "Veralt",
+    "Vermast"
+  )
+)

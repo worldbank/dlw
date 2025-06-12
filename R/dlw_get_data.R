@@ -1,19 +1,31 @@
 
 #' get data from datalibweb
 #'
-#' @param server
-#' @param country_code
-#' @param verbose
+#' @inheritParams dlw_country_catalog
+#' @inheritParams dlw_server_catalog
 #' @param ... additional filtering arguments (e.g.,survey_year, survey_acronym,
 #'   vermast, veralt, collection, module)
-#' @param local_dir
-#' @param local
-#' @param local_overwrite
+#' @param local_dir character: Local directory to save data. Default available
+#'   in option dlw.local_dir which is set initially as "".
+#' @param local logical: whether or not to save and read data locally. default
+#'   is TRUE if `local_dir` exists.
+#' @param local_overwrite logical. Whether to overwrite any saved data. Default
+#'   is FALSE
 #'
-#' @returns
+#' @returns data base request as data.table
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#'   dlw_get_data(
+#'     country_code = "COL",
+#'     year = 2010L,
+#'     server = "GMD",
+#'     survey = "GEIH",
+#'     module = "GPWG",
+#'     filename = "COL_2010_GEIH_V02_M_V09_A_GMD_GPWG.dta",
+#'     collection = "GMD")
+#' }
 dlw_get_data <- function(country_code,
                          server = NULL,
                          verbose =  getOption("dlw.verbose"),
@@ -62,7 +74,7 @@ dlw_get_data <- function(country_code,
 #' This is a wrapper of dlw_get_data. It just build the calls to dlw_get_data,
 #' for ease of use.
 #'
-#' @param country_code character: ISO3
+#' @inheritParams dlw_country_catalog
 #' @param year numeric: four digit year
 #' @param module character: module of GMD collection (e.g., ALL, GPWG, L)
 #' @param survey character: survey acronyn
@@ -71,9 +83,8 @@ dlw_get_data <- function(country_code,
 #'   X is a number of two digits like "01" or "02".
 #' @param veralt character: Version of the alternative  data in the form "vXX"
 #'   where X is a number of two digits like "01" or "02".
-#' @param latest logical. If TRUE and  `vermast` and `veralt` are NULL and then,
+#' @param latest logical: If TRUE and  `vermast` and `veralt` are NULL and then,
 #'   it will use the most recent data.
-#' @param verbose logical. to display info.
 #' @inheritDotParams dlw_get_data local local_dir local_overwrite
 #'
 #' @returns If the call is unique, it will return the data. If not, it will
@@ -92,6 +103,7 @@ dlw_get_gmd <- function(country_code,
                         vermast = NULL,
                         veralt = NULL,
                         latest = TRUE,
+                        verbose =  getOption("dlw.verbose"),
                         ...) {
 
 

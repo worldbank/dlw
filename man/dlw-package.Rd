@@ -4,15 +4,15 @@
 \name{dlw-package}
 \alias{dlw}
 \alias{dlw-package}
-\title{dlw: What the Package Does (Title Case)}
+\title{dlw: R Client for the internal Datalibweb API of the World Bank}
 \description{
 More about what it does (maybe more than one line). Continuation lines should be indented.
 }
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://github.com/randrescastaneda/dlw}
-  \item Report bugs at \url{https://github.com/randrescastaneda/dlw/issues}
+  \item \url{https://github.com/worldbank/dlw}
+  \item Report bugs at \url{https://github.com/worldbank/dlw/issues}
 }
 
 }

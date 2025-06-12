@@ -13,11 +13,12 @@ dlw_get_gmd(
   vermast = NULL,
   veralt = NULL,
   latest = TRUE,
+  verbose = getOption("dlw.verbose"),
   ...
 )
 }
 \arguments{
-\item{country_code}{character: ISO3}
+\item{country_code}{character: ISO3 code}
 
 \item{year}{numeric: four digit year}
 
@@ -33,16 +34,21 @@ X is a number of two digits like "01" or "02".}
 \item{veralt}{character: Version of the alternative  data in the form "vXX"
 where X is a number of two digits like "01" or "02".}
 
-\item{latest}{logical. If TRUE and  `vermast` and `veralt` are NULL and then,
+\item{latest}{logical: If TRUE and  `vermast` and `veralt` are NULL and then,
 it will use the most recent data.}
+
+\item{verbose}{logical: whether to display info}
 
 \item{...}{
   Arguments passed on to \code{\link[=dlw_get_data]{dlw_get_data}}
   \describe{
-    \item{\code{local_overwrite}}{}
+    \item{\code{local_dir}}{character: Local directory to save data. Default available
+in option dlw.local_dir which is set initially as "".}
+    \item{\code{local}}{logical: whether or not to save and read data locally. default
+is TRUE if `local_dir` exists.}
+    \item{\code{local_overwrite}}{logical. Whether to overwrite any saved data. Default
+is FALSE}
   }}
-
-\item{verbose}{logical. to display info.}
 }
 \value{
 If the call is unique, it will return the data. If not, it will

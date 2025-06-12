@@ -73,6 +73,10 @@ as.dlw_call_list <- function(x) {
   x
 }
 
+#' print gmd calls
+#'
+#' @inheritParams base::print
+#' @export
 print.dlw_call_list <- function(x, ...) {
   cli::cli_h1("dlw_get_data Calls")
   for (i in seq_along(x)) {

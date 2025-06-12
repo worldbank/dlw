@@ -14,6 +14,8 @@ dlw_test_token(
 \item{dlw_url}{character: in case we have more than one url.}
 
 \item{api_version}{character: API version}
+
+\item{verbose}{logical: whether to display info}
 }
 \value{
 TRUE if all goes well
@@ -22,7 +24,7 @@ TRUE if all goes well
 confirm wither the token is working correctly
 }
 \examples{
-\dontrun {
+\dontrun{
 dlw_test_token()
 }
 }

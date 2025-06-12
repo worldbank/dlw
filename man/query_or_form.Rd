@@ -6,6 +6,10 @@
 \usage{
 query_or_form(method = c("GET", "POST"))
 }
+\arguments{
+\item{method}{character: method of http request. Either "GET" or "POST".
+Default is "GET".}
+}
 \value{
 correspongin httr2 function
 }

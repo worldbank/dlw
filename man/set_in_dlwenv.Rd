@@ -10,6 +10,8 @@ set_in_dlwenv(key, value, verbose = getOption("dlw.verbose"))
 \item{key}{A character string representing the key}
 
 \item{value}{The value to store in .dlwenv}
+
+\item{verbose}{logical: whether to display info}
 }
 \value{
 The assigned value (invisibly)

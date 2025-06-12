@@ -4,6 +4,8 @@
 #' @param api_version character: API version
 #' @param endpoint character: dlw  API endpoint
 #' @param ... other parameters
+#' @param method character: method of http request. Either "GET" or "POST".
+#'   Default is "GET".
 #'
 #' @return httr2 request
 build_request <- function(dlw_url = NULL,

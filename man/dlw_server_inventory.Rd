@@ -10,6 +10,8 @@ dlw_server_inventory(country, server = NULL, ...)
 \item{country}{character. same as `country_code` in [dlw_get_data] but with
 the purpose of easy programming. Not meant to be used by final user.}
 
+\item{server}{character: in case we have more than one server. default is  GMD}
+
 \item{...}{additional filtering arguments (e.g., year, module, survey, fileName)}
 }
 \value{

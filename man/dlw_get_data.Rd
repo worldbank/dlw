@@ -8,14 +8,15 @@ dlw_get_data(
   country_code,
   server = NULL,
   verbose = getOption("dlw.verbose"),
-  filter = TRUE,
-  local_dir = Sys.getenv("DLW_local_data"),
+  local_dir = getOption("dlw.local_dir"),
   local = fs::is_dir(local_dir),
   local_overwrite = FALSE,
   ...
 )
 }
 \arguments{
+\item{local_overwrite}{}
+
 \item{...}{additional filtering arguments (e.g.,survey_year, survey_acronym,
 vermast, veralt, collection, module)}
 }

@@ -4,7 +4,7 @@
 \alias{gmd_calls}
 \title{get data calls when more than one option.}
 \usage{
-gmd_calls(ctl, country_code)
+gmd_calls(ctl, country_code, ...)
 }
 \arguments{
 \item{ctl}{data.table from [dlw_server_inventory]}

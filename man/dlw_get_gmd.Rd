@@ -13,7 +13,7 @@ dlw_get_gmd(
   vermast = NULL,
   veralt = NULL,
   latest = TRUE,
-  verbose = getOption("dlw.verbose")
+  ...
 )
 }
 \arguments{
@@ -35,6 +35,12 @@ where X is a number of two digits like "01" or "02".}
 
 \item{latest}{logical. If TRUE and  `vermast` and `veralt` are NULL and then,
 it will use the most recent data.}
+
+\item{...}{
+  Arguments passed on to \code{\link[=dlw_get_data]{dlw_get_data}}
+  \describe{
+    \item{\code{local_overwrite}}{}
+  }}
 
 \item{verbose}{logical. to display info.}
 }

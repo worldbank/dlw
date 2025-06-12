@@ -86,7 +86,7 @@ dlw_get_data(
   server = "GMD",
   survey = "EPH",
   module = "GPWG",
-  filename = "PRY_2011_EPH_V01_M_V08_A_GMD_GPWG.dta",
+  filename = "PRY_2011_EPH_V01_M_V03_A_GMD_GPWG.dta",
   collection = "GMD"
 )
 ```
@@ -96,7 +96,7 @@ works only for the GMD server: `dlw_get_gmd()`. This function is much
 easier to use:
 
 ``` r
-pry <- dlw_get_gmd(country_code = "PRY", year = 2011, module = "GPWG", vermast = "v01", veralt = "v08")
+pry <- dlw_get_gmd(country_code = "PRY", year = 2011, module = "GPWG", vermast = "v01", veralt = "v03")
 #> 
 #> ── dlw_get_data Calls ──────────────────────────────────────────────────────────
 #> Call 1:
@@ -106,11 +106,11 @@ pry <- dlw_get_gmd(country_code = "PRY", year = 2011, module = "GPWG", vermast =
 #>   server = "GMD",
 #>   survey = "EPH",
 #>   module = "GPWG",
-#>   filename = "PRY_2011_EPH_V01_M_V08_A_GMD_GPWG.dta",
+#>   filename = "PRY_2011_EPH_V01_M_V03_A_GMD_GPWG.dta",
 #>   collection = "GMD"
 #> )
 pry[, weighted.mean(welfare, weight, na.rm = TRUE)]
-#> [1] 12675293
+#> [1] 1099527
 ```
 
 If you are interested in downloading the most recent version of a file,

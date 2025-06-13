@@ -12,6 +12,7 @@ More about what it does (maybe more than one line). Continuation lines should be
 Useful links:
 \itemize{
   \item \url{https://github.com/worldbank/dlw}
+  \item \url{https://worldbank.github.io/dlw/}
   \item Report bugs at \url{https://github.com/worldbank/dlw/issues}
 }
 

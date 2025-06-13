@@ -47,6 +47,59 @@ dlw_server_catalog <- function(server = NULL,
   ctl
 }
 
+#' filter server catolog to show inventory by country and other variables
+#'
+#' @inheritParams dlw_get_data
+#' @param country character. same as `country_code` in [dlw_get_data] but with
+#'   the purpose of easy programming. Not meant to be used by final user.
+#' @param ... additional filtering arguments (e.g., year, module, survey, fileName)
+#'
+#' @returns filter server catalog from [dlw_server_catalog]
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' dlw_server_inventory("COL", 2010)
+#' }
+dlw_server_inventory <- function(country,
+                                 server = NULL,
+                                 ...) {
+
+  # Capture ... arguments as a list
+  dots <- list(...)
+  # Combine country and ... into a single list of arguments
+  args <- c(list(country = country), dots) |>
+    lapply(\(.) {
+      if (is.character(.)) {
+        toupper(.)
+      } else {
+        .
+      }
+    })
+
+  # get names of arguments that are not null
+  args_info <- Filter(Negate(is.null), args) |>
+    names()
+
+  ctl <- dlw_server_catalog(server = server,
+                            verbose = FALSE)
+
+  # create condition for arguments not NULL
+  cnds <- lapply(args_info, \(.) {
+    paste(simpleCap(.), ., sep = " %in% ")
+  }) |>
+    # append them together
+    paste(collapse = " & ") |>
+    # convert to expression
+    rlang::parse_expr()
+
+  ctl[rlang::eval_tidy(cnds, data = args)] |>
+    unique()
+}
+
+
+
+
 #' Add GMD vars to GMD server catalog
 #'
 #' @param ctl data.table of server catalog raw

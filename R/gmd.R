@@ -96,4 +96,10 @@ gmd_calls <- function(ctl,
   as.dlw_call_list(calls)
 }
 
+dlw_get_gmd_support <- function(verbose =  getOption("dlw.verbose")
+                                ) {
 
+  ctl <- dlw_server_catalog(server = "GMD")
+  ctl <- ctl[Country == "Support"]
+
+}

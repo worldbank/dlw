@@ -10,6 +10,7 @@
 <url><loc>https://worldbank.github.io/dlw/reference/dlw_country_catalog.html</loc></url>
 <url><loc>https://worldbank.github.io/dlw/reference/dlw_get_data.html</loc></url>
 <url><loc>https://worldbank.github.io/dlw/reference/dlw_get_gmd.html</loc></url>
+<url><loc>https://worldbank.github.io/dlw/reference/dlw_get_gmd_support.html</loc></url>
 <url><loc>https://worldbank.github.io/dlw/reference/dlw_get_token.html</loc></url>
 <url><loc>https://worldbank.github.io/dlw/reference/dlw_remove_token.html</loc></url>
 <url><loc>https://worldbank.github.io/dlw/reference/dlw_server_catalog.html</loc></url>
@@ -17,6 +18,7 @@
 <url><loc>https://worldbank.github.io/dlw/reference/dlw_set_token.html</loc></url>
 <url><loc>https://worldbank.github.io/dlw/reference/dlw_test_token.html</loc></url>
 <url><loc>https://worldbank.github.io/dlw/reference/dot-dlwenv.html</loc></url>
+<url><loc>https://worldbank.github.io/dlw/reference/eval_gmd_call.html</loc></url>
 <url><loc>https://worldbank.github.io/dlw/reference/get_dlwenv.html</loc></url>
 <url><loc>https://worldbank.github.io/dlw/reference/get_from_dlwenv.html</loc></url>
 <url><loc>https://worldbank.github.io/dlw/reference/gmd_calls.html</loc></url>

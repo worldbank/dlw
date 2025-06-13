@@ -55,12 +55,15 @@ dlw_get_gmd <- function(country_code,
                      ...)
 
   if (length(calls) > 1) {
-    cli::cli_alert("your arguments do not uniquely identify a dataset. So you need execute one of the following:")
-    print(calls)
+    if (verbose) {
+      cli::cli_alert("your arguments do not uniquely identify a dataset.
+                     So you need execute one of the following:")
+      print(calls)
+
+    }
     return(invisible(calls))
   }
-  print(calls)
-  rlang::eval_tidy(calls[[1]])
+  eval_gmd_call(calls, verbose)
 }
 
 
@@ -96,10 +99,53 @@ gmd_calls <- function(ctl,
   as.dlw_call_list(calls)
 }
 
-dlw_get_gmd_support <- function(verbose =  getOption("dlw.verbose")
-                                ) {
+#' get Support files for GMD
+#'
+#' @inheritParams dlw_get_gmd
+#' @param module character: As of now, either CPIICP (the default) or CPI.
+#'
+#' @returns data.table
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' dlw_get_gmd_support()
+#' dlw_get_gmd_support(vermast = "v10")
+#' }
+dlw_get_gmd_support <- function(module = c("CPIICP", "CPI"),
+                                vermast = NULL,
+                                verbose =  getOption("dlw.verbose")) {
 
+  module       <- match.arg(module)
+  country_code <- "Support"
   ctl <- dlw_server_catalog(server = "GMD")
-  ctl <- ctl[Country == "Support"]
+  ctl <- ctl[Country == country_code &
+               Country_code == country_code &
+               Module == module]
 
+  # get latest by default.
+
+  if (is.null(vermast)) {
+    ctl <- ctl[Vermast == max(Vermast, na.rm = TRUE)]
+  } else {
+    ctl <- ctl[Vermast == Vermast]
+  }
+
+  calls <- gmd_calls(ctl, country_code = country_code)
+
+  eval_gmd_call(calls, verbose)
+
+}
+
+
+#' evaluate GMD call
+#'
+#' @param calls calls from [gmd_calls]
+#' @inheritParams dlw_get_gmd
+#'
+#' @returns evaluation
+#' @keywords internal
+eval_gmd_call <- function(calls, verbose = getOption("dlw.verbose"))  {
+  if (verbose) print(calls)
+  rlang::eval_tidy(calls[[1]])
 }

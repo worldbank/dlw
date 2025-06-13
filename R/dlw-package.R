@@ -21,6 +21,9 @@ utils::globalVariables(
     "FileName",
     "FilePath",
     "Veralt",
-    "Vermast"
+    "Vermast",
+    "Country",
+    "Country_code",
+    "Module"
   )
 )

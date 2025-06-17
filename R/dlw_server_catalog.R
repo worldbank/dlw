@@ -17,7 +17,8 @@ dlw_server_catalog <- function(server = NULL,
                               dlw_url = NULL,
                               api_version = getOption("dlw.default_api_version"),
                               force = FALSE,
-                              verbose = getOption("dlw.verbose")
+                              verbose = getOption("dlw.verbose"),
+                              store_request = FALSE
                               ) {
   endpoint <- "ServerCatalog"
   base_server <- select_server(server = server)
@@ -32,7 +33,8 @@ dlw_server_catalog <- function(server = NULL,
   req <- build_request(dlw_url = dlw_url,
                        api_version = api_version,
                        endpoint = endpoint,
-                       Server = base_server)
+                       Server = base_server,
+                       store_request = store_request)
   ctl <- req |>
     handle_resp() |>
     httr2::resp_body_string() |>

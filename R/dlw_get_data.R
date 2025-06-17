@@ -124,13 +124,13 @@ dlw_read <- function(board, pin_name) {
 #' @returns data base request as data.table
 #' @export
 dlw_get_data <- function(country_code,
-                         server = NULL,
                          filename,
-                         verbose =  getOption("dlw.verbose"),
-                         local_dir = getOption("dlw.local_dir"),
-                         local = fs::is_dir(local_dir),
+                         server     = NULL,
+                         verbose    =  getOption("dlw.verbose"),
+                         local_dir  = getOption("dlw.local_dir"),
+                         local      = fs::is_dir(local_dir),
                          board_type = c("folder", "local"),
-                         format = c("parquet", "qs"),
+                         format     = c("parquet", "qs"),
                          local_overwrite = FALSE,
                          ...) {
 
@@ -165,13 +165,11 @@ dlw_get_data <- function(country_code,
 #' @returns raw data from [resp_body_raw]
 #' @keywords internal
 get_raw_data <- \(req) {
-  req |>
-    httr2::req_perform() |>
+
+  raw_data <- req |>
+    handle_resp() |>
     httr2::resp_body_raw()
 
+  set_in_dlwenv(key = "last_raw_data", value = raw_data)
 
-  rlang::env_poke(env = .dlwenv,
-                  nm = "last_raw_data",
-                  value = raw_data)
-  raw_data
 }

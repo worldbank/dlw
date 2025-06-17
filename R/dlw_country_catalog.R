@@ -16,7 +16,8 @@ dlw_country_catalog <- function(country_code,
                                 api_version = getOption("dlw.default_api_version"),
                                 force = FALSE,
                                 internal = FALSE,
-                                verbose = getOption("dlw.verbose")) {
+                                verbose = getOption("dlw.verbose"),
+                                store_request = FALSE) {
   if (internal) {
     endpoint <- "CountryCatalogInternal"
   } else {
@@ -33,7 +34,8 @@ dlw_country_catalog <- function(country_code,
   endpoint <- c(endpoint, country_code)
   req <- build_request(dlw_url = dlw_url,
                        api_version = api_version,
-                       endpoint = endpoint)
+                       endpoint = endpoint,
+                       store_request = store_request)
   ctl <- req |>
     handle_resp() |>
     httr2::resp_body_string() |>

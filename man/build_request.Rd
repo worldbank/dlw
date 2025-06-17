@@ -9,6 +9,7 @@ build_request(
   api_version = getOption("dlw.default_api_version"),
   endpoint,
   method = "GET",
+  store_request = TRUE,
   ...
 )
 }
@@ -21,6 +22,8 @@ build_request(
 
 \item{method}{character: method of http request. Either "GET" or "POST".
 Default is "GET".}
+
+\item{store_request}{logical: store request in .dlwenv as `last_req`}
 
 \item{...}{other parameters}
 }

@@ -65,7 +65,7 @@ dlw_get_gmd <- function(country_code,
   if (length(calls) > 1) {
     if (verbose) {
       cli::cli_alert("your arguments do not uniquely identify a dataset.
-                     So you need execute one of the following:")
+                     You need execute one of the following:")
       print(calls)
 
     }

@@ -6,12 +6,14 @@
 #' @param ... other parameters
 #' @param method character: method of http request. Either "GET" or "POST".
 #'   Default is "GET".
+#' @param store_request logical: store request in .dlwenv as `last_req`
 #'
 #' @return httr2 request
 build_request <- function(dlw_url = NULL,
                           api_version = getOption("dlw.default_api_version"),
                           endpoint,
                           method = "GET",
+                          store_request = TRUE,
                           ...) {
   base_url <- select_base_url(dlw_url = dlw_url)
   params   <- list(...)
@@ -31,12 +33,10 @@ build_request <- function(dlw_url = NULL,
     get_or_post(!!!params, .multi = "comma") |>
     httr2::req_cache(tools::R_user_dir("dlw", which = "cache"),
                      use_on_error = TRUE,
-                     debug = TRUE) # |>
+                     debug = TRUE)
   }
 
-  rlang::env_poke(env = .dlwenv,
-                  nm = "last_req",
-                  value = req)
+  if (store_request) set_in_dlwenv(key = "last_req", value = req)
 
   # To add later
     # httr2::req_error(body = parse_error_body) |>
@@ -92,7 +92,7 @@ handle_resp <- function(req) {
     }, # end of warning section
 
     finally = {
-      # Do this at the end before quitting the tryCatch structure...
+      # Do this at the end before quitting the tryCatch
     } # end of finally section
 
   ) # End of trycatch

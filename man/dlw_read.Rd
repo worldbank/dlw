@@ -7,7 +7,9 @@
 dlw_read(
   filename,
   local_dir = getOption("dlw.local_dir"),
-  local = fs::is_dir(local_dir)
+  local = fs::is_dir(local_dir),
+  board_type = c("folder", "local"),
+  format = c("parquet", "qs")
 )
 }
 \arguments{
@@ -18,6 +20,10 @@ in option dlw.local_dir which is set initially as "".}
 
 \item{local}{logical: whether or not to save and read data locally. default
 is TRUE if `local_dir` exists.}
+
+\item{board_type}{character: Which pins board to use: 'folder' (default, shared) or 'local' (user-specific)}
+
+\item{format}{character: File format to use for pinning data ('parquet' [default] or 'qs')}
 }
 \value{
 data.table

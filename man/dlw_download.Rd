@@ -10,6 +10,8 @@ dlw_download(
   server = NULL,
   local_dir = getOption("dlw.local_dir"),
   local = fs::is_dir(local_dir),
+  board_type = c("folder", "local"),
+  format = c("parquet", "qs"),
   local_overwrite = FALSE,
   ...,
   verbose = getOption("dlw.verbose")
@@ -27,6 +29,10 @@ in option dlw.local_dir which is set initially as "".}
 
 \item{local}{logical: whether or not to save and read data locally. default
 is TRUE if `local_dir` exists.}
+
+\item{board_type}{character: Which pins board to use: 'folder' (default, shared) or 'local' (user-specific)}
+
+\item{format}{character: File format to use for pinning data ('parquet' [default] or 'qs')}
 
 \item{local_overwrite}{logical. Whether to overwrite any saved data. Default
 is FALSE}

@@ -34,6 +34,10 @@ build_request <- function(dlw_url = NULL,
                      debug = TRUE) # |>
   }
 
+  rlang::env_poke(env = .dlwenv,
+                  nm = "last_req",
+                  value = req)
+
   # To add later
     # httr2::req_error(body = parse_error_body) |>
     # httr2::req_retry(

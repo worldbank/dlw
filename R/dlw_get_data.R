@@ -67,10 +67,8 @@ dlw_download <- function(country_code,
   }
 
 
-  req <- do.call("build_request", args)
-  raw_data <- req |>
-    httr2::req_perform() |>
-    httr2::resp_body_raw()
+  raw_data <- do.call("build_request", args) |>
+    get_raw_data()
 
   # store in
 
@@ -156,4 +154,24 @@ dlw_get_data <- function(country_code,
 
   dlw_read(board = dlw_info$board,
            pin_name = dlw_info$pin_name)
+}
+
+
+
+#' perform request and get raw data
+#'
+#' @param req request from [build_request]
+#'
+#' @returns raw data from [resp_body_raw]
+#' @keywords internal
+get_raw_data <- \(req) {
+  req |>
+    httr2::req_perform() |>
+    httr2::resp_body_raw()
+
+
+  rlang::env_poke(env = .dlwenv,
+                  nm = "last_raw_data",
+                  value = raw_data)
+  raw_data
 }

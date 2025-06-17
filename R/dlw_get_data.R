@@ -49,7 +49,15 @@ dlw_download <- function(country_code,
       pins::board_folder(local_dir)
     }
   } else {
-    pins::board_temp()
+    if (!rlang::env_has(.dlwenv, "temp_board")) {
+      brd <- pins::board_temp()
+      rlang::env_poke(env = .dlwenv,
+                      nm = "temp_board",
+                      value = brd)
+      brd
+    } else {
+      rlang::env_get(.dlwenv, "temp_board")
+    }
   }
   pin_name <- paste0(fs::path_ext_remove(filename), ".", format)
 

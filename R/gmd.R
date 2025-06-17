@@ -23,7 +23,7 @@
 #'
 #' @examples
 #' \dontrun{
-#'   dlw_get_gmd("COL", 2010, "GPWG")
+#'   dlw_get_gmd("PRY", 2010, "GPWG")
 #'   dlw_get_gmd("COL", 2010, "GPWG")
 #' }
 dlw_get_gmd <- function(country_code,

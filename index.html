@@ -54,6 +54,13 @@
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
+<p>Since <a href="https://github.com/worldbank/dlw" class="external-link">dlw</a> is hosted in the World Bank’s GitHub organization, you need to authorize your Personal Access Token (PAT) for SAML Single Sign-On (SSO) before you can install it. Follow these steps to authorize your PAT:</p>
+<ol style="list-style-type: decimal">
+<li><p>Go to your GitHub account: Visit <a href="https://github.com" class="external-link uri">https://github.com</a> and log in.</p></li>
+<li><p>Check your PAT: Go to Settings → Developer settings → Personal access tokens. Find the token you are using (or create a new one if needed).</p></li>
+<li><p>Authorize your PAT for SAML SSO: Go to <a href="https://github.com/settings/tokens" class="external-link uri">https://github.com/settings/tokens</a>. Next to your token, You’ll see a button that says “Configure SSO.” Click it to authorize your token to the worldbank.</p></li>
+<li><p>Try installing</p></li>
+</ol>
 <p>You can install the development version of dlw from <a href="https://github.com/" class="external-link">GitHub</a> with:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># install.packages("pak")</span></span>
@@ -121,6 +128,10 @@
 <span><span class="co">#&gt;   filename = "PRY_2011_EPH_V01_M_V03_A_GMD_GPWG.dta",</span></span>
 <span><span class="co">#&gt;   collection = "GMD"</span></span>
 <span><span class="co">#&gt; )</span></span>
+<span><span class="co">#&gt; ℹ saving last_req in .dlwevn</span></span>
+<span><span class="co">#&gt; ℹ saving last_raw_data in .dlwevn</span></span>
+<span><span class="co">#&gt; Creating new version '20250617T202722Z-662d2'</span></span>
+<span><span class="co">#&gt; Writing to pin 'PRY_2011_EPH_V01_M_V03_A_GMD_GPWG.parquet'</span></span>
 <span><span class="va">pry</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/stats/weighted.mean.html" class="external-link">weighted.mean</a></span><span class="op">(</span><span class="va">welfare</span>, <span class="va">weight</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">]</span></span>
 <span><span class="co">#&gt; [1] 1099527</span></span></code></pre></div>
 <p>If you are interested in downloading the most recent version of a file, you can simply omit the version arguments:</p>
@@ -138,6 +149,10 @@
 <span><span class="co">#&gt;   filename = "PRY_2011_EPH_V02_M_V01_A_GMD_GPWG.dta",</span></span>
 <span><span class="co">#&gt;   collection = "GMD"</span></span>
 <span><span class="co">#&gt; )</span></span>
+<span><span class="co">#&gt; ℹ saving last_req in .dlwevn</span></span>
+<span><span class="co">#&gt; ℹ saving last_raw_data in .dlwevn</span></span>
+<span><span class="co">#&gt; Creating new version '20250617T202725Z-6bd54'</span></span>
+<span><span class="co">#&gt; Writing to pin 'PRY_2011_EPH_V02_M_V01_A_GMD_GPWG.parquet'</span></span>
 <span><span class="va">pry</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/stats/weighted.mean.html" class="external-link">weighted.mean</a></span><span class="op">(</span><span class="va">welfare</span>, <span class="va">weight</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">]</span></span>
 <span><span class="co">#&gt; [1] 12675293</span></span></code></pre></div>
 <p>In this case, the most recent version available will be used (for example, master version v02 and alternative version v01).</p>

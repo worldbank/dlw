@@ -46,8 +46,9 @@ dlw_get_gmd <- function(country_code,
                               vermast  = vermast,
                               veralt   = veralt)
 
-  if (is.null(vermast) & is.null(veralt) & latest == TRUE) {
-    ctl <- ctl[Vermast == max(Vermast, na.rm = TRUE)
+  if (latest == TRUE & (is.null(year) | is.null(vermast) | is.null(veralt))) {
+    ctl <- ctl[Year == max(Year, na.rm = TRUE)
+    ][Vermast == max(Vermast, na.rm = TRUE)
     ][Veralt == max(Veralt, na.rm = TRUE)]
   }
   calls <- gmd_calls(ctl = ctl,

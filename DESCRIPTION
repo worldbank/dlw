@@ -16,7 +16,6 @@ Depends:
     R (>= 3.5)
 RoxygenNote: 7.3.2
 Imports: 
-    arrow,
     cli,
     data.table,
     fs,
@@ -24,7 +23,6 @@ Imports:
     httr2,
     keyring,
     pins,
-    qs,
     rlang
 Suggests: 
     usethis,

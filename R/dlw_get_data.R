@@ -2,8 +2,10 @@
 #'
 #' @inheritParams dlw_get_data
 #' @param filename character: Name of the file to save/read (required)
-#' @param board_type character: Which pins board to use: 'folder' (default, shared) or 'local' (user-specific)
-#' @param format character: File format to use for pinning data ('parquet' [default] or 'qs')
+#' @param board_type character: Which pins board to use: 'folder' (default,
+#'   shared) or 'local' (user-specific)
+#' @param format character: File format to use for pinning data ('parquet'
+#'   [default] or 'qs')
 #' @returns Invisibly returns TRUE if download and pinning succeed
 #' @keywords internal
 #' @importFrom pins board_local board_temp pin_write
@@ -23,10 +25,12 @@ dlw_download <- function(country_code,
                          ...,
                          verbose = getOption("dlw.verbose")) {
   board_type <- match.arg(board_type)
-  format <- match.arg(format)
+  format     <- match.arg(format)
+
   if (missing(filename) || is.null(filename)) {
     cli::cli_abort("{.arg filename} is a required argument.")
   }
+
   dots <- list(...)
   endpoint <- "FileInformation/GetFileInfo"
   args <- c(list(Country = country_code,
@@ -35,6 +39,7 @@ dlw_download <- function(country_code,
                  endpoint = endpoint,
                  filename = filename),
             dots)
+
   # Choose board
   board <- if (local) {
     if (board_type == "local") {
@@ -45,29 +50,32 @@ dlw_download <- function(country_code,
   } else {
     pins::board_temp()
   }
-  pin_name <- paste0(tools::file_path_sans_ext(filename), ".", format)
+  pin_name <- paste0(fs::path_ext_remove(filename), ".", format)
+
   # If not overwriting and pin exists, skip download
   if (!local_overwrite && pin_name %in% pins::pin_list(board)) {
     return(invisible(TRUE))
   }
+
   req <- do.call("build_request", args)
   raw_data <- req |>
     httr2::req_perform() |>
     httr2::resp_body_raw()
+
   # Save raw data to a temp file for reading
   tmpfile <- tempfile(fileext = ".dta")
   writeBin(raw_data, tmpfile)
-  # Read .dta and save as parquet or qs
-  dt <- haven::read_dta(tmpfile) |> setDT()
+
+
+  # Read .dta and pin as parquet or qs
+  dt <- haven::read_dta(tmpfile) |>
+    setDT()
   unlink(tmpfile)
-  tmpout <- tempfile(fileext = paste0(".", format))
-  if (format == "parquet") {
-    arrow::write_parquet(dt, tmpout)
-  } else if (format == "qs") {
-    qs::qsave(dt, tmpout)
-  }
-  pins::pin_write(board, tmpout, name = pin_name, type = "file", overwrite = TRUE)
-  unlink(tmpout)
+
+  pins::pin_write(board = board, x = dt,
+                  name = pin_name,
+                  type = format,
+                  versioned = TRUE)
   invisible(TRUE)
 }
 
@@ -86,7 +94,10 @@ dlw_read <- function(filename,
                     board_type = c("folder", "local"),
                     format = c("parquet", "qs")) {
   board_type <- match.arg(board_type)
-  format <- match.arg(format)
+  format    <- match.arg(format)
+
+
+  # Select board
   board <- if (local) {
     if (board_type == "local") {
       pins::board_local(local_dir)
@@ -96,20 +107,21 @@ dlw_read <- function(filename,
   } else {
     pins::board_temp()
   }
-  pin_name <- paste0(tools::file_path_sans_ext(filename), ".", format)
+  pin_name <- paste0(fs::path_ext_remove(filename), ".", format)
+
   if (!(pin_name %in% pins::pin_list(board))) {
-    board_type_str <- if (local) board_type else "temp"
-    cli::cli_abort("File {.file {pin_name}} not found in the {.file {board_type_str}} board.")
+    board_type_str <- if (local) {
+      board_type
+  } else {
+    "temp"
   }
-  pin_path <- pins::pin_read(board, pin_name)
-  # pin_read returns a file path for type = 'file'
-  if (format == "parquet") {
-    data <- arrow::read_parquet(pin_path)
-  } else if (format == "qs") {
-    data <- qs::qread(pin_path)
+    cli::cli_abort("File {.file {pin_name}} not found in the
+                   {.file {board_type_str}} board.")
   }
-  setDT(data)
-  data
+
+  pins::pin_read(board, pin_name) |>
+    setDT()
+
 }
 
 #' get data from datalibweb (refactored)
@@ -122,8 +134,10 @@ dlw_read <- function(filename,
 #'   in option dlw.local_dir which is set initially as "".
 #' @param local logical: whether or not to save and read data locally. default
 #'   is TRUE if `local_dir` exists.
-#' @param board_type character: Which pins board to use: 'folder' (default, shared) or 'local' (user-specific)
-#' @param format character: File format to use for pinning data ('parquet' [default] or 'qs')
+#' @param board_type character: Which pins board to use: 'folder' (default,
+#'   shared) or 'local' (user-specific)
+#' @param format character: File format to use for pinning data ('parquet'
+#'   [default] or 'qs')
 #' @param local_overwrite logical. Whether to overwrite any saved data. Default
 #'   is FALSE
 #' @returns data base request as data.table

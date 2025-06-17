@@ -1,6 +1,71 @@
-
-#' get data from datalibweb
+#' Download data from datalibweb and save as a pin
 #'
+#' @inheritParams dlw_get_data
+#' @returns Invisibly returns TRUE if download and pinning succeed
+#' @keywords internal
+#' @importFrom pins board_local board_temp pin_write
+#' @importFrom httr2 req_perform resp_body_raw
+#' @importFrom haven read_dta
+#' @importFrom data.table setDT
+#' @export
+#' 
+dlw_download <- function(country_code,
+                         server = NULL,
+                         local_dir = getOption("dlw.local_dir"),
+                         local = fs::is_dir(local_dir),
+                         local_overwrite = FALSE,
+                         ...,
+                         verbose = getOption("dlw.verbose")) {
+  dots <- list(...)
+  endpoint <- "FileInformation/GetFileInfo"
+  args <- c(list(Country = country_code,
+                 method = "POST",
+                 Server = server,
+                 endpoint = endpoint),
+            dots)
+  filename <- dots$filename
+  if (is.null(filename)) stop("filename must be provided in ... arguments")
+  # Choose board
+  board <- if (local) pins::board_local(local_dir) else pins::board_temp()
+  # If not overwriting and pin exists, skip download
+  if (!local_overwrite && filename %in% pins::pin_list(board)) return(invisible(TRUE))
+  req <- do.call("build_request", args)
+  raw_data <- req |>
+    httr2::req_perform() |>
+    httr2::resp_body_raw()
+  # Save raw data to a temp file for reading
+  tmpfile <- tempfile(fileext = ".dta")
+  writeBin(raw_data, tmpfile)
+  # Pin the file
+  pins::pin_write(board, tmpfile, name = filename, type = "file", overwrite = TRUE)
+  unlink(tmpfile)
+  invisible(TRUE)
+}
+
+#' Read data from a pin (local or temp)
+#'
+#' @inheritParams dlw_get_data
+#' @returns data.table
+#' @keywords internal
+#' @importFrom pins board_local board_temp pin_read
+#' @importFrom haven read_dta
+#' @importFrom data.table setDT
+#' @export
+#' 
+dlw_read <- function(filename,
+                    local_dir = getOption("dlw.local_dir"),
+                    local = fs::is_dir(local_dir)) {
+  board <- if (local) pins::board_local(local_dir) else pins::board_temp()
+  if (!(filename %in% pins::pin_list(board))) {
+    stop(sprintf("File '%s' not found in the %s board.", filename, if (local) "local" else "temp"))
+  }
+  pin_path <- pins::pin_read(board, filename)
+  # pin_read returns a file path for type = 'file'
+  data <- haven::read_dta(pin_path) |> setDT()
+  data
+}
+
+#' get data from datalibweb (refactored)
 #' @inheritParams dlw_country_catalog
 #' @inheritParams dlw_server_catalog
 #' @param ... additional filtering arguments (e.g.,survey_year, survey_acronym,
@@ -11,105 +76,25 @@
 #'   is TRUE if `local_dir` exists.
 #' @param local_overwrite logical. Whether to overwrite any saved data. Default
 #'   is FALSE
-#'
 #' @returns data base request as data.table
 #' @export
-#'
-#' @examples
-#' \dontrun{
-#'   dlw_get_data(
-#'     country_code = "COL",
-#'     year = 2010L,
-#'     server = "GMD",
-#'     survey = "GEIH",
-#'     module = "GPWG",
-#'     filename = "COL_2010_GEIH_V02_M_V09_A_GMD_GPWG.dta",
-#'     collection = "GMD")
-#' }
+#' 
 dlw_get_data <- function(country_code,
                          server = NULL,
                          verbose =  getOption("dlw.verbose"),
                          local_dir = getOption("dlw.local_dir"),
                          local = fs::is_dir(local_dir),
                          local_overwrite = FALSE,
-                         ...
-                         ) {
-  # Capture ... arguments as a list
+                         ...) {
   dots <- list(...)
-  # Combine country and ... into a single list of arguments
-  endpoint <- "FileInformation/GetFileInfo"
-  args <- c(list(Country = country_code,
-                 method = "POST",
-                 Server = server,
-                 endpoint = endpoint),
-            dots)
-
   filename <- dots$filename
-  if (local == TRUE && local_overwrite == FALSE) {
-    resp <- load_from_local(local_dir = local_dir,
-                            filename = filename)
-    if (!is.null(resp)) return(resp)
-  }
-
-  req <- do.call("build_request", args)
-
-  resp <- req |>
-    httr2::req_perform()   |>
-    httr2::resp_body_raw() |>
-    # this part should be changed to read generic data from other formats
-    haven::read_dta(encoding = "latin1") |>
-    setDT()
-
-
-  if (local == TRUE) {
-    save_to_local(x = resp, local_dir = local_dir, filename = filename)
-  }
-
-  resp
-}
-
-
-
-
-
-#' Load from local drive
-#'
-#' @param local_dir local directory
-#' @param filename  File name. "dta" format for now
-#'
-#' @returns data in `fs::path(local_dir, filename)` or NULL if file does not
-#'   exist
-#'   @keywords internal
-load_from_local <- function(local_dir, filename) {
-  if (fs::is_dir(local_dir)) {
-    fn <- fs::path(local_dir, filename)
-    if (fs::file_exists(fn)) {
-      resp <- haven::read_dta(fn) |>
-        setDT()
-      return(resp)
-    } else {
-      return(NULL)
-    }
-  } else {
-    cli::cli_abort("directory {.file  {local_dir}} does nto exist")
-  }
-}
-
-
-#' save to local drive
-#'
-#' @param x data in "dta" formar for now
-#' @param local_dir  local directory
-#' @param filename  filename. dta for now
-#'
-#' @returns  invisible(TRUE)
-#' @keywords internal
-save_to_local <- function(x, local_dir, filename){
-  if (fs::is_dir(local_dir)) {
-    fn <- fs::path(local_dir, filename)
-    haven::write_dta(data = x, path = fn)
-  } else {
-    cli::cli_abort("directory {.file  {local_dir}} does nto exist")
-  }
-  invisible(TRUE)
+  if (is.null(filename)) stop("filename must be provided in ... arguments")
+  dlw_download(country_code = country_code,
+               server = server,
+               local_dir = local_dir,
+               local = local,
+               local_overwrite = local_overwrite,
+               ...,
+               verbose = verbose)
+  dlw_read(filename = filename, local_dir = local_dir, local = local)
 }

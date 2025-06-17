@@ -57,7 +57,7 @@ dlw_get_data <- function(country_code,
     httr2::req_perform()   |>
     httr2::resp_body_raw() |>
     # this part should be changed to read generic data from other formats
-    haven::read_dta() |>
+    haven::read_dta(encoding = "latin1") |>
     setDT()
 
 

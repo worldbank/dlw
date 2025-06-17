@@ -1,5 +1,6 @@
 #' Download data from datalibweb and save as a pin
 #'
+#' @param filename character: Name of the file to save/read (required)
 #' @inheritParams dlw_get_data
 #' @returns Invisibly returns TRUE if download and pinning succeed
 #' @keywords internal
@@ -11,6 +12,7 @@
 #' 
 dlw_download <- function(country_code,
                          server = NULL,
+                         filename,
                          local_dir = getOption("dlw.local_dir"),
                          local = fs::is_dir(local_dir),
                          local_overwrite = FALSE,
@@ -21,10 +23,10 @@ dlw_download <- function(country_code,
   args <- c(list(Country = country_code,
                  method = "POST",
                  Server = server,
-                 endpoint = endpoint),
+                 endpoint = endpoint,
+                 filename = filename),
             dots)
-  filename <- dots$filename
-  if (is.null(filename)) stop("filename must be provided in ... arguments")
+  if (missing(filename) || is.null(filename)) stop("filename is a required argument.")
   # Choose board
   board <- if (local) pins::board_local(local_dir) else pins::board_temp()
   # If not overwriting and pin exists, skip download
@@ -66,6 +68,7 @@ dlw_read <- function(filename,
 }
 
 #' get data from datalibweb (refactored)
+#' @param filename character: Name of the file to save/read (required)
 #' @inheritParams dlw_country_catalog
 #' @inheritParams dlw_server_catalog
 #' @param ... additional filtering arguments (e.g.,survey_year, survey_acronym,
@@ -81,16 +84,16 @@ dlw_read <- function(filename,
 #' 
 dlw_get_data <- function(country_code,
                          server = NULL,
+                         filename,
                          verbose =  getOption("dlw.verbose"),
                          local_dir = getOption("dlw.local_dir"),
                          local = fs::is_dir(local_dir),
                          local_overwrite = FALSE,
                          ...) {
-  dots <- list(...)
-  filename <- dots$filename
-  if (is.null(filename)) stop("filename must be provided in ... arguments")
+  if (missing(filename) || is.null(filename)) stop("filename is a required argument.")
   dlw_download(country_code = country_code,
                server = server,
+               filename = filename,
                local_dir = local_dir,
                local = local,
                local_overwrite = local_overwrite,

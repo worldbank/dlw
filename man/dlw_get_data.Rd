@@ -6,8 +6,8 @@
 \usage{
 dlw_get_data(
   country_code,
-  server = NULL,
   filename,
+  server = NULL,
   verbose = getOption("dlw.verbose"),
   local_dir = getOption("dlw.local_dir"),
   local = fs::is_dir(local_dir),
@@ -20,9 +20,9 @@ dlw_get_data(
 \arguments{
 \item{country_code}{character: ISO3 code}
 
-\item{server}{character: in case we have more than one server. default is  GMD}
-
 \item{filename}{character: Name of the file to save/read (required)}
+
+\item{server}{character: in case we have more than one server. default is  GMD}
 
 \item{verbose}{logical: whether to display info}
 

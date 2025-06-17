@@ -22,6 +22,22 @@ knitr::opts_chunk$set(
 
 ## Installation
 
+Since `{dlw}` is hosted in the World Bank's GitHub organization, you need to
+authorize your Personal Access Token (PAT) for SAML Single Sign-On (SSO) before you can install it. Follow these steps to authorize your PAT:
+
+1. Go to your GitHub account:
+Visit https://github.com and log in.
+
+2. Check your PAT:
+Go to Settings → Developer settings → Personal access tokens.
+Find the token you are using (or create a new one if needed).
+
+3. Authorize your PAT for SAML SSO:
+Go to https://github.com/settings/tokens.
+Next to your token, You'll see a button that says "Configure SSO." Click it to authorize your token to the worldbank.
+
+4. Try installing 
+
 You can install the development version of dlw from [GitHub](https://github.com/) with:
 
 ``` r

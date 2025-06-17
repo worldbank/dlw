@@ -15,6 +15,24 @@ collections and raw/non-harmonized data for subsequent analysis
 
 ## Installation
 
+Since `{dlw}` is hosted in the World Bank’s GitHub organization, you
+need to authorize your Personal Access Token (PAT) for SAML Single
+Sign-On (SSO) before you can install it. Follow these steps to authorize
+your PAT:
+
+1.  Go to your GitHub account: Visit <https://github.com> and log in.
+
+2.  Check your PAT: Go to Settings → Developer settings → Personal
+    access tokens. Find the token you are using (or create a new one if
+    needed).
+
+3.  Authorize your PAT for SAML SSO: Go to
+    <https://github.com/settings/tokens>. Next to your token, You’ll see
+    a button that says “Configure SSO.” Click it to authorize your token
+    to the worldbank.
+
+4.  Try installing
+
 You can install the development version of dlw from
 [GitHub](https://github.com/) with:
 
@@ -109,6 +127,10 @@ pry <- dlw_get_gmd(country_code = "PRY", year = 2011, module = "GPWG", vermast =
 #>   filename = "PRY_2011_EPH_V01_M_V03_A_GMD_GPWG.dta",
 #>   collection = "GMD"
 #> )
+#> ℹ saving last_req in .dlwevn
+#> ℹ saving last_raw_data in .dlwevn
+#> Creating new version '20250617T202722Z-662d2'
+#> Writing to pin 'PRY_2011_EPH_V01_M_V03_A_GMD_GPWG.parquet'
 pry[, weighted.mean(welfare, weight, na.rm = TRUE)]
 #> [1] 1099527
 ```
@@ -130,6 +152,10 @@ pry <- dlw_get_gmd(country_code = "PRY", year = 2011, module = "GPWG")
 #>   filename = "PRY_2011_EPH_V02_M_V01_A_GMD_GPWG.dta",
 #>   collection = "GMD"
 #> )
+#> ℹ saving last_req in .dlwevn
+#> ℹ saving last_raw_data in .dlwevn
+#> Creating new version '20250617T202725Z-6bd54'
+#> Writing to pin 'PRY_2011_EPH_V02_M_V01_A_GMD_GPWG.parquet'
 pry[, weighted.mean(welfare, weight, na.rm = TRUE)]
 #> [1] 12675293
 ```

@@ -84,7 +84,7 @@ load_from_local <- function(local_dir, filename) {
   if (fs::is_dir(local_dir)) {
     fn <- fs::path(local_dir, filename)
     if (fs::file_exists(fn)) {
-      resp <- haven::read_dta(fn) |>
+      resp <- haven::read_dta(fn, encoding = "latin1") |>
         setDT()
       return(resp)
     } else {

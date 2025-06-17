@@ -61,5 +61,6 @@ for ease of use.
 \examples{
 \dontrun{
   dlw_get_gmd("COL", 2010, "GPWG")
+  dlw_get_gmd("COL", 2010, "GPWG")
 }
 }

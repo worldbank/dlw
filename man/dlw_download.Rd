@@ -45,7 +45,7 @@ vermast, veralt, collection, module)}
 \item{verbose}{logical: whether to display info}
 }
 \value{
-Invisibly returns TRUE if download and pinning succeed
+A list with the board and pin_name used
 }
 \description{
 Download data from datalibweb and save as a pin

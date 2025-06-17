@@ -6,13 +6,12 @@
 #'   shared) or 'local' (user-specific)
 #' @param format character: File format to use for pinning data ('parquet'
 #'   [default] or 'qs')
-#' @returns Invisibly returns TRUE if download and pinning succeed
+#' @returns A list with the board and pin_name used
 #' @keywords internal
 #' @importFrom pins board_local board_temp pin_write
 #' @importFrom httr2 req_perform resp_body_raw
 #' @importFrom haven read_dta
 #' @importFrom data.table setDT
-#' @export
 #'
 dlw_download <- function(country_code,
                          filename,
@@ -24,6 +23,7 @@ dlw_download <- function(country_code,
                          local_overwrite = FALSE,
                          ...,
                          verbose = getOption("dlw.verbose")) {
+
   board_type <- match.arg(board_type)
   format     <- match.arg(format)
 
@@ -31,6 +31,7 @@ dlw_download <- function(country_code,
     cli::cli_abort("{.arg filename} is a required argument.")
   }
 
+  # prepare the args for request
   dots <- list(...)
   endpoint <- "FileInformation/GetFileInfo"
   args <- c(list(Country = country_code,
@@ -54,74 +55,43 @@ dlw_download <- function(country_code,
 
   # If not overwriting and pin exists, skip download
   if (!local_overwrite && pin_name %in% pins::pin_list(board)) {
-    return(invisible(TRUE))
+    return(list(board = board, pin_name = pin_name))
   }
-
   req <- do.call("build_request", args)
   raw_data <- req |>
     httr2::req_perform() |>
     httr2::resp_body_raw()
-
   # Save raw data to a temp file for reading
   tmpfile <- tempfile(fileext = ".dta")
   writeBin(raw_data, tmpfile)
 
-
   # Read .dta and pin as parquet or qs
-  dt <- haven::read_dta(tmpfile) |>
+  dt <- haven::read_dta(tmpfile, encoding = "latin1") |>
     setDT()
   unlink(tmpfile)
-
-  pins::pin_write(board = board, x = dt,
-                  name = pin_name,
-                  type = format,
+  pins::pin_write(board = board,
+                  x     = dt,
+                  name  = pin_name,
+                  type  = format,
                   versioned = TRUE)
-  invisible(TRUE)
+  list(board = board, pin_name = pin_name)
 }
 
 #' Read data from a pin (local or temp)
 #'
-#' @inheritParams dlw_get_data
+#' @param board A pins board object (as returned by dlw_download)
+#' @param pin_name The name of the pin (as returned by dlw_download)
 #' @returns data.table
 #' @keywords internal
-#' @importFrom pins board_local board_temp pin_read
-#' @importFrom haven read_dta
+#' @importFrom pins pin_read
 #' @importFrom data.table setDT
-#' @export
-dlw_read <- function(filename,
-                    local_dir = getOption("dlw.local_dir"),
-                    local = fs::is_dir(local_dir),
-                    board_type = c("folder", "local"),
-                    format = c("parquet", "qs")) {
-  board_type <- match.arg(board_type)
-  format    <- match.arg(format)
-
-
-  # Select board
-  board <- if (local) {
-    if (board_type == "local") {
-      pins::board_local(local_dir)
-    } else {
-      pins::board_folder(local_dir)
-    }
-  } else {
-    pins::board_temp()
-  }
-  pin_name <- paste0(fs::path_ext_remove(filename), ".", format)
-
+#'
+dlw_read <- function(board, pin_name) {
   if (!(pin_name %in% pins::pin_list(board))) {
-    board_type_str <- if (local) {
-      board_type
-  } else {
-    "temp"
+    cli::cli_abort("File {.file {pin_name}} not found in the provided board.")
   }
-    cli::cli_abort("File {.file {pin_name}} not found in the
-                   {.file {board_type_str}} board.")
-  }
-
   pins::pin_read(board, pin_name) |>
     setDT()
-
 }
 
 #' get data from datalibweb (refactored)
@@ -152,24 +122,25 @@ dlw_get_data <- function(country_code,
                          format = c("parquet", "qs"),
                          local_overwrite = FALSE,
                          ...) {
+
   board_type <- match.arg(board_type)
-  format <- match.arg(format)
+  format     <- match.arg(format)
+
   if (missing(filename) || is.null(filename)) {
     cli::cli_abort("{.arg filename} is a required argument.")
   }
-  dlw_download(country_code    = country_code,
-               server          = server,
-               filename        = filename,
-               local_dir       = local_dir,
-               local           = local,
-               board_type      = board_type,
-               format          = format,
-               local_overwrite = local_overwrite,
-               ...,
-               verbose = verbose)
-  dlw_read(filename = filename,
-           local_dir = local_dir,
-           local = local,
-           board_type = board_type,
-           format = format)
+
+  dlw_info <- dlw_download(country_code    = country_code,
+                          server          = server,
+                          filename        = filename,
+                          local_dir       = local_dir,
+                          local           = local,
+                          board_type      = board_type,
+                          format          = format,
+                          local_overwrite = local_overwrite,
+                          ...,
+                          verbose = verbose)
+
+  dlw_read(board = dlw_info$board,
+           pin_name = dlw_info$pin_name)
 }

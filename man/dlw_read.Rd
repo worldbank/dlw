@@ -4,28 +4,12 @@
 \alias{dlw_read}
 \title{Read data from a pin (local or temp)}
 \usage{
-dlw_read(
-  filename,
-  local_dir = getOption("dlw.local_dir"),
-  local = fs::is_dir(local_dir),
-  board_type = c("folder", "local"),
-  format = c("parquet", "qs")
-)
+dlw_read(board, pin_name)
 }
 \arguments{
-\item{filename}{character: Name of the file to save/read (required)}
+\item{board}{A pins board object (as returned by dlw_download)}
 
-\item{local_dir}{character: Local directory to save data. Default available
-in option dlw.local_dir which is set initially as "".}
-
-\item{local}{logical: whether or not to save and read data locally. default
-is TRUE if `local_dir` exists.}
-
-\item{board_type}{character: Which pins board to use: 'folder' (default,
-shared) or 'local' (user-specific)}
-
-\item{format}{character: File format to use for pinning data ('parquet'
-[default] or 'qs')}
+\item{pin_name}{The name of the pin (as returned by dlw_download)}
 }
 \value{
 data.table

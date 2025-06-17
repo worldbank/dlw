@@ -19,6 +19,7 @@ build_request <- function(dlw_url = NULL,
   req <- httr2::request(base_url) |>
     httr2::req_url_path_append(api_version) |>
     httr2::req_url_path_append(endpoint) |>
+    httr2::req_user_agent(dlw_user_agent) |>
     httr2::req_auth_bearer_token(dlw_get_token())
 
   if (length(params) > 0) {
@@ -34,7 +35,6 @@ build_request <- function(dlw_url = NULL,
   }
 
   # To add later
-    # httr2::req_user_agent(dlw_user_agent) |>
     # httr2::req_error(body = parse_error_body) |>
     # httr2::req_retry(
     #   is_transient = dlw_is_transient,

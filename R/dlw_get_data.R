@@ -61,16 +61,21 @@ dlw_download <- function(country_code,
   }
   pin_name <- paste0(fs::path_ext_remove(filename), ".", format)
 
-  # If not overwriting and pin exists, skip download
+  # If not overwriting and pin exists, skip download (early return)
   if (!local_overwrite && pin_name %in% pins::pin_list(board)) {
     return(list(board = board, pin_name = pin_name))
   }
+
+
   req <- do.call("build_request", args)
   raw_data <- req |>
     httr2::req_perform() |>
     httr2::resp_body_raw()
+
+  # store in
+
   # Save raw data to a temp file for reading
-  tmpfile <- tempfile(fileext = ".dta")
+  tmpfile <- fs::file_temp(ext =  "dta")
   writeBin(raw_data, tmpfile)
 
   # Read .dta and pin as parquet or qs

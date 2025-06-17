@@ -62,7 +62,7 @@ for ease of use.
 }
 \examples{
 \dontrun{
-  dlw_get_gmd("PRY", 2010, "GPWG")
-  dlw_get_gmd("COL", 2010, "GPWG")
+  dlw_get_gmd("PRY", 2010, "GPWG") # latest version of 2010
+  dlw_get_gmd("PRY", module = "GPWG") # latest year and latest version
 }
 }

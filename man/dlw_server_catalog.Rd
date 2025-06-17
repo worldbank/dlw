@@ -9,7 +9,8 @@ dlw_server_catalog(
   dlw_url = NULL,
   api_version = getOption("dlw.default_api_version"),
   force = FALSE,
-  verbose = getOption("dlw.verbose")
+  verbose = getOption("dlw.verbose"),
+  store_request = FALSE
 )
 }
 \arguments{
@@ -23,6 +24,8 @@ dlw_server_catalog(
 there is version available in .dlwenv}
 
 \item{verbose}{logical: whether to display info}
+
+\item{store_request}{logical: store request in .dlwenv as `last_req`}
 }
 \value{
 dataframe with

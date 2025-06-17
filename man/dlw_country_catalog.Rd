@@ -10,7 +10,8 @@ dlw_country_catalog(
   api_version = getOption("dlw.default_api_version"),
   force = FALSE,
   internal = FALSE,
-  verbose = getOption("dlw.verbose")
+  verbose = getOption("dlw.verbose"),
+  store_request = FALSE
 )
 }
 \arguments{
@@ -26,6 +27,8 @@ there is version available in .dlwenv}
 \item{internal}{logical: for internal use ONLY.}
 
 \item{verbose}{logical: whether to display info}
+
+\item{store_request}{logical: store request in .dlwenv as `last_req`}
 }
 \value{
 data.table with country catalog

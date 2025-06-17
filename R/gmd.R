@@ -13,8 +13,10 @@
 #'   X is a number of two digits like "01" or "02".
 #' @param veralt character: Version of the alternative  data in the form "vXX"
 #'   where X is a number of two digits like "01" or "02".
-#' @param latest logical: If TRUE and  `vermast` and `veralt` are NULL and then,
-#'   it will use the most recent data.
+#' @param latest logical: If TRUE, this argument has double functionality.
+#'   First, If `year` is NULL, it will filter the server catalog to the most
+#'   recent year of `country_code`. Second, if `vermast` and `veralt` are NULL,
+#'   it will use the most recent version of the data.
 #' @inheritDotParams dlw_get_data local local_dir local_overwrite
 #'
 #' @returns If the call is unique, it will return the data. If not, it will
@@ -23,7 +25,8 @@
 #'
 #' @examples
 #' \dontrun{
-#'   dlw_get_gmd("COL", 2010, "GPWG")
+#'   dlw_get_gmd("PRY", 2010, "GPWG") # latest version of 2010
+#'   dlw_get_gmd("PRY", module = "GPWG") # latest year and latest version
 #' }
 dlw_get_gmd <- function(country_code,
                         year = NULL,
@@ -46,10 +49,15 @@ dlw_get_gmd <- function(country_code,
                               vermast  = vermast,
                               veralt   = veralt)
 
+  if (latest == TRUE && is.null(year)) {
+    ctl <- ctl[Year == max(Year, na.rm = TRUE)]
+  }
+
   if (is.null(vermast) & is.null(veralt) & latest == TRUE) {
     ctl <- ctl[Vermast == max(Vermast, na.rm = TRUE)
-    ][Veralt == max(Veralt, na.rm = TRUE)]
+               ][Veralt == max(Veralt, na.rm = TRUE)]
   }
+
   calls <- gmd_calls(ctl = ctl,
                      country_code = country_code,
                      ...)
@@ -57,7 +65,7 @@ dlw_get_gmd <- function(country_code,
   if (length(calls) > 1) {
     if (verbose) {
       cli::cli_alert("your arguments do not uniquely identify a dataset.
-                     So you need execute one of the following:")
+                     You need execute one of the following:")
       print(calls)
 
     }

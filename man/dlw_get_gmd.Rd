@@ -34,8 +34,10 @@ X is a number of two digits like "01" or "02".}
 \item{veralt}{character: Version of the alternative  data in the form "vXX"
 where X is a number of two digits like "01" or "02".}
 
-\item{latest}{logical: If TRUE and  `vermast` and `veralt` are NULL and then,
-it will use the most recent data.}
+\item{latest}{logical: If TRUE, this argument has double functionality.
+First, If `year` is NULL, it will filter the server catalog to the most
+recent year of `country_code`. Second, if `vermast` and `veralt` are NULL,
+it will use the most recent version of the data.}
 
 \item{verbose}{logical: whether to display info}
 
@@ -60,6 +62,7 @@ for ease of use.
 }
 \examples{
 \dontrun{
-  dlw_get_gmd("COL", 2010, "GPWG")
+  dlw_get_gmd("PRY", 2010, "GPWG") # latest version of 2010
+  dlw_get_gmd("PRY", module = "GPWG") # latest year and latest version
 }
 }

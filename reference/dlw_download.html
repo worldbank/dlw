@@ -41,12 +41,10 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">dlw_download</span><span class="op">(</span></span>
 <span>  <span class="va">country_code</span>,</span>
 <span>  <span class="va">filename</span>,</span>
+<span>  <span class="va">board</span>,</span>
+<span>  <span class="va">pin_name</span>,</span>
+<span>  <span class="va">format</span>,</span>
 <span>  server <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  local_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"dlw.local_dir"</span><span class="op">)</span>,</span>
-<span>  local <span class="op">=</span> <span class="fu">fs</span><span class="fu">::</span><span class="fu"><a href="https://fs.r-lib.org/reference/is_file.html" class="external-link">is_dir</a></span><span class="op">(</span><span class="va">local_dir</span><span class="op">)</span>,</span>
-<span>  board_type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"folder"</span>, <span class="st">"local"</span><span class="op">)</span>,</span>
-<span>  format <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"parquet"</span>, <span class="st">"qs"</span><span class="op">)</span>,</span>
-<span>  local_overwrite <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"dlw.verbose"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -64,33 +62,21 @@
 <dd><p>character: Name of the file to save/read (required)</p></dd>
 
 
-<dt id="arg-server">server<a class="anchor" aria-label="anchor" href="#arg-server"></a></dt>
-<dd><p>character: in case we have more than one server. default is  GMD</p></dd>
+<dt id="arg-board">board<a class="anchor" aria-label="anchor" href="#arg-board"></a></dt>
+<dd><p>A pins board object (as returned by dlw_download)</p></dd>
 
 
-<dt id="arg-local-dir">local_dir<a class="anchor" aria-label="anchor" href="#arg-local-dir"></a></dt>
-<dd><p>character: Local directory to save data. Default available
-in option dlw.local_dir which is set initially as "".</p></dd>
-
-
-<dt id="arg-local">local<a class="anchor" aria-label="anchor" href="#arg-local"></a></dt>
-<dd><p>logical: whether or not to save and read data locally. default
-is TRUE if `local_dir` exists.</p></dd>
-
-
-<dt id="arg-board-type">board_type<a class="anchor" aria-label="anchor" href="#arg-board-type"></a></dt>
-<dd><p>character: Which pins board to use: 'folder' (default,
-shared) or 'local' (user-specific)</p></dd>
+<dt id="arg-pin-name">pin_name<a class="anchor" aria-label="anchor" href="#arg-pin-name"></a></dt>
+<dd><p>The name of the pin (as returned by dlw_download)</p></dd>
 
 
 <dt id="arg-format">format<a class="anchor" aria-label="anchor" href="#arg-format"></a></dt>
-<dd><p>character: File format to use for pinning data ('parquet'
-[default] or 'qs')</p></dd>
+<dd><p>character: File format to use for pinning data ('qs'
+[default] or 'parquet')</p></dd>
 
 
-<dt id="arg-local-overwrite">local_overwrite<a class="anchor" aria-label="anchor" href="#arg-local-overwrite"></a></dt>
-<dd><p>logical. Whether to overwrite any saved data. Default
-is FALSE</p></dd>
+<dt id="arg-server">server<a class="anchor" aria-label="anchor" href="#arg-server"></a></dt>
+<dd><p>character: in case we have more than one server. default is  GMD</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
@@ -100,6 +86,11 @@ vermast, veralt, collection, module)</p></dd>
 
 <dt id="arg-verbose">verbose<a class="anchor" aria-label="anchor" href="#arg-verbose"></a></dt>
 <dd><p>logical: whether to display info</p></dd>
+
+
+<dt id="arg-board-type">board_type<a class="anchor" aria-label="anchor" href="#arg-board-type"></a></dt>
+<dd><p>character: Which pins board to use:'local' (default
+user-specific) 'folder' (shared network drive or similar).</p></dd>
 
 </dl></div>
     <div class="section level2">

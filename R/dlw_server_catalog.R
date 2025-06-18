@@ -35,10 +35,8 @@ dlw_server_catalog <- function(server = NULL,
                        endpoint = endpoint,
                        Server = base_server,
                        store_request = store_request)
-  ctl <- req |>
-    handle_resp() |>
-    httr2::resp_body_string() |>
-    fread(data.table = TRUE)
+
+  ctl <-  handle_resp(req)
 
   ctl[, FileName := basename(FilePath)]
 

@@ -2,16 +2,24 @@
 % Please edit documentation in R/build_request.R
 \name{handle_resp}
 \alias{handle_resp}
+\alias{handle_req_perform}
 \title{perform httr2::req_perform and handle errors properly}
 \usage{
 handle_resp(req)
+
+handle_req_perform(req)
 }
 \arguments{
 \item{req}{A httr2 request object.}
 }
 \value{
+a data.table if the response is CSV. A raw vector if the response is
+  dta. Error otherwise
+
 an HTTP response.
 }
 \description{
+perform httr2::req_perform and handle errors properly
+
 perform httr2::req_perform and handle errors properly
 }

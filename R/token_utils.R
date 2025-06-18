@@ -98,7 +98,8 @@ dlw_test_token <- function(dlw_url = NULL,
   req <- build_request(dlw_url = dlw_url,
                        api_version = api_version,
                        endpoint = endpoint) |>
-    handle_resp()
+    handle_req_perform()
+
   if (verbose) {
     cli::cli_alert_success("Token valid")
   }

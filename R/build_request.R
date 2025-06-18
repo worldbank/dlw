@@ -56,12 +56,14 @@ build_request <- function(dlw_url = NULL,
 #'
 #' @param req A httr2 request object.
 #'
-#' @returns an HTTP response.
+#' @returns a data.table if the response is CSV. A raw vector if the response is
+#'   dta. Error otherwise
+#'
 #' @export
 handle_resp <- function(req) {
   out <- tryCatch(
     expr = {
-        resp <- httr2::req_perform(req)
+        resp <- handle_req_perform(req)
 
         file_type <-
           httr2::resp_content_type(resp) |>
@@ -83,16 +85,48 @@ handle_resp <- function(req) {
           if (error_found) {
             abort_dlw_error(rs)
           }
-          return(rs)
-
-
-        } else if (file_type == "dta") {
           rs
+        } else if (file_type == "dta") {
+            httr2::resp_body_raw(resp)
         } else {
-
-          cli::cli_abort("")
+          cli::cli_abort("For now, only CSV and dta formats are supported")
         }
 
+    }, # end of expr section
+    dlw_api_error = \(e) {
+      # placeholder
+      rlang::cnd_signal(e)
+    },
+    error = \(e) {
+      # placeholder
+      rlang::cnd_signal(e)
+    },
+    warning = \(w) {
+      # placeholder
+      rlang::cnd_signal(w)
+    }, # end of warning section
+
+    finally = {
+      # placeholder
+    } # end of finally section
+
+  ) # End of trycatch
+
+  out
+}
+
+
+#' perform httr2::req_perform and handle errors properly
+#'
+#' @param req A httr2 request object.
+#'
+#' @returns an HTTP response.
+#' @rdname handle_resp
+#' @export
+handle_req_perform <- \(req) {
+  out <- tryCatch(
+    expr = {
+      httr2::req_perform(req)
 
     }, # end of expr section
     httr2_failure = \(e) {
@@ -131,7 +165,6 @@ handle_resp <- function(req) {
 
   out
 }
-
 
 
 #' return information of error

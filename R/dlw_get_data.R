@@ -166,9 +166,7 @@ dlw_get_data <- function(country_code,
 #' @keywords internal
 get_raw_data <- \(req) {
 
-  raw_data <- req |>
-    handle_resp() |>
-    httr2::resp_body_raw()
+  raw_data <- handle_resp(req)
 
   set_in_dlwenv(key = "last_raw_data", value = raw_data)
 

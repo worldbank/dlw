@@ -36,10 +36,8 @@ dlw_country_catalog <- function(country_code,
                        api_version = api_version,
                        endpoint = endpoint,
                        store_request = store_request)
-  ctl <- req |>
-    handle_resp() |>
-    httr2::resp_body_string() |>
-    fread(data.table = TRUE)
+
+  ctl <- handle_resp(req)
 
   set_in_dlwenv(key, ctl, verbose)
 

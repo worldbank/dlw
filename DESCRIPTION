@@ -1,7 +1,7 @@
 Package: dlw
 Type: Package
 Title: R Client for the internal Datalibweb API of the World Bank
-Version: 0.1.0.9003
+Version: 0.1.0.9004
 Authors@R: person("R.Andres", "Castaneda",
                             email = "acastanedaa@worldbank.org",
                             role = c("aut", "cre"))

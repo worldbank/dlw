@@ -18,7 +18,8 @@ build_request <- function(dlw_url = NULL,
   base_url <- select_base_url(dlw_url = dlw_url)
   params   <- list(...)
 
-  req <- httr2::request(base_url) |>
+  req <- base_url |>
+    httr2::request() |>
     httr2::req_url_path_append(api_version) |>
     httr2::req_url_path_append(endpoint) |>
     httr2::req_user_agent(dlw_user_agent) |>

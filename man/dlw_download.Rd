@@ -10,8 +10,8 @@ dlw_download(
   server = NULL,
   local_dir = getOption("dlw.local_dir"),
   local = fs::is_dir(local_dir),
-  board_type = c("folder", "local"),
-  format = c("parquet", "qs"),
+  board_type = getOption("dlw.board_type"),
+  format = getOption("dlw.format"),
   local_overwrite = FALSE,
   ...,
   verbose = getOption("dlw.verbose")
@@ -30,19 +30,17 @@ in option dlw.local_dir which is set initially as "".}
 \item{local}{logical: whether or not to save and read data locally. default
 is TRUE if `local_dir` exists.}
 
-\item{board_type}{character: Which pins board to use: 'folder' (default,
-shared) or 'local' (user-specific)}
+\item{board_type}{character: Which pins board to use:'local' (default
+user-specific) 'folder' (shared network drive or similar).}
 
-\item{format}{character: File format to use for pinning data ('parquet'
-[default] or 'qs')}
+\item{format}{character: File format to use for pinning data ('qs'
+[default] or 'parquet')}
 
 \item{local_overwrite}{logical. Whether to overwrite any saved data. Default
 is FALSE}
 
 \item{...}{additional filtering arguments (e.g.,survey_year, survey_acronym,
 vermast, veralt, collection, module)}
-
-\item{verbose}{logical: whether to display info}
 }
 \value{
 A list with the board and pin_name used

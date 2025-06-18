@@ -2,10 +2,10 @@
 #'
 #' @inheritParams dlw_get_data
 #' @param filename character: Name of the file to save/read (required)
-#' @param board_type character: Which pins board to use: 'folder' (default,
-#'   shared) or 'local' (user-specific)
-#' @param format character: File format to use for pinning data ('parquet'
-#'   [default] or 'qs')
+#' @param board_type character: Which pins board to use:'local' (default
+#'   user-specific) 'folder' (shared network drive or similar).
+#' @param format character: File format to use for pinning data ('qs'
+#'   [default] or 'parquet')
 #' @returns A list with the board and pin_name used
 #' @keywords internal
 #' @importFrom pins board_local board_temp pin_write
@@ -15,11 +15,11 @@
 #'
 dlw_download <- function(country_code,
                          filename,
-                         server = NULL,
-                         local_dir = getOption("dlw.local_dir"),
-                         local = fs::is_dir(local_dir),
-                         board_type = c("folder", "local"),
-                         format = c("parquet", "qs"),
+                         server          = NULL,
+                         local_dir       = getOption("dlw.local_dir"),
+                         local           = fs::is_dir(local_dir),
+                         board_type      = getOption("dlw.board_type"),
+                         format          = getOption("dlw.format"),
                          local_overwrite = FALSE,
                          ...,
                          verbose = getOption("dlw.verbose")) {
@@ -85,6 +85,9 @@ dlw_download <- function(country_code,
                   name  = pin_name,
                   type  = format,
                   versioned = TRUE)
+  # set in dlwenv
+  set_in_dlwenv("current_board", board)
+  set_in_dlwenv("current_pin", pin_name)
   list(board = board, pin_name = pin_name)
 }
 
@@ -125,12 +128,11 @@ dlw_read <- function(board, pin_name) {
 #' @export
 dlw_get_data <- function(country_code,
                          filename,
-                         server     = NULL,
-                         verbose    =  getOption("dlw.verbose"),
-                         local_dir  = getOption("dlw.local_dir"),
-                         local      = fs::is_dir(local_dir),
-                         board_type = c("folder", "local"),
-                         format     = c("parquet", "qs"),
+                         server          = NULL,
+                         local_dir       = getOption("dlw.local_dir"),
+                         local           = fs::is_dir(local_dir),
+                         board_type      = getOption("dlw.board_type"),
+                         format          = getOption("dlw.format"),
                          local_overwrite = FALSE,
                          ...) {
 

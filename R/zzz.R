@@ -3,7 +3,9 @@ op.dlw <- list(
   dlw.default_api_version = "v1",
   dlw.output_method   = cli::ansi_has_hyperlink_support(),
   cli.ignore_unknown_rstudio_theme = TRUE,
-  dlw.local_dir = ""
+  dlw.local_dir = Sys.getenv("DLW_local_dir"),
+  dlw.board_type = c("local", "folder"),
+  dlw.format     = c("qs", "parquet")
 )
 
 

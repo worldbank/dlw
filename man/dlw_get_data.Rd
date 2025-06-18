@@ -8,11 +8,10 @@ dlw_get_data(
   country_code,
   filename,
   server = NULL,
-  verbose = getOption("dlw.verbose"),
   local_dir = getOption("dlw.local_dir"),
   local = fs::is_dir(local_dir),
-  board_type = c("folder", "local"),
-  format = c("parquet", "qs"),
+  board_type = getOption("dlw.board_type"),
+  format = getOption("dlw.format"),
   local_overwrite = FALSE,
   ...
 )
@@ -23,8 +22,6 @@ dlw_get_data(
 \item{filename}{character: Name of the file to save/read (required)}
 
 \item{server}{character: in case we have more than one server. default is  GMD}
-
-\item{verbose}{logical: whether to display info}
 
 \item{local_dir}{character: Local directory to save data. Default available
 in option dlw.local_dir which is set initially as "".}

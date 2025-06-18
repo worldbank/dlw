@@ -62,18 +62,37 @@ handle_resp <- function(req) {
   out <- tryCatch(
     expr = {
         resp <- httr2::req_perform(req)
+
         file_type <-
-          resp_content_type(resp) |>
+          httr2::resp_content_type(resp) |>
           fs::path_file()
 
         if (file_type == "csv") {
-          info <- resp |>
+          rs <- resp |>
             httr2::resp_body_string() |>
+            strsplit("\r\n") |>
+            unlist() |>
+            paste(collapse = "\n") |>
             fread(data.table = TRUE)
 
-        } else if (file_type != "dta") {
+          # It here a variables with error
+          error_found <- names(rs) |>
+            tolower() |>
+            grepl("error", x = _) |>
+            any()
+          if (error_found) {
+            abort_dlw_error(rs)
+          }
+          return(rs)
+
+
+        } else if (file_type == "dta") {
+          rs
+        } else {
+
           cli::cli_abort("")
         }
+
 
     }, # end of expr section
     httr2_failure = \(e) {
@@ -115,7 +134,32 @@ handle_resp <- function(req) {
 
 
 
+#' return information of error
+#'
+#' @param info csv file with at least one variable with "error" in its name.
+#'
+#' @returns error
+#' @keywords internal
+#'
+abort_dlw_error <- function(info) {
+  # Filter out NULL or NA values
+  select_cols <- vapply(info, \(x) {
+    !is.null(x) && !is.na(x)
+  },
+  logical(1))
 
+  show_fields <- names(info)[select_cols]
+  # Build a named list for cli::format_error
+  details <-
+    vapply(show_fields, \(nm) {
+      paste0("\n{.field ", nm, "}: {.val ", info[[nm]], "}\n")
+    },
+    character(1)) |>
+    setNames(rep("*", length(show_fields)))
+  # Add a main error message
+  msg <- c("!" = "API request failed. Error details:", details)
+  cli::cli_abort(msg, .subclass = c("dlw_api_error", "api_error"))
+}
 
 
 #' select between query or form according to method

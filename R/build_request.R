@@ -61,7 +61,20 @@ build_request <- function(dlw_url = NULL,
 handle_resp <- function(req) {
   out <- tryCatch(
     expr = {
-        httr2::req_perform(req)
+        resp <- httr2::req_perform(req)
+        file_type <-
+          resp_content_type(resp) |>
+          fs::path_file()
+
+        if (file_type == "csv") {
+          info <- resp |>
+            httr2::resp_body_string() |>
+            fread(data.table = TRUE)
+
+        } else if (file_type != "dta") {
+          cli::cli_abort("")
+        }
+
     }, # end of expr section
     httr2_failure = \(e) {
       cli::cli_abort(" the connection is dropped or the server doesn't exist")
@@ -99,6 +112,10 @@ handle_resp <- function(req) {
 
   out
 }
+
+
+
+
 
 
 #' select between query or form according to method

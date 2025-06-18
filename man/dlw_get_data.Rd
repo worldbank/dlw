@@ -2,7 +2,7 @@
 % Please edit documentation in R/dlw_get_data.R
 \name{dlw_get_data}
 \alias{dlw_get_data}
-\title{get data from datalibweb (refactored)}
+\title{Get data from datalibweb (refactored)}
 \usage{
 dlw_get_data(
   country_code,
@@ -13,6 +13,8 @@ dlw_get_data(
   board_type = getOption("dlw.board_type"),
   format = getOption("dlw.format"),
   local_overwrite = FALSE,
+  version = NULL,
+  verbose = getOption("dlw.verbose"),
   ...
 )
 }
@@ -38,6 +40,11 @@ shared) or 'local' (user-specific)}
 \item{local_overwrite}{logical. Whether to overwrite any saved data. Default
 is FALSE}
 
+\item{version}{numeric: Version of the pin to read (for pinning data
+retrieval only)}
+
+\item{verbose}{logical: whether to display info}
+
 \item{...}{additional filtering arguments (e.g.,survey_year, survey_acronym,
 vermast, veralt, collection, module)}
 }
@@ -45,5 +52,5 @@ vermast, veralt, collection, module)}
 data base request as data.table
 }
 \description{
-get data from datalibweb (refactored)
+Get data from datalibweb (refactored)
 }

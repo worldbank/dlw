@@ -1,6 +1,7 @@
 #' Download data from datalibweb and save as a pin
 #'
 #' @inheritParams dlw_get_data
+#' @inheritParams dlw_read
 #' @param filename character: Name of the file to save/read (required)
 #' @param board_type character: Which pins board to use:'local' (default
 #'   user-specific) 'folder' (shared network drive or similar).
@@ -15,17 +16,13 @@
 #'
 dlw_download <- function(country_code,
                          filename,
-                         server          = NULL,
-                         local_dir       = getOption("dlw.local_dir"),
-                         local           = fs::is_dir(local_dir),
-                         board_type      = getOption("dlw.board_type"),
-                         format          = getOption("dlw.format"),
-                         local_overwrite = FALSE,
+                         board,
+                         pin_name,
+                         format,
+                         server = NULL,
                          ...,
                          verbose = getOption("dlw.verbose")) {
 
-  board_type <- match.arg(board_type)
-  format     <- match.arg(format)
 
   if (missing(filename) || is.null(filename)) {
     cli::cli_abort("{.arg filename} is a required argument.")
@@ -41,36 +38,8 @@ dlw_download <- function(country_code,
                  filename = filename),
             dots)
 
-  # Choose board
-  board <- if (local) {
-    if (board_type == "local") {
-      pins::board_local(local_dir)
-    } else {
-      pins::board_folder(local_dir)
-    }
-  } else {
-    if (!rlang::env_has(.dlwenv, "temp_board")) {
-      brd <- pins::board_temp()
-      rlang::env_poke(env = .dlwenv,
-                      nm = "temp_board",
-                      value = brd)
-      brd
-    } else {
-      rlang::env_get(.dlwenv, "temp_board")
-    }
-  }
-  pin_name <- paste0(fs::path_ext_remove(filename), ".", format)
-
-  # If not overwriting and pin exists, skip download (early return)
-  if (!local_overwrite && pin_name %in% pins::pin_list(board)) {
-    return(list(board = board, pin_name = pin_name))
-  }
-
-
   raw_data <- do.call("build_request", args) |>
     get_raw_data()
-
-  # store in
 
   # Save raw data to a temp file for reading
   tmpfile <- fs::file_temp(ext =  "dta")
@@ -85,30 +54,33 @@ dlw_download <- function(country_code,
                   name  = pin_name,
                   type  = format,
                   versioned = TRUE)
-  # set in dlwenv
-  set_in_dlwenv("current_board", board)
-  set_in_dlwenv("current_pin", pin_name)
-  list(board = board, pin_name = pin_name)
+  dt
 }
 
 #' Read data from a pin (local or temp)
 #'
 #' @param board A pins board object (as returned by dlw_download)
 #' @param pin_name The name of the pin (as returned by dlw_download)
+#' @param version numeric: Version of the pin to read (for pinning data
+#'   retrieval only)
 #' @returns data.table
 #' @keywords internal
 #' @importFrom pins pin_read
 #' @importFrom data.table setDT
 #'
-dlw_read <- function(board, pin_name) {
+dlw_read <- function(board, pin_name, version = NULL) {
+
   if (!(pin_name %in% pins::pin_list(board))) {
     cli::cli_abort("File {.file {pin_name}} not found in the provided board.")
   }
-  pins::pin_read(board, pin_name) |>
+  pins::pin_read(board, pin_name, version = version) |>
     setDT()
+
 }
 
-#' get data from datalibweb (refactored)
+
+#' Get data from datalibweb (refactored)
+#'
 #' @param filename character: Name of the file to save/read (required)
 #' @inheritParams dlw_country_catalog
 #' @inheritParams dlw_server_catalog
@@ -124,6 +96,8 @@ dlw_read <- function(board, pin_name) {
 #'   [default] or 'qs')
 #' @param local_overwrite logical. Whether to overwrite any saved data. Default
 #'   is FALSE
+#' @param version numeric: Version of the pin to read (for pinning data
+#'   retrieval only)
 #' @returns data base request as data.table
 #' @export
 dlw_get_data <- function(country_code,
@@ -134,6 +108,8 @@ dlw_get_data <- function(country_code,
                          board_type      = getOption("dlw.board_type"),
                          format          = getOption("dlw.format"),
                          local_overwrite = FALSE,
+                         version         = NULL,
+                         verbose = getOption("dlw.verbose"),
                          ...) {
 
   board_type <- match.arg(board_type)
@@ -143,21 +119,36 @@ dlw_get_data <- function(country_code,
     cli::cli_abort("{.arg filename} is a required argument.")
   }
 
-  dlw_info <- dlw_download(country_code    = country_code,
-                          server          = server,
-                          filename        = filename,
-                          local_dir       = local_dir,
-                          local           = local,
-                          board_type      = board_type,
-                          format          = format,
-                          local_overwrite = local_overwrite,
-                          ...,
-                          verbose = verbose)
+  # Construct board and pin_name for reading
+  board <- get_wrk_board(local = local,
+                         board_type = board_type,
+                         local_dir = local_dir)
 
-  dlw_read(board = dlw_info$board,
-           pin_name = dlw_info$pin_name)
+  pin_name <- filename |>
+    fs::path_ext_remove() |>
+    fs::path(ext = format)
+
+  # set in dlwenv
+  set_in_dlwenv("current_board", board)
+  set_in_dlwenv("current_pin", pin_name)
+
+  if (!local_overwrite && pin_name %in% pins::pin_list(board)) {
+    # Only read the requested version, do not download
+    out <- dlw_read(board = board,
+                    pin_name = pin_name,
+                    version = version)
+    return(out)
+  }
+
+  dlw_download(country_code    = country_code,
+               server          = server,
+               filename        = filename,
+               format          = format,
+               board           = board,
+               pin_name        = pin_name,
+               ...,
+               verbose = verbose)
 }
-
 
 
 #' perform request and get raw data
@@ -172,4 +163,30 @@ get_raw_data <- \(req) {
 
   set_in_dlwenv(key = "last_raw_data", value = raw_data)
 
+}
+
+
+
+
+
+#' Get workign pips board
+#'
+#' @inheritParams dlw_get_data
+#' @returns board from {pins} package
+#' @keywords internal
+get_wrk_board <- function(local, board_type, local_dir) {
+  if (local) {
+    if (board_type == "local") {
+      pins::board_local(local_dir)
+    } else {
+      pins::board_folder(local_dir)
+    }
+  } else {
+    brd <- get_from_dlwenv("temp_board")
+    if (is.null(brd)) {
+      brd <- pins::board_temp()
+      set_in_dlwenv(key = "temp_board", value = brd)
+    }
+    brd
+  }
 }

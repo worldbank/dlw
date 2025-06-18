@@ -4,7 +4,7 @@
 \alias{set_in_dlwenv}
 \title{Setter function: Assign a value in .dlwenv}
 \usage{
-set_in_dlwenv(key, value, verbose = getOption("dlw.verbose"))
+set_in_dlwenv(key, value, verbose = FALSE)
 }
 \arguments{
 \item{key}{A character string representing the key}

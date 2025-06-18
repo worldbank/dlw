@@ -4,12 +4,15 @@
 \alias{dlw_read}
 \title{Read data from a pin (local or temp)}
 \usage{
-dlw_read(board, pin_name)
+dlw_read(board, pin_name, version = NULL)
 }
 \arguments{
 \item{board}{A pins board object (as returned by dlw_download)}
 
 \item{pin_name}{The name of the pin (as returned by dlw_download)}
+
+\item{version}{numeric: Version of the pin to read (for pinning data
+retrieval only)}
 }
 \value{
 data.table

@@ -4,7 +4,7 @@
 \alias{get_from_dlwenv}
 \title{Get for a specific key from .dlwenv}
 \usage{
-get_from_dlwenv(key, verbose = getOption("dlw.verbose"))
+get_from_dlwenv(key, verbose = FALSE)
 }
 \arguments{
 \item{key}{A character string representing the key}

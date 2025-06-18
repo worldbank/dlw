@@ -17,7 +17,7 @@ shared) or 'local' (user-specific)}
 in option dlw.local_dir which is set initially as "".}
 }
 \value{
-board from {pins} package
+board from (pins) package
 }
 \description{
 Get workign pips board

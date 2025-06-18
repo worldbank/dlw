@@ -3,8 +3,6 @@
 #' @inheritParams dlw_get_data
 #' @inheritParams dlw_read
 #' @param filename character: Name of the file to save/read (required)
-#' @param board_type character: Which pins board to use:'local' (default
-#'   user-specific) 'folder' (shared network drive or similar).
 #' @param format character: File format to use for pinning data ('qs'
 #'   [default] or 'parquet')
 #' @returns A list with the board and pin_name used
@@ -172,7 +170,7 @@ get_raw_data <- \(req) {
 #' Get workign pips board
 #'
 #' @inheritParams dlw_get_data
-#' @returns board from {pins} package
+#' @returns board from (pins) package
 #' @keywords internal
 get_wrk_board <- function(local, board_type, local_dir) {
   if (local) {

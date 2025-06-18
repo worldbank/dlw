@@ -33,9 +33,6 @@ dlw_download(
 vermast, veralt, collection, module)}
 
 \item{verbose}{logical: whether to display info}
-
-\item{board_type}{character: Which pins board to use:'local' (default
-user-specific) 'folder' (shared network drive or similar).}
 }
 \value{
 A list with the board and pin_name used

@@ -23,7 +23,8 @@ Imports:
     httr2,
     keyring,
     pins,
-    rlang
+    rlang,
+    stats
 Suggests: 
     usethis,
     testthat (>= 3.0.0),

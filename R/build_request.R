@@ -188,7 +188,7 @@ abort_dlw_error <- function(info) {
       paste0("\n{.field ", nm, "}: {.val ", info[[nm]], "}\n")
     },
     character(1)) |>
-    setNames(rep("*", length(show_fields)))
+    stats::setNames(rep("*", length(show_fields)))
   # Add a main error message
   msg <- c("!" = "API request failed. Error details:", details)
   cli::cli_abort(msg, .subclass = c("dlw_api_error", "api_error"))

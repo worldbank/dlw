@@ -13,10 +13,11 @@
 #'   X is a number of two digits like "01" or "02".
 #' @param veralt character: Version of the alternative  data in the form "vXX"
 #'   where X is a number of two digits like "01" or "02".
-#' @param latest logical: If TRUE, this argument has double functionality.
-#'   First, If `year` is NULL, it will filter the server catalog to the most
-#'   recent year of `country_code`. Second, if `vermast` and `veralt` are NULL,
-#'   it will use the most recent version of the data.
+#' @param latest_version logical: If TRUE and  `vermast` and `veralt` are NULL,
+#'   it will use the most recent version of the data for a particular year.
+#' @param  latest_year logical: If `TRUE` and  `year` is NULL, it retrieves the
+#'   most recent year. Otherwise, it will return the calls for all the years
+#'   available. This is the default.
 #' @inheritDotParams dlw_get_data local local_dir local_overwrite
 #'
 #' @returns If the call is unique, it will return the data. If not, it will
@@ -29,14 +30,15 @@
 #'   dlw_get_gmd("PRY", module = "GPWG") # latest year and latest version
 #' }
 dlw_get_gmd <- function(country_code,
-                        year = NULL,
-                        module = NULL,
-                        survey  = NULL,
-                        filename = NULL,
-                        vermast = NULL,
-                        veralt = NULL,
-                        latest = TRUE,
-                        verbose =  getOption("dlw.verbose"),
+                        year           = NULL,
+                        module         = NULL,
+                        survey         = NULL,
+                        filename       = NULL,
+                        vermast        = NULL,
+                        veralt         = NULL,
+                        latest_version = TRUE,
+                        latest_year    = FALSE,
+                        verbose        =  getOption("dlw.verbose"),
                         ...) {
 
 
@@ -49,13 +51,19 @@ dlw_get_gmd <- function(country_code,
                               vermast  = vermast,
                               veralt   = veralt)
 
-  if (latest == TRUE && is.null(year)) {
+  if (latest_year == TRUE && is.null(year)) {
     ctl <- ctl[Year == max(Year, na.rm = TRUE)]
   }
 
-  if (is.null(vermast) & is.null(veralt) & latest == TRUE) {
-    ctl <- ctl[Vermast == max(Vermast, na.rm = TRUE)
-               ][Veralt == max(Veralt, na.rm = TRUE)]
+  if (is.null(vermast) & is.null(veralt) & latest_version == TRUE) {
+    ctl <- ctl[ ,
+                #  for each year, the row(s) with the maximum Vermast.
+                .SD[Vermast == max(Vermast)],
+                by = Year
+                ][,
+                  #It should return only one row per year (even if there are ties)
+                  .SD[Veralt == max(Veralt, na.rm = TRUE)],
+                  by = Year]
   }
 
   calls <- gmd_calls(ctl = ctl,

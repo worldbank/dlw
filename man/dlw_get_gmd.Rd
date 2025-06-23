@@ -12,7 +12,8 @@ dlw_get_gmd(
   filename = NULL,
   vermast = NULL,
   veralt = NULL,
-  latest = TRUE,
+  latest_version = TRUE,
+  latest_year = FALSE,
   verbose = getOption("dlw.verbose"),
   ...
 )
@@ -34,10 +35,12 @@ X is a number of two digits like "01" or "02".}
 \item{veralt}{character: Version of the alternative  data in the form "vXX"
 where X is a number of two digits like "01" or "02".}
 
-\item{latest}{logical: If TRUE, this argument has double functionality.
-First, If `year` is NULL, it will filter the server catalog to the most
-recent year of `country_code`. Second, if `vermast` and `veralt` are NULL,
-it will use the most recent version of the data.}
+\item{latest_version}{logical: If TRUE and  `vermast` and `veralt` are NULL,
+it will use the most recent version of the data for a particular year.}
+
+\item{latest_year}{logical: If `TRUE` and  `year` is NULL, it retrieves the
+most recent year. Otherwise, it will return the calls for all the years
+available. This is the default.}
 
 \item{verbose}{logical: whether to display info}
 

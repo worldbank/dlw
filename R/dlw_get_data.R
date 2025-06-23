@@ -88,8 +88,6 @@ dlw_read <- function(board, pin_name, version = NULL) {
 #'   in option dlw.local_dir which is set initially as "".
 #' @param local logical: whether or not to save and read data locally. default
 #'   is TRUE if `local_dir` exists.
-#' @param board_type character: Which pins board to use: 'folder' (default,
-#'   shared) or 'local' (user-specific)
 #' @param format character: File format to use for pinning data ('parquet'
 #'   [default] or 'qs')
 #' @param local_overwrite logical. Whether to overwrite any saved data. Default
@@ -103,14 +101,11 @@ dlw_get_data <- function(country_code,
                          server          = NULL,
                          local_dir       = getOption("dlw.local_dir"),
                          local           = fs::is_dir(local_dir),
-                         board_type      = getOption("dlw.board_type"),
                          format          = getOption("dlw.format"),
                          local_overwrite = FALSE,
                          version         = NULL,
                          verbose = getOption("dlw.verbose"),
                          ...) {
-
-  board_type <- match.arg(board_type)
   format     <- match.arg(format)
 
   if (missing(filename) || is.null(filename)) {
@@ -119,7 +114,6 @@ dlw_get_data <- function(country_code,
 
   # Construct board and pin_name for reading
   board <- get_wrk_board(local = local,
-                         board_type = board_type,
                          local_dir = local_dir)
 
   pin_name <- filename |>
@@ -172,12 +166,12 @@ get_raw_data <- \(req) {
 #' @inheritParams dlw_get_data
 #' @returns board from (pins) package
 #' @keywords internal
-get_wrk_board <- function(local, board_type, local_dir) {
+get_wrk_board <- function(local, local_dir) {
   if (local) {
-    if (board_type == "local") {
-      pins::board_local(local_dir)
-    } else {
+    if (fs::is_dir(local_dir)) {
       pins::board_folder(local_dir)
+    } else {
+      pins::board_local(local_dir)
     }
   } else {
     brd <- get_from_dlwenv("temp_board")

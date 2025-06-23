@@ -11,7 +11,9 @@ get_wrk_board(local, board_type, local_dir)
 is TRUE if `local_dir` exists.}
 
 \item{board_type}{character: Which pins board to use: 'folder' (default,
-shared) or 'local' (user-specific)}
+shared) or 'local' (user-specific). "local" Is useful if you want to share
+pins between R sessions on your computer, and you don't care where the data
+lives. In this case `local_dir` is ignored.}
 
 \item{local_dir}{character: Local directory to save data. Default available
 in option dlw.local_dir which is set initially as "".}

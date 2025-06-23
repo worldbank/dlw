@@ -49,7 +49,8 @@ for ease of use.</p>
 <span>  filename <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  vermast <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  veralt <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  latest <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  latest_version <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  latest_year <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"dlw.verbose"</span><span class="op">)</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -89,11 +90,15 @@ X is a number of two digits like "01" or "02".</p></dd>
 where X is a number of two digits like "01" or "02".</p></dd>
 
 
-<dt id="arg-latest">latest<a class="anchor" aria-label="anchor" href="#arg-latest"></a></dt>
-<dd><p>logical: If TRUE, this argument has double functionality.
-First, If `year` is NULL, it will filter the server catalog to the most
-recent year of `country_code`. Second, if `vermast` and `veralt` are NULL,
-it will use the most recent version of the data.</p></dd>
+<dt id="arg-latest-version">latest_version<a class="anchor" aria-label="anchor" href="#arg-latest-version"></a></dt>
+<dd><p>logical: If TRUE and  `vermast` and `veralt` are NULL,
+it will use the most recent version of the data for a particular year.</p></dd>
+
+
+<dt id="arg-latest-year">latest_year<a class="anchor" aria-label="anchor" href="#arg-latest-year"></a></dt>
+<dd><p>logical: If `TRUE` and  `year` is NULL, it retrieves the
+most recent year. Otherwise, it will return the calls for all the years
+available. This is the default.</p></dd>
 
 
 <dt id="arg-verbose">verbose<a class="anchor" aria-label="anchor" href="#arg-verbose"></a></dt>

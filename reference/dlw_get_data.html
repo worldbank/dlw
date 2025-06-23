@@ -81,7 +81,9 @@ is TRUE if `local_dir` exists.</p></dd>
 
 <dt id="arg-board-type">board_type<a class="anchor" aria-label="anchor" href="#arg-board-type"></a></dt>
 <dd><p>character: Which pins board to use: 'folder' (default,
-shared) or 'local' (user-specific)</p></dd>
+shared) or 'local' (user-specific). "local" Is useful if you want to share
+pins between R sessions on your computer, and you don't care where the data
+lives. In this case `local_dir` is ignored.</p></dd>
 
 
 <dt id="arg-format">format<a class="anchor" aria-label="anchor" href="#arg-format"></a></dt>

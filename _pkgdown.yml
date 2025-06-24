@@ -17,4 +17,7 @@ reference:
 - title: .dlwenv environment
 - contents:
   - has_concept("dlwenv utilities")
+- title: Misc
+- contents:
+  - starts_with("print")
 

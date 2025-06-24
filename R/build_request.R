@@ -9,6 +9,7 @@
 #' @param store_request logical: store request in .dlwenv as `last_req`
 #'
 #' @return httr2 request
+#' @keywords internal
 build_request <- function(dlw_url = NULL,
                           api_version = getOption("dlw.default_api_version"),
                           endpoint,
@@ -60,7 +61,7 @@ build_request <- function(dlw_url = NULL,
 #' @returns a data.table if the response is CSV. A raw vector if the response is
 #'   dta. Error otherwise
 #'
-#' @export
+#' @keywords internal
 handle_resp <- function(req) {
   out <- tryCatch(
     expr = {

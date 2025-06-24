@@ -1,78 +1,3 @@
-#' Download data from datalibweb and save as a pin
-#'
-#' @inheritParams dlw_get_data
-#' @inheritParams dlw_read
-#' @param filename character: Name of the file to save/read (required)
-#' @param format character: File format to use for pinning data ('qs'
-#'   [default] or 'parquet')
-#' @returns A list with the board and pin_name used
-#' @keywords internal
-#'
-dlw_download <- function(country_code,
-                         filename,
-                         board,
-                         pin_name,
-                         format,
-                         server = NULL,
-                         ...,
-                         verbose = getOption("dlw.verbose")) {
-
-
-  if (missing(filename) || is.null(filename)) {
-    cli::cli_abort("{.arg filename} is a required argument.")
-  }
-
-  # prepare the args for request
-  dots <- list(...)
-  endpoint <- "FileInformation/GetFileInfo"
-  args <- c(list(Country = country_code,
-                 method = "POST",
-                 Server = server,
-                 endpoint = endpoint,
-                 filename = filename),
-            dots)
-
-  raw_data <- do.call("build_request", args) |>
-    get_raw_data()
-
-  # Save raw data to a temp file for reading
-  tmpfile <- fs::file_temp(ext =  "dta")
-  writeBin(raw_data, tmpfile)
-
-  # Read .dta and pin as parquet or qs
-  dt <- haven::read_dta(tmpfile, encoding = "latin1") |>
-    setDT()
-  unlink(tmpfile)
-  pins::pin_write(board = board,
-                  x     = dt,
-                  name  = pin_name,
-                  type  = format,
-                  versioned = TRUE)
-  dt
-}
-
-#' Read data from a pin (local or temp)
-#'
-#' @param board A pins board object (as returned by dlw_download)
-#' @param pin_name The name of the pin (as returned by dlw_download)
-#' @param version numeric: Version of the pin to read (for pinning data
-#'   retrieval only)
-#' @returns data.table
-#' @keywords internal
-#' @importFrom pins pin_read
-#' @importFrom data.table setDT
-#'
-dlw_read <- function(board, pin_name, version = NULL) {
-
-  if (!(pin_name %in% pins::pin_list(board))) {
-    cli::cli_abort("File {.file {pin_name}} not found in the provided board.")
-  }
-  pins::pin_read(board, pin_name, version = version) |>
-    setDT()
-
-}
-
-
 #' Get data from datalibweb (refactored)
 #'
 #' @param filename character: Name of the file to save/read (required)
@@ -137,6 +62,78 @@ dlw_get_data <- function(country_code,
                ...,
                verbose = verbose)
 }
+
+
+#' Download data from datalibweb and save as a pin
+#'
+#' @inheritParams dlw_get_data
+#' @inheritParams dlw_read
+#' @param filename character: Name of the file to save/read (required)
+#' @param format character: File format to use for pinning data ('qs'
+#'   [default] or 'parquet')
+#' @returns A list with the board and pin_name used
+#' @keywords internal
+dlw_download <- function(country_code,
+                         filename,
+                         board,
+                         pin_name,
+                         format,
+                         server = NULL,
+                         ...,
+                         verbose = getOption("dlw.verbose")) {
+
+
+  if (missing(filename) || is.null(filename)) {
+    cli::cli_abort("{.arg filename} is a required argument.")
+  }
+
+  # prepare the args for request
+  dots <- list(...)
+  endpoint <- "FileInformation/GetFileInfo"
+  args <- c(list(Country = country_code,
+                 method = "POST",
+                 Server = server,
+                 endpoint = endpoint,
+                 filename = filename),
+            dots)
+
+  raw_data <- do.call("build_request", args) |>
+    get_raw_data()
+
+  # Save raw data to a temp file for reading
+  tmpfile <- fs::file_temp(ext =  "dta")
+  writeBin(raw_data, tmpfile)
+
+  # Read .dta and pin as parquet or qs
+  dt <- haven::read_dta(tmpfile, encoding = "latin1") |>
+    setDT()
+  unlink(tmpfile)
+  pins::pin_write(board = board,
+                  x     = dt,
+                  name  = pin_name,
+                  type  = format,
+                  versioned = TRUE)
+  dt
+}
+
+#' Read data from a pin (local or temp)
+#'
+#' @param board A pins board object (as returned by dlw_download)
+#' @param pin_name The name of the pin (as returned by dlw_download)
+#' @param version numeric: Version of the pin to read (for pinning data
+#'   retrieval only)
+#' @returns data.table
+#' @keywords internal
+dlw_read <- function(board, pin_name, version = NULL) {
+
+  if (!(pin_name %in% pins::pin_list(board))) {
+    cli::cli_abort("File {.file {pin_name}} not found in the provided board.")
+  }
+  pins::pin_read(board, pin_name, version = version) |>
+    setDT()
+
+}
+
 
 
 #' perform request and get raw data

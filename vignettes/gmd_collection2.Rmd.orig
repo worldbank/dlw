@@ -1,0 +1,98 @@
+---
+title: "GMD Collection"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{GMD Collection}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Introduction
+The Global Monitoring Database ([GMD](https://worldbankgroup.sharepoint.com/:u:/r/sites/WBPoverty/SitePages/PublishingPages/Global-Monitoring-Database-GMD-02062020-093339.aspx?csf=1&web=1&e=dVCBX4)) is the World Bank’s central repository of harmonized, multitopic household income and expenditure surveys. These surveys, collected by national statistical offices, are compiled and processed by the Data for Goals (D4G) team, with support from regional statistics teams in the Poverty and Equity Global Practice. The Global Poverty & Inequality Data Team (GPID) in the Development Economics Data Group (DECDG) also contributes historical and external data, including from the Luxembourg Income Study (LIS).
+
+The GMD harmonizes key variables to enable meaningful comparisons of poverty and sociodemographic trends across countries and over time. Its microdata underpin major World Bank initiatives, including the Poverty and Inequality Platform ([PIP](https://pip.worldbank.org/home)), the Multidimensional Poverty Measure (WB MPM), the Global Database of Shared Prosperity (GDSP), and the Poverty, Prosperity and Planet Reports.
+
+```{r setup}
+# devtools::load_all(".")
+library(dlw)
+```
+
+## GMD server
+
+The Datalibweb system is organized into several servers, each hosting one or more *collections* of data. For example, the GMD collection is hosted on the GMD server, which can be confusing since both the collection and the server share the same name.
+
+To explore the catalog of data available on a server, use `dlw_server_catalog()`. If you do not specify a server, the default is `dlw_server_catalog(server = "GMD")`.
+
+```{r server-catalog}
+ctl <- dlw_server_catalog(server = "GMD")
+names(ctl)
+```
+
+The catalog contains all the metadata required to download any dataset from the GMD collection, provided you have the necessary access rights. For example, let’s examine the data available for Paraguay in 2020 within the GPWG module:
+
+```{r ctl-pry}
+# Variables to display
+vars_to_see <- c("FileName", "Country_code", "Survey_year", "Survey_acronym", "Vermast", "Veralt")
+
+# The dlw package fully imports data.table, so you can use its syntax directly
+ctl[Country_code == "PRY" & Year == 2020 & Module == "GPWG", ..vars_to_see]
+```
+
+Notice that there are three different versions available for this survey. To download a specific version, you must explicitly provide all required arguments to the `dlw_get_data()` function, which is the main function for downloading data in the `{dlw}` package. For example:
+
+```{r, eval=FALSE}
+dlw_get_data(
+  country_code = "PRY",
+  year = 2020L,
+  server = "GMD",
+  survey = "EPH",
+  module = "GPWG",
+  filename = "PRY_2020_EPH_V01_M_V03_A_GMD_GPWG.dta",
+  collection = "GMD"
+)
+```
+
+## Downloading data
+While specifying all these arguments is necessary, since the Datalibweb API requires them, it can be tedious. To simplify this process, the `dlw_get_gmd()` function acts as a convenient wrapper around `dlw_get_data()`. With `dlw_get_gmd()`, you only need to provide the country code, year, and module, and it will automatically download the most recent version of the data for you.
+
+```{r pry-gmd-basic}
+pry20 <- dlw_get_gmd(country_code = "PRY", year = 2020, module = "GPWG")
+```
+
+Notice that `dlw_get_gmd()` prints the actual call to `dlw_get_data()` in the console for your reference and verification.
+
+### All versions
+By default, `dlw_get_gmd()` returns the most recent version of the data for a particular year. However, if you set the argument `latest_version = FALSE`, the function will instead return a list of calls—one for each survey version available for that year. This allows you to review and select the specific version you wish to download.
+
+```{r latest-version-false}
+calls_pry20 <- dlw_get_gmd(country_code = "PRY", 
+                     year = 2020, 
+                     module = "GPWG", 
+                     latest_version = FALSE)
+```
+
+### Most recent year
+If you do not specify the year, `dlw_get_gmd()` will return calls for all surveys available for the given country and module. If you want to retrieve only the most recent year (which may differ by country and module), set `latest_year = TRUE`. This will ensure you get the latest available data for your selection.
+
+```{r latest-year}
+pry23 <- dlw_get_gmd(country_code = "PRY", 
+                     module = "GPWG", 
+                     latest_year = TRUE)
+```
+
+### Old version
+It is possible that, depending on the country and module, you may need to access an older version of the data. In such cases, you can specify the `veralt` argument to indicate which version you want to download. For example, if you want to download the second version of the Paraguay 2020 survey, you can do so as follows:
+```{r old-version}
+pry20_v2 <- dlw_get_gmd(country_code = "PRY", 
+                     year = 2020, 
+                     module = "GPWG",
+                     veralt = "v02")
+```
+

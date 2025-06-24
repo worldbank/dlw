@@ -32,6 +32,12 @@
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
 <li class="nav-item"><a class="nav-link" href="reference/index.html">Reference</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
+<li><a class="dropdown-item" href="articles/gmd_collection2.html">GMD Collection</a></li>
+  </ul>
+</li>
       </ul>
 <ul class="navbar-nav">
 <li class="nav-item"><form class="form-inline" role="search">
@@ -76,10 +82,10 @@
 <div class="section level3">
 <h3 id="token">Token<a class="anchor" aria-label="anchor" href="#token"></a>
 </h3>
-<p>To begin working with <a href="https://github.com/worldbank/dlw" class="external-link">dlw</a>, you must provide your datalibweb API token using the <code><a href="reference/dlw_set_token.html">dlw_set_token()</a></code> function.</p>
+<p>To begin working with <a href="https://github.com/worldbank/dlw" class="external-link">dlw</a>, you must provide your datalibweb API token using the <code><a href="reference/token.html">dlw_set_token()</a></code> function.</p>
 <p>You can obtain or renew your token by visiting the <a href="https://datalibweb2.worldbank.org/" class="external-link">datalibweb page</a> and following the instructions there. Once you have your token, set it in your R session as follows:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/dlw_set_token.html">dlw_set_token</a></span><span class="op">(</span><span class="st">"your_token_here"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="reference/token.html">dlw_set_token</a></span><span class="op">(</span><span class="st">"your_token_here"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="server-catalob">server catalob<a class="anchor" aria-label="anchor" href="#server-catalob"></a>

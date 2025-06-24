@@ -2,6 +2,8 @@
 <url><loc>https://worldbank.github.io/dlw/404.html</loc></url>
 <url><loc>https://worldbank.github.io/dlw/LICENSE-text.html</loc></url>
 <url><loc>https://worldbank.github.io/dlw/LICENSE.html</loc></url>
+<url><loc>https://worldbank.github.io/dlw/articles/gmd_collection2.html</loc></url>
+<url><loc>https://worldbank.github.io/dlw/articles/index.html</loc></url>
 <url><loc>https://worldbank.github.io/dlw/authors.html</loc></url>
 <url><loc>https://worldbank.github.io/dlw/index.html</loc></url>
 <url><loc>https://worldbank.github.io/dlw/reference/abort_dlw_error.html</loc></url>
@@ -13,17 +15,12 @@
 <url><loc>https://worldbank.github.io/dlw/reference/dlw_get_data.html</loc></url>
 <url><loc>https://worldbank.github.io/dlw/reference/dlw_get_gmd.html</loc></url>
 <url><loc>https://worldbank.github.io/dlw/reference/dlw_get_gmd_support.html</loc></url>
-<url><loc>https://worldbank.github.io/dlw/reference/dlw_get_token.html</loc></url>
 <url><loc>https://worldbank.github.io/dlw/reference/dlw_read.html</loc></url>
-<url><loc>https://worldbank.github.io/dlw/reference/dlw_remove_token.html</loc></url>
 <url><loc>https://worldbank.github.io/dlw/reference/dlw_server_catalog.html</loc></url>
 <url><loc>https://worldbank.github.io/dlw/reference/dlw_server_inventory.html</loc></url>
-<url><loc>https://worldbank.github.io/dlw/reference/dlw_set_token.html</loc></url>
-<url><loc>https://worldbank.github.io/dlw/reference/dlw_test_token.html</loc></url>
+<url><loc>https://worldbank.github.io/dlw/reference/dlwenv.html</loc></url>
 <url><loc>https://worldbank.github.io/dlw/reference/dot-dlwenv.html</loc></url>
 <url><loc>https://worldbank.github.io/dlw/reference/eval_gmd_call.html</loc></url>
-<url><loc>https://worldbank.github.io/dlw/reference/get_dlwenv.html</loc></url>
-<url><loc>https://worldbank.github.io/dlw/reference/get_from_dlwenv.html</loc></url>
 <url><loc>https://worldbank.github.io/dlw/reference/get_raw_data.html</loc></url>
 <url><loc>https://worldbank.github.io/dlw/reference/get_wrk_board.html</loc></url>
 <url><loc>https://worldbank.github.io/dlw/reference/gmd_calls.html</loc></url>
@@ -32,7 +29,7 @@
 <url><loc>https://worldbank.github.io/dlw/reference/print.dlw_call_list.html</loc></url>
 <url><loc>https://worldbank.github.io/dlw/reference/query_or_form.html</loc></url>
 <url><loc>https://worldbank.github.io/dlw/reference/select_server.html</loc></url>
-<url><loc>https://worldbank.github.io/dlw/reference/set_in_dlwenv.html</loc></url>
 <url><loc>https://worldbank.github.io/dlw/reference/simpleCap.html</loc></url>
+<url><loc>https://worldbank.github.io/dlw/reference/token.html</loc></url>
 </urlset>
 

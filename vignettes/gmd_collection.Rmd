@@ -1,0 +1,72 @@
+---
+title: "GMD Collection"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{GMD Collection}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+devtools::load_all(".")
+# library(dlw)
+```
+
+## Introduction
+The Global Monitoring Database ([GMD](https://worldbankgroup.sharepoint.com/:u:/r/sites/WBPoverty/SitePages/PublishingPages/Global-Monitoring-Database-GMD-02062020-093339.aspx?csf=1&web=1&e=dVCBX4)) is the World Bank’s central repository of harmonized, multitopic household income and expenditure surveys. These surveys, collected by national statistical offices, are compiled and processed by the Data for Goals (D4G) team, with support from regional statistics teams in the Poverty and Equity Global Practice. The Global Poverty & Inequality Data Team (GPID) in the Development Economics Data Group (DECDG) also contributes historical and external data, including from the Luxembourg Income Study (LIS).
+
+The GMD harmonizes key variables to enable meaningful comparisons of poverty and sociodemographic trends across countries and over time. Its microdata underpin major World Bank initiatives, including the Poverty and Inequality Platform ([PIP](https://pip.worldbank.org/home)), the Multidimensional Poverty Measure (WB MPM), the Global Database of Shared Prosperity (GDSP), and the Poverty, Prosperity and Planet Reports.
+
+
+## GMD server
+
+The Datalibweb system is divided by different servers, each of them hosting one or more *collections* of data. The GMD collection is hosted by the GMD server, which makes it confusing as both collection and server have the same name. 
+
+To access the catalog of data available in a server, you may use `dlw_server_catalog()`. If no input is provided, the default is `dlw_server_catalog(server = "GMD")`
+
+```{r server-catalog}
+ctl <- dlw_server_catalog(server = "GMD")
+names(ctl)
+```
+
+The catalog provides all the information necessary to download any data available in the GMD catalog as long as you have access to that data. Let's analyse, for instance, the data available for Paraguay 2020 in the GPWG module. 
+
+```{r ctl-pry}
+# vars
+vars_to_see <- c("FileName", "Country_code", "Survey_year", "Survey_acronym", "Vermast", "Veralt")
+
+# the dlw packages imports fully the data.table package
+ctl[Country_code == "PRY" & Year == 2020 & Module == "GPWG", 
+    ..vars_to_see]
+```
+
+Notice that there are three versions available for this survey. In order to download any of the version, you need to parse explicitly each argument to the `dlw_get_data()` function, which is the workhorse to download data of the `{dlw}` package. It would look something like this
+
+```{r, eval=FALSE}
+dlw_get_data(
+  country_code = "PRY",
+  year = 2020L,
+  server = "GMD",
+  survey = "EPH",
+  module = "GPWG",
+  filename = "PRY_2020_EPH_V01_M_V03_A_GMD_GPWG.dta",
+  collection = "GMD"
+)
+```
+
+However, passing all this information to `dlw_get_data()` could be tiresome, but it is necessary as the Datalibweb API requires all this information to work. However, function `dlw_get_gmd()` is wrapper of `dlw_get_data()` that makes your work easier. You only need to provide the country code, the year and the module and it will download the most recent version of the data. 
+
+```{r pry-gmd-basic}
+pry20 <- dlw_get_gmd(country_code = "PRY", year =2020,  module = "GPWG")
+```
+
+
+
+

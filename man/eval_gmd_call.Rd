@@ -17,4 +17,11 @@ evaluation
 \description{
 evaluate GMD call
 }
+\seealso{
+Other GMD utilities: 
+\code{\link{dlw_get_gmd}()},
+\code{\link{dlw_get_gmd_support}()},
+\code{\link{gmd_calls}()}
+}
+\concept{GMD utilities}
 \keyword{internal}

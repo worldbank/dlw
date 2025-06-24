@@ -69,3 +69,10 @@ for ease of use.
   dlw_get_gmd("PRY", module = "GPWG") # latest year and latest version
 }
 }
+\seealso{
+Other GMD utilities: 
+\code{\link{dlw_get_gmd_support}()},
+\code{\link{eval_gmd_call}()},
+\code{\link{gmd_calls}()}
+}
+\concept{GMD utilities}

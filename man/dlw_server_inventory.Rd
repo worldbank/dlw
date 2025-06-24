@@ -25,3 +25,9 @@ filter server catolog to show inventory by country and other variables
 dlw_server_inventory("COL", 2010)
 }
 }
+\seealso{
+Other catalogs: 
+\code{\link{dlw_country_catalog}()},
+\code{\link{dlw_server_catalog}()}
+}
+\concept{catalogs}

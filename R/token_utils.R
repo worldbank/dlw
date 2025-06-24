@@ -1,6 +1,14 @@
+#' Datalibweb Token utilities
+#' @name token
+NULL
+#> NULL
+
+
 # data is comming from R/data.R
 #' Store Datalibweb API token securely
 #' @param token The API token as a string
+#' @rdname token
+#' @family token utilities
 #' @export
 dlw_set_token <- function(token) {
   # If using the "file" backend (not the default on Windows/Mac/Linux)
@@ -36,6 +44,8 @@ dlw_set_token <- function(token) {
 #' @param prompt_if_missing logical: whether to be prompted to store token
 #'
 #' @return invisible token
+#' @rdname token
+#' @family token utilities
 #' @export
 dlw_get_token <- function(prompt_if_missing = TRUE) {
   # Try to get the token
@@ -65,6 +75,8 @@ dlw_get_token <- function(prompt_if_missing = TRUE) {
 }
 
 #' Remove/reset the Datalibweb API token
+#' @rdname token
+#' @family token utilities
 #' @export
 dlw_remove_token <- function() {
   if (keyring::default_backend()$name == "file") {
@@ -84,6 +96,8 @@ dlw_remove_token <- function() {
 #' @inheritParams build_request
 #' @inheritParams dlw_country_catalog
 #' @returns TRUE if all goes well
+#' @rdname token
+#' @family token utilities
 #' @export
 #'
 #' @examples

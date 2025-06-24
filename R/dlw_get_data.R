@@ -7,10 +7,6 @@
 #'   [default] or 'parquet')
 #' @returns A list with the board and pin_name used
 #' @keywords internal
-#' @importFrom pins board_local board_temp pin_write
-#' @importFrom httr2 req_perform resp_body_raw
-#' @importFrom haven read_dta
-#' @importFrom data.table setDT
 #'
 dlw_download <- function(country_code,
                          filename,

@@ -10,7 +10,6 @@ dlw_get_data(
   server = NULL,
   local_dir = getOption("dlw.local_dir"),
   local = fs::is_dir(local_dir),
-  board_type = getOption("dlw.board_type"),
   format = getOption("dlw.format"),
   local_overwrite = FALSE,
   version = NULL,
@@ -30,11 +29,6 @@ in option dlw.local_dir which is set initially as "".}
 
 \item{local}{logical: whether or not to save and read data locally. default
 is TRUE if `local_dir` exists.}
-
-\item{board_type}{character: Which pins board to use: 'folder' (default,
-shared) or 'local' (user-specific). "local" Is useful if you want to share
-pins between R sessions on your computer, and you don't care where the data
-lives. In this case `local_dir` is ignored.}
 
 \item{format}{character: File format to use for pinning data ('parquet'
 [default] or 'qs')}

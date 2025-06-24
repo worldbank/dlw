@@ -38,3 +38,9 @@ Server catalog
 dlw_server_catalog(sever = "GMD")
 }
 }
+\seealso{
+Other catalogs: 
+\code{\link{dlw_country_catalog}()},
+\code{\link{dlw_server_inventory}()}
+}
+\concept{catalogs}

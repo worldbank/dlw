@@ -30,3 +30,10 @@ dlw_get_gmd_support()
 dlw_get_gmd_support(vermast = "v10")
 }
 }
+\seealso{
+Other GMD utilities: 
+\code{\link{dlw_get_gmd}()},
+\code{\link{eval_gmd_call}()},
+\code{\link{gmd_calls}()}
+}
+\concept{GMD utilities}

@@ -41,3 +41,9 @@ Get country catalog
 dlw_country_catalog("COL")
 }
 }
+\seealso{
+Other catalogs: 
+\code{\link{dlw_server_catalog}()},
+\code{\link{dlw_server_inventory}()}
+}
+\concept{catalogs}

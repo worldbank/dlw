@@ -19,6 +19,7 @@
 #'   most recent year. Otherwise, it will return the calls for all the years
 #'   available. This is the default.
 #' @inheritDotParams dlw_get_data local local_dir local_overwrite
+#' @family GMD utilities
 #'
 #' @returns If the call is unique, it will return the data. If not, it will
 #'   return the posibilities for the user to choose.
@@ -88,6 +89,7 @@ dlw_get_gmd <- function(country_code,
 #'
 #' @param ctl data.table from [dlw_server_inventory]
 #' @param country_code ISO3
+#' @family GMD utilities
 #'
 #' @returns list of possible calls
 #' @keywords internal
@@ -120,6 +122,7 @@ gmd_calls <- function(ctl,
 #' @inheritParams dlw_get_gmd
 #' @param module character: As of now, either CPIICP (the default) or CPI.
 #'
+#' @family GMD utilities
 #' @returns data.table
 #' @export
 #'
@@ -158,6 +161,7 @@ dlw_get_gmd_support <- function(module = c("CPIICP", "CPI"),
 #'
 #' @param calls calls from [gmd_calls]
 #' @inheritParams dlw_get_gmd
+#' @family GMD utilities
 #'
 #' @returns evaluation
 #' @keywords internal

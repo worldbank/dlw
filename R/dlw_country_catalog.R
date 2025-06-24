@@ -5,6 +5,7 @@
 #' @inheritParams dlw_server_catalog
 #'
 #' @returns data.table with country catalog
+#' @family catalogs
 #' @export
 #'
 #' @examples

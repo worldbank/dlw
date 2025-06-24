@@ -17,4 +17,11 @@ list of possible calls
 \description{
 get data calls when more than one option.
 }
+\seealso{
+Other GMD utilities: 
+\code{\link{dlw_get_gmd}()},
+\code{\link{dlw_get_gmd_support}()},
+\code{\link{eval_gmd_call}()}
+}
+\concept{GMD utilities}
 \keyword{internal}

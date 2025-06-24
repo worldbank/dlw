@@ -1,6 +1,14 @@
+#' .dlwenv environment
+#' @name dlwenv
+NULL
+#> NULL
+
+
 #' Get function: Returns the entire .dlwenv environment
 #'
 #' @return The .dlwenv environment
+#' @rdname dlwenv
+#' @family dlwenv utilities
 #' @export
 #'
 #' @examples
@@ -13,6 +21,8 @@ get_dlwenv <- function() {
 #'
 #' @inheritParams set_in_dlwenv
 #' @return The value associated with the key in .dlwenv
+#' @rdname dlwenv
+#' @family dlwenv utilities
 #' @export
 #'
 #' @examples
@@ -33,6 +43,8 @@ get_from_dlwenv <- function(key, verbose =  FALSE) {
 #' @param value The value to store in .dlwenv
 #' @inheritParams dlw_country_catalog
 #'
+#' @rdname dlwenv
+#' @family dlwenv utilities
 #' @return The assigned value (invisibly)
 #' @export
 #'

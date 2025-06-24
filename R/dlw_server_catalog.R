@@ -7,6 +7,7 @@
 #' @inheritParams build_request
 #'
 #' @returns dataframe with
+#' @family catalogs
 #' @export
 #'
 #' @examples
@@ -55,6 +56,7 @@ dlw_server_catalog <- function(server = NULL,
 #' @param ... additional filtering arguments (e.g., year, module, survey, fileName)
 #'
 #' @returns filter server catalog from [dlw_server_catalog]
+#' @family catalogs
 #' @export
 #'
 #' @examples

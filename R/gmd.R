@@ -52,6 +52,12 @@ dlw_get_gmd <- function(country_code,
                               vermast  = vermast,
                               veralt   = veralt)
 
+  if (nrow(ctl) == 0) {
+
+    cli::cli_abort("Requested data is not available in the catalog")
+
+  }
+
   if (latest_year == TRUE && is.null(year)) {
     ctl <- ctl[Year == max(Year, na.rm = TRUE)]
   }

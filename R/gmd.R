@@ -59,11 +59,11 @@ dlw_get_gmd <- function(country_code,
   if (is.null(vermast) & is.null(veralt) & latest_version == TRUE) {
     ctl <- ctl[ ,
                 #  for each year, the row(s) with the maximum Vermast.
-                .SD[Vermast == max(Vermast)],
+                .SD[toupper(Vermast) == max(toupper(Vermast))],
                 by = Year
                 ][,
                   #It should return only one row per year (even if there are ties)
-                  .SD[Veralt == max(Veralt, na.rm = TRUE)],
+                  .SD[toupper(Veralt) == max(toupper(Veralt), na.rm = TRUE)],
                   by = Year]
   }
 
@@ -145,7 +145,7 @@ dlw_get_gmd_support <- function(module = c("CPIICP", "CPI"),
   # get latest by default.
 
   if (is.null(vermast)) {
-    ctl <- ctl[Vermast == max(Vermast, na.rm = TRUE)]
+    ctl <- ctl[toupper(Vermast) == max(toupper(Vermast), na.rm = TRUE)]
   } else {
     ctl <- ctl[Vermast == Vermast]
   }

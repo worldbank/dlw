@@ -22,3 +22,8 @@ dlw_list_env() # List objects in .dlwenv
 dlw_list_env(globalenv(), invisible = FALSE) # List objects in the global environment and print
 tmpenv <- new.env(); assign("x", 1, envir = tmpenv); dlw_list_env(tmpenv, invisible = FALSE)
 }
+\seealso{
+Other dlwenv utilities: 
+\code{\link{dlwenv}}
+}
+\concept{dlwenv utilities}

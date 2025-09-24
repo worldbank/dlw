@@ -69,6 +69,7 @@ set_in_dlwenv <- function(key,
 #' @param invisible Logical; if TRUE (default), returns the info invisibly. If FALSE, prints a formatted summary to the console.
 #'
 #' @return A data frame with columns `name` (object name) and `class` (object class), invisibly by default.
+#' @family dlwenv utilities
 #' @export
 #'
 #' @examples

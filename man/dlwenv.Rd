@@ -42,4 +42,14 @@ set_in_dlwenv("example_key", 42)
 get_from_dlwenv("example_key") # returns 42
 set_in_dlwenv("example_key", 42)
 }
+\seealso{
+Other dlwenv utilities: 
+\code{\link{dlw_list_env}()}
+
+Other dlwenv utilities: 
+\code{\link{dlw_list_env}()}
+
+Other dlwenv utilities: 
+\code{\link{dlw_list_env}()}
+}
 \concept{dlwenv utilities}

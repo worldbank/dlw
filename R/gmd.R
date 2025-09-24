@@ -43,19 +43,29 @@ dlw_get_gmd <- function(country_code,
                         ...) {
 
 
-  ctl <- dlw_server_inventory(country = country_code,
-                              server = "GMD",
-                              year = year,
-                              module = module,
-                              survey = survey,
-                              fileName = filename,
-                              vermast  = vermast,
-                              veralt   = veralt)
+  ctl_args <- list(
+    country = country_code,
+    server = "GMD",
+    year = year,
+    module = module,
+    survey = survey,
+    fileName = filename,
+    vermast = vermast,
+    veralt = veralt
+  )
+  ctl <- do.call(dlw_server_inventory, ctl_args)
 
   if (nrow(ctl) == 0) {
-
-    cli::cli_abort("Requested data is not available in the catalog")
-
+    arg_str <- paste(
+      sapply(names(ctl_args), \(nm) paste0(nm, "=", deparse(ctl_args[[nm]]))),
+      collapse = ", "
+    )
+    cli::cli_abort(
+      c(
+        "Requested data is not available in the catalog.",
+        paste0("Arguments: ", arg_str)
+      )
+    )
   }
 
   if (latest_year == TRUE && is.null(year)) {

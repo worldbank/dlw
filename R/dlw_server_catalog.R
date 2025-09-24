@@ -127,7 +127,10 @@ add_gmd_vars <- function(ctl) {
   ptt <- "^[A-Za-z]+_[0-9]{4}_[^_]+_[Vv][0-9]{2}_M_[Vv][0-9]{2}_A_[^_]+_[^_]+\\.[A-Za-z]+$"
   ctl[grepl(ptt, FileName),
       (vars) := tstrsplit(FileName, split = "_|[.]", fill = NA)
-  ][,
-    c("M", "A") := NULL]
+  ][, (vars) := lapply(.SD, toupper),
+    .SDcols = vars
+    ][,
+    c("M", "A") := NULL
+    ]
 
 }

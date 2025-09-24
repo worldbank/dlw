@@ -43,6 +43,18 @@ dlw_get_gmd <- function(country_code,
                         ...) {
 
 
+
+  # Automatically convert all character arguments to upper case
+  arg_names <- sys.function() |>
+    formals() |>
+    names() |>
+    setdiff("...")
+  arg_vals <- mget(arg_names, envir = environment(), ifnotfound = list(NULL))
+  for (arg in arg_names) {
+    val <- arg_vals[[arg]]
+    if (!is.null(val) && is.character(val)) assign(arg, toupper(val), envir = environment())
+  }
+
   ctl_args <- list(
     country = country_code,
     server = "GMD",

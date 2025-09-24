@@ -39,9 +39,9 @@ dlw_server_catalog <- function(server = NULL,
 
   ctl <-  handle_resp(req)
 
-  ctl[, FileName := basename(FilePath)]
+  ctl[, FileName := fs::path_file(FilePath)]
 
-  ctl <- ctl[(Ext == "dta"), ]
+  ctl <- ctl[tolower(Ext) %chin% getOption("dlw.download_formats"), ]
 
   add_gmd_vars(ctl)
 

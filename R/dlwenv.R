@@ -85,27 +85,37 @@ dlw_list_env <- function(env = .dlwenv, invisible = TRUE) {
   obj_names <- rlang::env_names(env)
   if (length(obj_names) == 0) {
     cli::cli_alert_info("The environment is empty.")
-    return(invisible(character(0)))
+    return(invisible(list()))
   }
 
-  obj_classes <- vapply(obj_names, function(nm) {
+  info <- lapply(obj_names, function(nm) {
     obj <- rlang::env_get(env, nm)
-    paste(class(obj), collapse = ", ")
-  }, character(1))
-
-  info <- data.frame(
-    name = obj_names,
-    class = obj_classes,
-    stringsAsFactors = FALSE
-  )
+    list(
+      class = class(obj)
+      # In the future, more elements can be added here
+    )
+  })
+  names(info) <- obj_names
 
   if (invisible) {
     return(invisible(info))
   }
 
   cli::cli_h1("Objects in environment:")
-  for (i in seq_len(nrow(info))) {
-    cli::cli_text("{info$name[i]}: {info$class[i]}")
+  for (nm in obj_names) {
+    obj_info <- info[[nm]]
+    details <- vapply(names(obj_info), function(field) {
+      val <- obj_info[[field]]
+      val_str <- if (is.character(val) && length(val) > 1) {
+        paste(val, collapse = ", ")
+        } else {
+          as.character(val)
+        }
+      paste0(cli::col_red(field), ": ", val_str)
+    },
+    character(1))
+
+    cli::cli_text("{.field {nm}}--> {paste(details, collapse = '; ')}")
   }
   invisible(info)
 }

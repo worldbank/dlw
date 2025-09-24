@@ -59,3 +59,27 @@ set_in_dlwenv <- function(key,
   }
   invisible(value)  # Return value invisibly to avoid clutter in console
 }
+
+
+#' Get the list of objects in a specified environment
+#'
+#' @param env A Environment name, default to `.dlwenv`
+#'
+#' @returns List of objects
+#' @export
+#'
+#' @examples
+#' dlw_list_env()
+dlw_list_env <- function(env = .dlwenv) {
+
+  # Check if the provided argument is an environment
+  if (!is.environment(env)) {
+
+    cli::cli_abort("The provided argument is not an environment.")
+  }
+
+  # get the list of objects in the environment
+  obj_list <- ls(env)
+
+  return(invisible(obj_list))
+}

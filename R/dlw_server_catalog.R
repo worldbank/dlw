@@ -41,6 +41,8 @@ dlw_server_catalog <- function(server = NULL,
 
   ctl[, FileName := basename(FilePath)]
 
+  ctl <- ctl[(Ext == "dta"), ]
+
   add_gmd_vars(ctl)
 
   set_in_dlwenv(key, ctl, verbose)

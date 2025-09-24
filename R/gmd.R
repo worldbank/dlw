@@ -43,14 +43,42 @@ dlw_get_gmd <- function(country_code,
                         ...) {
 
 
-  ctl <- dlw_server_inventory(country = country_code,
-                              server = "GMD",
-                              year = year,
-                              module = module,
-                              survey = survey,
-                              fileName = filename,
-                              vermast  = vermast,
-                              veralt   = veralt)
+
+  # Automatically convert all character arguments to upper case
+  arg_names <- sys.function() |>
+    formals() |>
+    names() |>
+    setdiff("...")
+  arg_vals <- mget(arg_names, envir = environment(), ifnotfound = list(NULL))
+  for (arg in arg_names) {
+    val <- arg_vals[[arg]]
+    if (!is.null(val) && is.character(val)) assign(arg, toupper(val), envir = environment())
+  }
+
+  ctl_args <- list(
+    country = country_code,
+    server = "GMD",
+    year = year,
+    module = module,
+    survey = survey,
+    fileName = filename,
+    vermast = vermast,
+    veralt = veralt
+  )
+  ctl <- do.call(dlw_server_inventory, ctl_args)
+
+  if (nrow(ctl) == 0) {
+    arg_str <- paste(
+      sapply(names(ctl_args), \(nm) paste0(nm, "=", deparse(ctl_args[[nm]]))),
+      collapse = ", "
+    )
+    cli::cli_abort(
+      c(
+        "Requested data is not available in the catalog.",
+        paste0("Arguments: ", arg_str)
+      )
+    )
+  }
 
   if (latest_year == TRUE && is.null(year)) {
     ctl <- ctl[Year == max(Year, na.rm = TRUE)]

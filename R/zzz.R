@@ -5,7 +5,8 @@ op.dlw <- list(
   cli.ignore_unknown_rstudio_theme = TRUE,
   dlw.local_dir = Sys.getenv("DLW_local_dir"),
   dlw.board_type = c("folder", "local"),
-  dlw.format     = c("qs", "parquet")
+  dlw.format     = c("qs", "parquet"),
+  dlw.download_formats = c("dta") # we could add more later.
 )
 
 

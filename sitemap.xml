@@ -7,6 +7,7 @@
 <url><loc>https://worldbank.github.io/dlw/articles/index.html</loc></url>
 <url><loc>https://worldbank.github.io/dlw/authors.html</loc></url>
 <url><loc>https://worldbank.github.io/dlw/index.html</loc></url>
+<url><loc>https://worldbank.github.io/dlw/news/index.html</loc></url>
 <url><loc>https://worldbank.github.io/dlw/reference/abort_dlw_error.html</loc></url>
 <url><loc>https://worldbank.github.io/dlw/reference/add_gmd_vars.html</loc></url>
 <url><loc>https://worldbank.github.io/dlw/reference/build_request.html</loc></url>
@@ -16,6 +17,7 @@
 <url><loc>https://worldbank.github.io/dlw/reference/dlw_get_data.html</loc></url>
 <url><loc>https://worldbank.github.io/dlw/reference/dlw_get_gmd.html</loc></url>
 <url><loc>https://worldbank.github.io/dlw/reference/dlw_get_gmd_support.html</loc></url>
+<url><loc>https://worldbank.github.io/dlw/reference/dlw_list_env.html</loc></url>
 <url><loc>https://worldbank.github.io/dlw/reference/dlw_read.html</loc></url>
 <url><loc>https://worldbank.github.io/dlw/reference/dlw_server_catalog.html</loc></url>
 <url><loc>https://worldbank.github.io/dlw/reference/dlw_server_inventory.html</loc></url>

@@ -88,7 +88,7 @@ dlw_list_env <- function(env = .dlwenv, invisible = TRUE) {
     return(invisible(list()))
   }
 
-  info <- lapply(obj_names, function(nm) {
+  info <- lapply(obj_names, \(nm) {
     obj <- rlang::env_get(env, nm)
     list(
       class = class(obj)
@@ -104,7 +104,7 @@ dlw_list_env <- function(env = .dlwenv, invisible = TRUE) {
   cli::cli_h1("Objects in environment:")
   for (nm in obj_names) {
     obj_info <- info[[nm]]
-    details <- vapply(names(obj_info), function(field) {
+    details <- vapply(names(obj_info), \(field) {
       val <- obj_info[[field]]
       val_str <- if (is.character(val) && length(val) > 1) {
         paste(val, collapse = ", ")

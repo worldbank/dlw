@@ -41,4 +41,7 @@ dlw_country_catalog <- function(country_code,
   ctl <- handle_resp(req)
 
   set_in_dlwenv(key, ctl, verbose)
+
+  # return the catalog
+  ctl
 }

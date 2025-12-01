@@ -148,11 +148,10 @@ get_raw_data <- \(req) {
 
   set_in_dlwenv(key = "last_raw_data", value = raw_data)
 
+  # return raw data so callers receive the bytes
+  raw_data
+
 }
-
-
-
-
 
 #' Get workign pips board
 #'

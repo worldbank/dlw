@@ -28,6 +28,7 @@ Imports:
 Suggests: 
     usethis,
     testthat (>= 3.0.0),
+    mockery,
     knitr,
     rmarkdown
 Config/testthat/edition: 3

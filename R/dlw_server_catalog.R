@@ -1,6 +1,6 @@
 #' Server catalog
 #'
-#' @param server character: in case we have more than one server. default is  GMD
+#' @param server character: in case we have more than one server. default is GMD
 #' @param verbose logical: whether to display info
 #' @param force logical: If TRUE, it will query the API regardless of whether
 #'   there is version available in .dlwenv
@@ -63,7 +63,8 @@ dlw_server_catalog <- function(server = NULL,
 #'
 #' @examples
 #' \dontrun{
-#' dlw_server_inventory("COL", 2010)
+#' dlw_server_inventory("COL")
+#' dlw_server_inventory("COL", year = 2010)
 #' }
 dlw_server_inventory <- function(country,
                                  server = NULL,

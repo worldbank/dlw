@@ -2,22 +2,22 @@
 % Please edit documentation in R/dlw_get_data.R
 \name{dlw_read}
 \alias{dlw_read}
-\title{Read data from a pin (local or temp)}
+\title{Read data from (local or temp)}
 \usage{
-dlw_read(board, pin_name, version = NULL)
+dlw_read(dlw_dir, id_name, version = NULL)
 }
 \arguments{
-\item{board}{A pins board object (as returned by dlw_download)}
+\item{dlw_dir}{A folder object (as returned by dlw_download)}
 
-\item{pin_name}{The name of the pin (as returned by dlw_download)}
+\item{id_name}{The name of the a dataset (as returned by dlw_download)}
 
-\item{version}{numeric: Version of the pin to read (for pinning data
+\item{version}{numeric: Version of the data to read (for versioning data
 retrieval only)}
 }
 \value{
 data.table
 }
 \description{
-Read data from a pin (local or temp)
+Read data from (local or temp)
 }
 \keyword{internal}

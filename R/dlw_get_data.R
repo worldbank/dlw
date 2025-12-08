@@ -9,8 +9,8 @@
 #'   in option dlw.local_dir which is set initially as "".
 #' @param local logical: whether or not to save and read data locally. default
 #'   is TRUE if `local_dir` exists.
-#' @param format character: File format to use for pinning data ('parquet'
-#'   [default] or 'qs')
+#' @param format character: File format to use for saving data ('parquet'
+#'   [default] or 'qs2')
 #' @param local_overwrite logical. Whether to overwrite any saved data. Default
 #'   is FALSE
 #' @param version numeric: Version of the pin to read (for pinning data
@@ -33,32 +33,45 @@ dlw_get_data <- function(country_code,
     cli::cli_abort("{.arg filename} is a required argument.")
   }
 
-  # Construct board and pin_name for reading
-  board <- get_wrk_board(local = local,
-                         local_dir = local_dir)
+  # Construct directory and id_name for reading
+  dlw_dir <- get_wrk_board(local = local,
+                           local_dir = local_dir)
 
-  pin_name <- filename |>
+  # Get file name without extension
+  file_name <- filename |>
+    fs::path_ext_remove()
+
+  dlw_dir <- fs::path(dlw_dir, file_name)
+
+  if (!fs::is_dir(dlw_dir)) {
+    fs::dir_create(dlw_dir)
+  }
+
+  id_name <- filename |>
     fs::path_ext_remove() |>
     fs::path(ext = format)
 
   # set in dlwenv
-  set_in_dlwenv("current_board", board)
-  set_in_dlwenv("current_pin", pin_name)
+  set_in_dlwenv("current_dir", dlw_dir)
+  set_in_dlwenv("current_id", id_name)
 
-  if (!local_overwrite && pin_name %in% pins::pin_list(board)) {
+  files_in_dir <- basename(list.files(dlw_dir))
+
+  if (!local_overwrite && id_name %in% files_in_dir) {
     # Only read the requested version, do not download
-    out <- dlw_read(board = board,
-                    pin_name = pin_name,
+    out <- dlw_read(dlw_dir = dlw_dir,
+                    id_name = id_name,
                     version = version)
     return(out)
   }
+
 
   dlw_download(country_code    = country_code,
                server          = server,
                filename        = filename,
                format          = format,
-               board           = board,
-               pin_name        = pin_name,
+               dlw_dir         = dlw_dir,
+               id_name         = id_name,
                ...,
                verbose = verbose)
 }
@@ -75,8 +88,8 @@ dlw_get_data <- function(country_code,
 #' @keywords internal
 dlw_download <- function(country_code,
                          filename,
-                         board,
-                         pin_name,
+                         dlw_dir,
+                         id_name,
                          format,
                          server = NULL,
                          ...,
@@ -108,32 +121,44 @@ dlw_download <- function(country_code,
   dt <- haven::read_dta(tmpfile, encoding = "latin1") |>
     setDT()
   unlink(tmpfile)
-  pins::pin_write(board = board,
-                  x     = dt,
-                  name  = pin_name,
-                  type  = format,
-                  versioned = TRUE)
+
+  id_name <- id_name |>
+    fs::path_ext_remove()
+
+  stamp::st_init(dlw_dir)
+
+  pipload::pip_write(x = dt,
+    id = id_name,
+    dir = dlw_dir,
+    format  = format)
   dt
 }
 
-#' Read data from a pin (local or temp)
+#' Read data from (local or temp)
 #'
-#' @param board A pins board object (as returned by dlw_download)
-#' @param pin_name The name of the pin (as returned by dlw_download)
-#' @param version numeric: Version of the pin to read (for pinning data
+#' @param dlw_dir A folder object (as returned by dlw_download)
+#' @param id_name The name of the a dataset (as returned by dlw_download)
+#' @param version numeric: Version of the data to read (for versioning data
 #'   retrieval only)
 #' @returns data.table
 #' @keywords internal
-dlw_read <- function(board, pin_name, version = NULL) {
+dlw_read <- function(dlw_dir, id_name, version = NULL) {
 
-  if (!(pin_name %in% pins::pin_list(board))) {
-    cli::cli_abort("File {.file {pin_name}} not found in the provided board.")
+  files_in_dir <- basename(list.files(dlw_dir))
+
+  if (!(id_name %in% files_in_dir)) {
+    cli::cli_abort("File {.file {id_name}} not found in the provided directory.")
   }
-  pins::pin_read(board, pin_name, version = version) |>
-    setDT()
+
+  id_name <- id_name |>
+    fs::path_ext_remove()
+
+  pipload::pip_read(id_name, dir = dlw_dir, version = version)
+
+  # pipload::pip_read(id_name, dlw_dir, version = version) |>
+  #   setDT()
 
 }
-
 
 
 #' perform request and get raw data
@@ -156,21 +181,25 @@ get_raw_data <- \(req) {
 #' Get workign pips board
 #'
 #' @inheritParams dlw_get_data
-#' @returns board from (pins) package
+#' @returns Folder path
 #' @keywords internal
 get_wrk_board <- function(local, local_dir) {
   if (local) {
-    if (fs::is_dir(local_dir)) {
-      pins::board_folder(local_dir)
+    if (!fs::is_dir(local_dir)) {
+      wrk_dir <- fs::dir_create(local_dir)
     } else {
-      pins::board_local(local_dir)
+      wrk_dir <- fs::dir_create(local_dir)
     }
   } else {
-    brd <- get_from_dlwenv("temp_board")
-    if (is.null(brd)) {
-      brd <- pins::board_temp()
-      set_in_dlwenv(key = "temp_board", value = brd)
+    wrk_dir <- get_from_dlwenv("temp_dir")
+
+    if (is.null(wrk_dir)) {
+      wrk_dir <- fs::path_temp("wrk_dir_dlw")
+      fs::dir_create(wrk_dir)
+
+      set_in_dlwenv(key = "temp_dir", value = wrk_dir)
+
     }
-    brd
+    wrk_dir
   }
 }

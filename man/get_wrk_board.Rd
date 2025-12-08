@@ -14,7 +14,7 @@ is TRUE if `local_dir` exists.}
 in option dlw.local_dir which is set initially as "".}
 }
 \value{
-board from (pins) package
+Folder path
 }
 \description{
 Get workign pips board

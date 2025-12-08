@@ -22,8 +22,10 @@ Imports:
     haven,
     httr2,
     keyring,
+    pipload,
     pins,
     rlang,
+    stamp (>= 0.0.4),
     stats
 Suggests: 
     usethis,
@@ -33,3 +35,5 @@ Suggests:
     rmarkdown
 Config/testthat/edition: 3
 VignetteBuilder: knitr
+Remotes:  
+    github::randrescastaneda/stamp@DEV

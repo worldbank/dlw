@@ -7,8 +7,8 @@
 dlw_download(
   country_code,
   filename,
-  board,
-  pin_name,
+  dlw_dir,
+  id_name,
   format,
   server = NULL,
   ...,
@@ -20,14 +20,14 @@ dlw_download(
 
 \item{filename}{character: Name of the file to save/read (required)}
 
-\item{board}{A pins board object (as returned by dlw_download)}
+\item{dlw_dir}{A folder object (as returned by dlw_download)}
 
-\item{pin_name}{The name of the pin (as returned by dlw_download)}
+\item{id_name}{The name of the a dataset (as returned by dlw_download)}
 
 \item{format}{character: File format to use for pinning data ('qs'
 [default] or 'parquet')}
 
-\item{server}{character: in case we have more than one server. default is  GMD}
+\item{server}{character: in case we have more than one server. default is GMD}
 
 \item{...}{additional filtering arguments (e.g.,survey_year, survey_acronym,
 vermast, veralt, collection, module)}

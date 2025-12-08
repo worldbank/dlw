@@ -22,7 +22,7 @@ dlw_get_data(
 
 \item{filename}{character: Name of the file to save/read (required)}
 
-\item{server}{character: in case we have more than one server. default is  GMD}
+\item{server}{character: in case we have more than one server. default is GMD}
 
 \item{local_dir}{character: Local directory to save data. Default available
 in option dlw.local_dir which is set initially as "".}
@@ -30,8 +30,8 @@ in option dlw.local_dir which is set initially as "".}
 \item{local}{logical: whether or not to save and read data locally. default
 is TRUE if `local_dir` exists.}
 
-\item{format}{character: File format to use for pinning data ('parquet'
-[default] or 'qs')}
+\item{format}{character: File format to use for saving data ('parquet'
+[default] or 'qs2')}
 
 \item{local_overwrite}{logical. Whether to overwrite any saved data. Default
 is FALSE}

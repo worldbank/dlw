@@ -14,7 +14,7 @@ dlw_server_catalog(
 )
 }
 \arguments{
-\item{server}{character: in case we have more than one server. default is  GMD}
+\item{server}{character: in case we have more than one server. default is GMD}
 
 \item{dlw_url}{character: in case we have more than one url.}
 

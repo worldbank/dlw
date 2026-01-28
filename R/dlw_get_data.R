@@ -38,14 +38,18 @@ dlw_get_data <- function(country_code,
                            local_dir = local_dir)
 
   # Get file name without extension
-  file_name <- filename |>
-    fs::path_ext_remove()
-
-  dlw_dir <- fs::path(dlw_dir, file_name)
-
-  if (!fs::is_dir(dlw_dir)) {
-    fs::dir_create(dlw_dir)
-  }
+  # file_name <- filename |>
+  #   fs::path_ext_remove()
+  #
+  # dlw_dir <- fs::path(dlw_dir, file_name)
+  #
+  # if (!fs::is_dir(dlw_dir)) {
+  #   fs::dir_create(dlw_dir)
+  # }
+  #
+  # id_name <- filename |>
+  #   fs::path_ext_remove() |>
+  #   fs::path(ext = format)
 
   id_name <- filename |>
     fs::path_ext_remove() |>
@@ -122,16 +126,21 @@ dlw_download <- function(country_code,
     setDT()
   unlink(tmpfile)
 
-  id_name <- id_name |>
-    fs::path_ext_remove()
+  # id_name <- id_name |>
+  #   fs::path_ext_remove()
 
-  stamp::st_init(dlw_dir)
+  # stamp::st_init(dlw_dir)
+  #
+  # pipload::pip_write(x = dt,
+  #   id = id_name,
+  #   dir = dlw_dir,
+  #   format  = format)
+  # dt
 
-  pipload::pip_write(x = dt,
-    id = id_name,
-    dir = dlw_dir,
-    format  = format)
+  # stamp::st_init(dlw_dir)
+  stamp::st_save(dt, fs::path(dlw_dir, id_name))
   dt
+
 }
 
 #' Read data from (local or temp)
@@ -153,10 +162,8 @@ dlw_read <- function(dlw_dir, id_name, version = NULL) {
   id_name <- id_name |>
     fs::path_ext_remove()
 
-  pipload::pip_read(id_name, dir = dlw_dir, version = version)
-
-  # pipload::pip_read(id_name, dlw_dir, version = version) |>
-  #   setDT()
+  # pipload::pip_read(id_name, dir = dlw_dir, version = version)
+  stamp::st_load(fs::path(dlw_dir, id_name, ext = ".qs2"))
 
 }
 
@@ -178,7 +185,14 @@ get_raw_data <- \(req) {
 
 }
 
-#' Get workign pips board
+#' Get working folder for saving or reading data
+#'
+#' Determines the directory to use for saving or reading data, depending on whether you want to use a local directory or a temporary one.
+#'
+#' - If `local` is `TRUE`, it checks if `local_dir` exists. If not, it creates it (using `fs::dir_create()`). It then returns this directory path.
+#' - If `local` is `FALSE`, it tries to get a temporary directory path from the package environment (`get_from_dlwenv("temp_dir")`). If this does not exist, it creates a new temporary directory, stores its path in the environment, and returns it.
+#'
+#' This function ensures that data is always saved to a valid directory, either user-specified or temporary.
 #'
 #' @inheritParams dlw_get_data
 #' @returns Folder path

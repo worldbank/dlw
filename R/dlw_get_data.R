@@ -1,5 +1,19 @@
 #' Get data from datalibweb (refactored)
 #'
+#' The `dlw_get_data()` function is the main user-facing function for 
+#'   retrieving datasets from the Datalibweb (DLW) API. It handles 
+#'   downloading, caching, and reading datasets, supporting both local 
+#'   and temporary storage.
+#'
+#' **How it works:**
+#' 1. Checks if the requested file exists locally (unless `local_overwrite = TRUE`).
+#' 2. If it exists, reads it using `dlw_read()`.
+#' 3. If not, downloads the data from the DLW API using `dlw_download()`, saves it in the specified format, and returns it as a `data.table`.
+#' 4. Handles directory management and caching via `get_wrk_board()`.
+#'
+#' This function streamlines access to DLW datasets, automatically 
+#'    managing download, storage, and retrieval.
+#' 
 #' @param filename character: Name of the file to save/read (required)
 #' @inheritParams dlw_country_catalog
 #' @inheritParams dlw_server_catalog

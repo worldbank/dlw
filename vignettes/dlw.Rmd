@@ -59,7 +59,7 @@ year_2023 <- server_cat[Year == 2023, ]
 head(year_2023)
 
 # to find list of all datasets for a specific country and year:
-country_year <- server_cat[Country == "COL" & Year == 2020, ]
+country_year <- server_cat[Country == "PRY" & Year == 2020, ]
 head(country_year)
 ```
 
@@ -68,8 +68,8 @@ head(country_year)
 The country catalog provides detailed metadata for datasets specific to a single country. You can retrieve the country catalog using the `dlw_country_catalog()` function by specifying the desired country code.
 
 ```{r}
-country_ind <- dlw_country_catalog(country_code = "IND")
-head(country_ind)
+country_pry <- dlw_country_catalog(country_code = "PRY")
+head(country_pry)
 ```
 
 ### Exploring the Country Catalog
@@ -77,16 +77,43 @@ head(country_ind)
 You can filter and explore the country catalog to find list datasets of interest.
 ```{r}
 # For examples 
-# to find list of all datasets related to NSS-SCH10 survey in India: 
-nss_sch10_ind <- country_ind[grep("NSS-SCH10", Survey), ] 
-head(nss_sch10_ind)
+# to find list of all datasets related to EPH survey in Paraguay: 
+eph_pry <- country_pry[Survey == "EPH", ] 
+head(eph_pry)
 
 # to find list of all datasets for a specific year:
-year_2011_ind <- country_ind[Year == 2011, ] head(year_2011_ind)
-
+year_2020_pry <- country_pry[Year == 2020, ] 
+head(year_2020_pry)
 ```
 
 ## Downloading Datasets
-Once you have identified datasets of interest from either the server or country catalog, you can download them using the `dlw_get_data()` function by providing the dataset ID.
-```{r, eval = FALSE}
-# Example to download a dataset by its ID
+Once you have identified datasets of interest from either the server or country catalog, you can download them using the `dlw_get_data()` function.
+```{r}
+dlw_get_data(
+  country_code = "PRY",
+  year = 2020L,
+  server = "GMD",
+  survey = "EPH",
+  module = "GPWG",
+  filename = "PRY_2020_EPH_V01_M_V03_A_GMD_GPWG.dta",
+  collection = "GMD"
+)
+```
+
+Alternatively, you can use `dlw_get_gmd()`, which is a convenient wrapper around `dlw_get_data()`. To download the most recent version of a dataset, you only need to provide the country code, year, and module.
+```{r}
+pry20 <- dlw_get_gmd(country_code = "PRY", year = 2020, module = "GPWG")
+```
+
+To download a specific version of a dataset, you can provide additional arguments such as `survey`, `vermast`, and `veralt` to `dlw_get_gmd()`.
+```{r}
+# this downloads version V02 of the EPH survey for Paraguay in 2020 within the GPWG module.
+pry20_v2 <- dlw_get_gmd(
+  country_code = "PRY",
+  year = 2020,
+  module = "GPWG",
+  survey = "EPH",
+  vermast = "V01",
+  veralt = "V02"
+)
+```

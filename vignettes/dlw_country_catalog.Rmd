@@ -39,13 +39,12 @@ Before using `dlw_country_catalog()`, ensure you have:
 # Install dlw (if not already installed)
 # devtools::install_github("worldbank/dlw")
 
+# devtools::load_all(".")
 # library(dlw)
 library(data.table)
 
 # Set your API token
 # dlw_set_token("your_api_token_here")
-dlwtoken <- Sys.getenv("dlw_token")
-dlw_set_token(dlwtoken)
 ```
 
 # Server Catalog vs. Country Catalog
@@ -70,9 +69,6 @@ head(country_cat)
 # Use server catalog function to get the list of datasets available across all countries
 server_cat <- dlw_server_catalog()
 head(server_cat)
-
-# geih_countries <- unique(server_cat[Survey_acronym == "GEIH", Country_code])
-# print(geih_countries)
 
 ```
 

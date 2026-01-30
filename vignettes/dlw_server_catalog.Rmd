@@ -39,13 +39,12 @@ Before using `dlw_server_catalog()`, ensure you have:
 # Install dlw (if not already installed)
 # devtools::install_github("worldbank/dlw")
 
-library(dlw)
+# devtools::load_all(".")
+# library(dlw)
 library(data.table)
 
 # Set your API token
 # dlw_set_token("your_api_token_here")
-dlwtoken <- Sys.getenv("dlw_token")
-dlw_set_token(dlwtoken)
 ```
 
 # Basic Usage: Retrieve the Catalog

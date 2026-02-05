@@ -1,7 +1,5 @@
 ---
 title: "Working with dlw_server_catalog()"
-author: "World Bank"
-date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Working with dlw_server_catalog()}
@@ -17,7 +15,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# Introduction
+## Introduction
 
 The **dlw** package provides access to datasets from the Datalibweb (DLW) API. Before downloading data, you need to explore what datasets are available. The `dlw_server_catalog()` function retrieves a comprehensive catalog of all available files on the server, making it easy to discover and filter datasets.
 
@@ -28,7 +26,7 @@ This vignette walks you through:
 - Filtering and exploring datasets
 - Leveraging caching for performance
 
-# Prerequisites
+## Prerequisites
 
 Before using `dlw_server_catalog()`, ensure you have:
 
@@ -40,14 +38,14 @@ Before using `dlw_server_catalog()`, ensure you have:
 # devtools::install_github("worldbank/dlw")
 
 # devtools::load_all(".")
-# library(dlw)
+library(dlw)
 library(data.table)
 
 # Set your API token
 # dlw_set_token("your_api_token_here")
 ```
 
-# Basic Usage: Retrieve the Catalog
+## Basic Usage: Retrieve the Catalog
 
 The simplest way to get the server catalog is:
 
@@ -61,7 +59,7 @@ head(catalog)
 
 This returns a `data.table` with metadata about all `.dta` files available on the server.
 
-## What's in the Catalog?
+### What's in the Catalog?
 
 The catalog contains the following key columns:
 
@@ -86,16 +84,16 @@ Key columns include:
 | **Collection** | Collection name (e.g., `GMD`) |
 | **Module** | Module name (e.g., `ALL`, `GPWG`, `ASPIRE`, `HIST`, `GROUP`,  `BIN`) |
 
-# Exploring the Catalog
+## Exploring the Catalog
 
-## Count Datasets by Country
+### Count Datasets by Country
 
 ```{r count-by-country}
 # How many datasets per country?
 catalog[, .(count = .N), by = Country_code][order(-count)]
 ```
 
-## Find All Surveys for a Specific Country
+### Find All Surveys for a Specific Country
 
 ```{r surveys-by-country}
 # Get all surveys for Colombia
@@ -105,7 +103,7 @@ colombia <- catalog[Country_code == "COL"]
 colombia[, .(count = .N), by = .(Survey_acronym, Survey_year)][order(Survey_year)]
 ```
 
-## Find the Latest Version of a Dataset
+### Find the Latest Version of a Dataset
 
 ```{r latest-version}
 # Find the most recent survey for Colombia
@@ -115,7 +113,7 @@ latest_col <- catalog[Country_code == "COL"][order(-Survey_year)][1]
 latest_col[, .(Country_code, Survey_year, Survey_acronym, Vermast, Veralt, FileName)]
 ```
 
-## Filter by Multiple Criteria
+### Filter by Multiple Criteria
 
 ```{r multiple-criteria}
 # Find all GEIH surveys from 2010 onwards
@@ -126,7 +124,7 @@ geih_recent <- catalog[
 head(geih_recent)
 ```
 
-## Search by Module or Collection
+### Search by Module or Collection
 
 ```{r search-module}
 # Find all datasets containing GPWG Module
@@ -138,7 +136,7 @@ nrow(gpwg_data)  # How many?
 catalog[, .(count = .N), by = Module][order(-count)]
 ```
 
-# Using `dlw_server_inventory()` for Easier Filtering
+## Using `dlw_server_inventory()` for Easier Filtering
 
 While `dlw_server_catalog()` returns the full catalog, `dlw_server_inventory()` provides a convenient wrapper for filtering:
 
@@ -153,7 +151,7 @@ inv_manual <- catalog[Country_code == "COL" & Year == 2010]
 identical(inv, inv_manual)
 ```
 
-# Understanding Caching
+## Understanding Caching
 
 By default, `dlw_server_catalog()` caches the catalog in memory during your R session. This improves performance for repeated calls:
 
@@ -174,7 +172,7 @@ system.time({
 })
 ```
 
-## When to Use `force = TRUE`
+### When to Use `force = TRUE`
 
 - **Development/testing**: When you expect the server catalog to have changed
 - **Production workflows**: Occasionally refresh to catch new datasets
@@ -185,11 +183,11 @@ system.time({
 catalog_latest <- dlw_server_catalog(force = TRUE, verbose = TRUE)
 ```
 
-# Advanced: Understanding Filename Structure
+## Advanced: Understanding Filename Structure
 
 The dlw package follows a strict naming convention for GMD files. Understanding this helps you work with datasets programmatically.
 
-## Filename Pattern
+### Filename Pattern
 
 The general pattern is:
 
@@ -212,7 +210,7 @@ The general pattern is:
 - **GPWG**: Module
 - **.dta**: File format (Stata)
 
-## Accessing Parsed Components
+### Accessing Parsed Components
 
 The catalog automatically parses this structure into columns:
 
@@ -230,20 +228,20 @@ data.frame(
   Module = file_info$Module)
 ```
 
-## Downloading Data
+### Downloading Data
 
 See `?dlw_get_data()` for more download options.
 
-# Best Practices
+## Best Practices
 
 1. **Cache wisely**: Use the default caching behavior for interactive work; use `force = TRUE` in automated scripts.
 2. **Validate filenames**: Always check that your filtered dataset contains the expected files before downloading.
 3. **Use descriptive filters**: Prefer filtering by country, year, and survey acronym rather than searching by module names.
 4. **Handle errors gracefully**: Wrap `dlw_get_data()` calls in `tryCatch()` for production workflows.
 
-# Troubleshooting
+## Troubleshooting
 
-## No Datasets Returned
+### No Datasets Returned
 
 If your filter returns zero rows, verify:
 
@@ -251,7 +249,7 @@ If your filter returns zero rows, verify:
 - Survey year exists in the catalog
 - Survey acronym is spelled correctly
 
-## API Authentication Issues
+### API Authentication Issues
 
 If you get authentication errors:
 
@@ -260,7 +258,7 @@ If you get authentication errors:
 3. Try `dlw_server_catalog(force = TRUE)` to refresh
 
 
-# Summary
+## Summary
 
 The `dlw_server_catalog()` function provides a powerful way to:
 
@@ -269,7 +267,7 @@ The `dlw_server_catalog()` function provides a powerful way to:
 - Understand dataset structure and versions
 - Prepare for data downloads
 
-## Related Functions
+### Related Functions
 
 - `dlw_server_catalog()` — Retrieve full server catalog
 - `dlw_server_inventory()` — Convenient filtering wrapper

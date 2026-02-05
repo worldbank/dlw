@@ -188,7 +188,7 @@ dlw_read <- function(dlw_dir, id_name, version = NULL) {
     fs::path_ext_remove()
 
   # pipload::pip_read(id_name, dir = dlw_dir, version = version)
-  stamp::st_load(fs::path(dlw_dir, id_name, ext = ".qs2"))
+  stamp::st_load(fs::path(dlw_dir, id_name, ext = "qs2"))
 
 }
 

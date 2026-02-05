@@ -1,6 +1,6 @@
 url: https://worldbank.github.io/dlw/
 template:
-  bootstrap: 5
+  bootstrap: 3
 
 reference:
 - title: Configuration and Utility
@@ -10,8 +10,8 @@ reference:
     - dlw_set_token
     - has_concept("token utilities")
     - has_concept("dlwenv utilities")
-    - token_utils
-    - utils
+    - repo
+    - dlw_list_env
 
 - title: Setting Up Working Directory
   desc: >
@@ -33,14 +33,15 @@ reference:
     Core functions for downloading, caching, and reading datasets from Datalibweb. These handle the full data retrieval workflow, including checking for local copies, downloading from the API, and reading data into R.
   contents:
     - dlw_get_data
+    - dlw_get_gmd
     - dlw_download
     - dlw_read
     - get_raw_data
-
+    - dlw_get_gmd_support
+    
 - title: Miscellaneous
   desc: >
     Miscellaneous functions, including print methods and other helpers.
   contents:
     - starts_with("print")
-  
 

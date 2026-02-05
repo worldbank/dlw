@@ -18,6 +18,14 @@ retrieval only)}
 data.table
 }
 \description{
-Read data from (local or temp)
+Reads a dataset from a specified directory and file name, returning it as a `data.table`.
+}
+\details{
+- Lists files in `dlw_dir` and checks if `id_name` exists.
+- If not found, aborts with an error.
+- Removes any extension from `id_name`.
+- Loads the data using `stamp::st_load()` from a `.qs2` file in the directory.
+
+This function is used internally to retrieve previously saved or downloaded datasets in a fast, versioned format.
 }
 \keyword{internal}

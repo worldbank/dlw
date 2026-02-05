@@ -1,7 +1,5 @@
 ---
 title: "Working with dlw_country_catalog()"
-author: "World Bank"
-date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Working with dlw_country_catalog()}
@@ -17,7 +15,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# Introduction
+## Introduction
 
 The **dlw** package provides granular access to country-specific dataset information from the Datalibweb (DLW) API. While `dlw_server_catalog()` gives you a complete list of all datasets across all countries, `dlw_country_catalog()` provides detailed, country-level metadata for a specific nation.
 
@@ -28,7 +26,7 @@ This vignette covers:
 - Filtering and exploring country-level datasets
 - Leveraging caching for performance
 
-# Prerequisites
+## Prerequisites
 
 Before using `dlw_country_catalog()`, ensure you have:
 
@@ -40,14 +38,14 @@ Before using `dlw_country_catalog()`, ensure you have:
 # devtools::install_github("worldbank/dlw")
 
 # devtools::load_all(".")
-# library(dlw)
+library(dlw)
 library(data.table)
 
 # Set your API token
 # dlw_set_token("your_api_token_here")
 ```
 
-# Server Catalog vs. Country Catalog
+## Server Catalog vs. Country Catalog
 
 Before diving into `dlw_country_catalog()`, understand the difference:
 
@@ -61,18 +59,20 @@ Before diving into `dlw_country_catalog()`, understand the difference:
 
 **When to use each:**
 
-```{r comparison}
-# Use country catalog function to explore all available data for a particular country, e.g., Colombia
+Use country catalog function to explore all available data for a particular country, e.g., Colombia
+```{r}
 country_cat <- dlw_country_catalog("COL")
 head(country_cat)
+```
 
-# Use server catalog function to get the list of datasets available across all countries
+Use server catalog function to get the list of datasets available across all countries.
+```{r comparison}
 server_cat <- dlw_server_catalog()
 head(server_cat)
 
 ```
 
-# Basic Usage: Retrieve Country Catalog
+## Basic Usage: Retrieve Country Catalog
 
 The simplest way to get a country catalog is:
 
@@ -89,7 +89,7 @@ dim(catalog_col)
 
 This returns a `data.table` with detailed metadata about all datasets available for Colombia.
 
-## Understanding the Catalog Structure
+### Understanding the Catalog Structure
 
 ```{r catalog-structure}
 # View column names
@@ -113,9 +113,9 @@ Key columns typically include:
 | **Timestamp** | character | Date of data compilation |
 | **Checksum** | character | hash |
 
-# Exploring Country Catalog
+## Exploring Country Catalog
 
-## Get Summary Statistics
+### Get Summary Statistics
 
 ```{r summary-stats}
 # How many surveys for this country?
@@ -132,7 +132,7 @@ print(year_range)
 
 ```
 
-## Filter by Survey Type
+### Filter by Survey Type
 
 ```{r filter-survey}
 # Find all GEIH surveys
@@ -152,7 +152,7 @@ if (nrow(hbs_surveys) > 0) {
 }
 ```
 
-## Find Latest Versions
+### Find Latest Versions
 
 ```{r latest-versions}
 # For each survey, find the latest year
@@ -164,7 +164,7 @@ latest_overall <- catalog_col[order(-Year)][1]
 print(latest_overall)
 ```
 
-# Working with Multiple Countries
+## Working with Multiple Countries
 
 Compare catalogs across different countries:
 
@@ -200,7 +200,7 @@ for (country in countries) {
 }
 ```
 
-# Understanding Caching
+## Understanding Caching
 
 By default, `dlw_country_catalog()` caches country catalogs in memory during your R session. This improves performance for repeated calls:
 
@@ -224,7 +224,7 @@ system.time({
 })
 ```
 
-## When to Use `force = TRUE`
+### When to Use `force = TRUE`
 
 - **Development/testing**: When you expect the server catalog to have changed
 - **Production workflows**: Occasionally refresh to catch new datasets
@@ -240,9 +240,9 @@ catalog_latest <- dlw_country_catalog(
 )
 ```
 
-# Troubleshooting
+## Troubleshooting
 
-## No Data Returned
+### No Data Returned
 
 If `dlw_country_catalog()` returns an empty result:
 
@@ -257,7 +257,7 @@ if (nrow(catalog) == 0) {
 }
 ```
 
-## Authentication Errors
+### Authentication Errors
 
 If you get authentication errors:
 
@@ -270,7 +270,7 @@ If you get authentication errors:
 
 ```
 
-## API Connection Issues
+### API Connection Issues
 
 If you cannot reach the server:
 
@@ -284,7 +284,7 @@ tryCatch({
 })
 ```
 
-# Related Functions
+## Related Functions
 
 - `dlw_server_catalog()` — List of all datasets across all countries
 - `dlw_server_inventory()` — Filter server catalog by multiple criteria

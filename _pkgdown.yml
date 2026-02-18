@@ -3,24 +3,36 @@ template:
   bootstrap: 5
 
 reference:
-- title: GMD data
-  desc: Utilities for GMD data
-- contents:
-  - has_concept("GMD utilities")
-- title: Get data
-- contents:
-  - dlw_get_data
-  - has_concept("catalogs")
-- title: Token
-- contents:
-  - has_concept("token utilities")
-- title: dlw repository
-- contents:
-  - starts_with("repo")
-- title: .dlwenv environment
-- contents:
-  - has_concept("dlwenv utilities")
-- title: Misc
-- contents:
-  - starts_with("print")
+- title: Configuration and Utility
+  desc: >
+    Functions for setting up authentication, managing environment variables, and providing general utilities required for interacting with the Datalibweb API.
+  contents:
+    - dlw_set_token
+    - has_concept("token utilities")
+    - has_concept("dlwenv utilities")
+    - repo
+    - dlw_list_env
+
+- title: Preparing Input Arguments for Downloading DLW Data
+  desc: >
+    Functions for constructing API requests and retrieving metadata catalogs. These help users filter, select, and specify the datasets they want to download.
+  contents:
+    - build_request
+    - dlw_country_catalog
+    - dlw_server_catalog
+    - has_concept("catalogs")
+
+- title: Downloading Data
+  desc: >
+    Core functions for downloading, caching, and reading datasets from Datalibweb. These handle the full data retrieval workflow, including checking for local copies, downloading from the API, and reading data into R.
+  contents:
+    - dlw_get_data
+    - dlw_get_gmd
+    - dlw_get_gmd_support
+    
+- title: Miscellaneous
+  desc: >
+    Miscellaneous functions, including print methods and other helpers.
+  contents:
+    - starts_with("print")
 

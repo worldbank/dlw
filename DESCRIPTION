@@ -22,7 +22,7 @@ Imports:
     haven,
     httr2,
     keyring,
-    pins,
+    stamp,
     rlang,
     stats
 Suggests: 
@@ -32,3 +32,5 @@ Suggests:
     rmarkdown
 Config/testthat/edition: 3
 VignetteBuilder: knitr
+Remotes:  
+    github::randrescastaneda/stamp

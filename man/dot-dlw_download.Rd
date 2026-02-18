@@ -2,7 +2,7 @@
 % Please edit documentation in R/dlw_get_data.R
 \name{.dlw_download}
 \alias{.dlw_download}
-\title{Download data from datalibweb and save using {stamp} framework}
+\title{Download data from datalibweb and save using stamp framework}
 \usage{
 .dlw_download(
   country_code,
@@ -38,6 +38,6 @@ vermast, veralt, collection, module)}
 A list with the board and pin_name used
 }
 \description{
-Download data from datalibweb and save using {stamp} framework
+Download data from datalibweb and save using stamp framework
 }
 \keyword{internal}

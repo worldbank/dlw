@@ -83,7 +83,7 @@ dlw_get_data <- function(country_code,
 }
 
 
-#' Download data from datalibweb and save using {stamp} framework
+#' Download data from datalibweb and save using stamp framework
 #'
 #' @inheritParams dlw_get_data
 #' @inheritParams .dlw_read

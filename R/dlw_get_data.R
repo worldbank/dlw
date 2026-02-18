@@ -8,10 +8,10 @@
 #'
 #' **How it works:**
 #' 1. Checks if the requested file exists locally (unless `local_overwrite = TRUE`).
-#' 2. If it exists, reads it using `dlw_read()`.
-#' 3. If not, downloads the data from the DLW API using `dlw_download()`, saves 
+#' 2. If it exists, reads it using `.dlw_read()`.
+#' 3. If not, downloads the data from the DLW API using `.dlw_download()`, saves 
 #'    it in the specified format, and returns it as a `data.table`.
-#' 4. Handles directory management and caching via `get_wrk_board()`.
+#' 4. Handles directory management and caching via `.get_wrk_board()`.
 #'
 #' This function streamlines access to DLW datasets, automatically 
 #' managing download, storage, and retrieval.
@@ -50,7 +50,7 @@ dlw_get_data <- function(country_code,
   }
 
   # Construct directory and id_name for reading
-  dlw_dir <- get_wrk_board(local = local, local_dir = local_dir)
+  dlw_dir <- .get_wrk_board(local = local, local_dir = local_dir)
 
   id_name <- filename |>
     fs::path_ext_remove() |>
@@ -64,13 +64,13 @@ dlw_get_data <- function(country_code,
 
   if (!local_overwrite && id_name %in% files_in_dir) {
     # Only read the requested version, do not download
-    out <- dlw_read(dlw_dir = dlw_dir,
+    out <- .dlw_read(dlw_dir = dlw_dir,
       id_name = id_name, 
       version = version)
     return(out)
   }
 
-  dlw_download(
+  .dlw_download(
     country_code = country_code,
     server = server,
     filename = filename,
@@ -86,13 +86,13 @@ dlw_get_data <- function(country_code,
 #' Download data from datalibweb and save using {stamp} framework
 #'
 #' @inheritParams dlw_get_data
-#' @inheritParams dlw_read
+#' @inheritParams .dlw_read
 #' @param filename character: Name of the file to save/read (required)
 #' @param format character: File format to use for saving data ('qs2'
 #'   [default] or 'parquet')
 #' @returns A list with the board and pin_name used
 #' @keywords internal
-dlw_download <- function(country_code,
+.dlw_download <- function(country_code,
                          filename,
                          dlw_dir,
                          id_name,
@@ -117,7 +117,7 @@ dlw_download <- function(country_code,
             dots)
 
   raw_data <- do.call("build_request", args) |>
-    get_raw_data()
+    .get_raw_data()
 
   # Save raw data to a temp file for reading
   tmpfile <- fs::file_temp(ext =  "dta")
@@ -143,13 +143,13 @@ dlw_download <- function(country_code,
 #'
 #' This function is used internally to retrieve previously saved or downloaded datasets in a fast, versioned format.
 #' 
-#' @param dlw_dir A folder object (as returned by dlw_download)
-#' @param id_name The name of the a dataset (as returned by dlw_download)
+#' @param dlw_dir A folder object (as returned by .dlw_download)
+#' @param id_name The name of the a dataset (as returned by .dlw_download)
 #' @param version numeric: Version of the data to read (for versioning data
 #'   retrieval only)
 #' @returns data.table
 #' @keywords internal
-dlw_read <- function(dlw_dir, id_name, version = NULL) {
+ .dlw_read <- function(dlw_dir, id_name, version = NULL) {
 
   files_in_dir <- basename(list.files(dlw_dir))
 
@@ -169,7 +169,7 @@ dlw_read <- function(dlw_dir, id_name, version = NULL) {
 #'
 #' @returns raw data from [resp_body_raw]
 #' @keywords internal
-get_raw_data <- \(req) {
+ .get_raw_data <- \(req) {
 
   raw_data <- handle_resp(req)
 
@@ -194,7 +194,7 @@ get_raw_data <- \(req) {
 #' @inheritParams dlw_get_data
 #' @returns Folder path
 #' @keywords internal
-get_wrk_board <- function(local, local_dir) {
+ .get_wrk_board <- function(local, local_dir) {
   if (local) {
     if (!fs::is_dir(local_dir)) {
       wrk_dir <- fs::dir_create(local_dir)

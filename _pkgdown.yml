@@ -1,7 +1,9 @@
 url: https://worldbank.github.io/dlw/
+
 template:
   bootstrap: 5
-
+  bootswatch: materia
+  
 reference:
 - title: Configuration and Utility
   desc: >
@@ -35,4 +37,3 @@ reference:
     Miscellaneous functions, including print methods and other helpers.
   contents:
     - starts_with("print")
-

@@ -1,0 +1,539 @@
+---
+title: "Server Catalog"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Server Catalog}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+
+## Introduction
+
+The **dlw** package provides access to datasets from the Datalibweb (DLW) API. Before downloading data, you need to explore what datasets are available. The `dlw_server_catalog()` function retrieves a comprehensive catalog of all available files on the server, making it easy to discover and filter datasets.
+
+This vignette walks you through:
+
+- Retrieving the server catalog
+- Understanding the catalog structure
+- Filtering and exploring datasets
+- Leveraging caching for performance
+
+## Prerequisites
+
+Before using `dlw_server_catalog()`, ensure you have:
+
+1. Installed the **dlw** package
+2. Set your API token using `dlw_set_token()`
+
+
+``` r
+# Install dlw (if not already installed)
+# devtools::install_github("worldbank/dlw")
+
+# devtools::load_all(".")
+library(dlw)
+library(data.table)
+
+# Set your API token
+# dlw_set_token("your_api_token_here")
+```
+
+## Basic Usage: Retrieve the Catalog
+
+The simplest way to get the server catalog is:
+
+
+``` r
+# Retrieve the default (GMD) server catalog list of datasets
+catalog <- dlw_server_catalog()
+#> ℹ Returning ServerCatalog_GMD from .dlwevn
+
+# View the first few rows
+head(catalog)
+#>    ServerAlias Country  Year Survey
+#>         <char>  <char> <int> <char>
+#> 1:         GMD     VEN  2006    EHM
+#> 2:         GMD     VEN  2005    EHM
+#> 3:         GMD     VEN  2004    EHM
+#> 4:         GMD     VEN  2003    EHM
+#> 5:         GMD     VEN  2002    EHM
+#> 6:         GMD     VEN  2001    EHM
+#>                                                                                               FilePath
+#>                                                                                                 <char>
+#> 1: VEN/VEN_2006_EHM/VEN_2006_EHM_v01_M_v01_A_GMD/Data/Harmonized/VEN_2006_EHM_v01_M_v01_A_GMD_HIST.dta
+#> 2: VEN/VEN_2005_EHM/VEN_2005_EHM_v01_M_v01_A_GMD/Data/Harmonized/VEN_2005_EHM_v01_M_v01_A_GMD_HIST.dta
+#> 3: VEN/VEN_2004_EHM/VEN_2004_EHM_v01_M_v01_A_GMD/Data/Harmonized/VEN_2004_EHM_v01_M_v01_A_GMD_HIST.dta
+#> 4: VEN/VEN_2003_EHM/VEN_2003_EHM_v01_M_v01_A_GMD/Data/Harmonized/VEN_2003_EHM_v01_M_v01_A_GMD_HIST.dta
+#> 5: VEN/VEN_2002_EHM/VEN_2002_EHM_v01_M_v01_A_GMD/Data/Harmonized/VEN_2002_EHM_v01_M_v01_A_GMD_HIST.dta
+#> 6: VEN/VEN_2001_EHM/VEN_2001_EHM_v01_M_v01_A_GMD/Data/Harmonized/VEN_2001_EHM_v01_M_v01_A_GMD_HIST.dta
+#>       Ext FileSize            Timestamp
+#>    <char>   <char>               <char>
+#> 1:    dta  7.02 MB May 14 2025 08:32 PM
+#> 2:    dta  6.84 MB May 14 2025 08:31 PM
+#> 3:    dta  7.01 MB May 14 2025 08:31 PM
+#> 4:    dta  8.55 MB May 14 2025 08:31 PM
+#> 5:    dta 10.12 MB May 14 2025 08:31 PM
+#> 6:    dta  8.63 MB May 14 2025 08:31 PM
+#>                            Checksum OnlySol
+#>                              <char>  <lgcl>
+#> 1: e11b225b892a75fc66bac8ec1d432603      NA
+#> 2: dfe2aa7b1be7c3ad818966ea55e43f86      NA
+#> 3: 17fd8ceb4dbcc39c5ab948e771e83273      NA
+#> 4: 2ce1a74eaba62e9f99a3a66c22f939e5      NA
+#> 5: 2ffd4868918885f4fc2394c55806dd48      NA
+#> 6: 608696c2fc617f4af9d6c8ed6303cadd      NA
+#>                                 FileName
+#>                                   <char>
+#> 1: VEN_2006_EHM_v01_M_v01_A_GMD_HIST.dta
+#> 2: VEN_2005_EHM_v01_M_v01_A_GMD_HIST.dta
+#> 3: VEN_2004_EHM_v01_M_v01_A_GMD_HIST.dta
+#> 4: VEN_2003_EHM_v01_M_v01_A_GMD_HIST.dta
+#> 5: VEN_2002_EHM_v01_M_v01_A_GMD_HIST.dta
+#> 6: VEN_2001_EHM_v01_M_v01_A_GMD_HIST.dta
+#>    Country_code Survey_year Survey_acronym
+#>          <char>      <char>         <char>
+#> 1:          VEN        2006            EHM
+#> 2:          VEN        2005            EHM
+#> 3:          VEN        2004            EHM
+#> 4:          VEN        2003            EHM
+#> 5:          VEN        2002            EHM
+#> 6:          VEN        2001            EHM
+#>    Vermast Veralt Collection Module    ext
+#>     <char> <char>     <char> <char> <char>
+#> 1:     V01    V01        GMD   HIST    DTA
+#> 2:     V01    V01        GMD   HIST    DTA
+#> 3:     V01    V01        GMD   HIST    DTA
+#> 4:     V01    V01        GMD   HIST    DTA
+#> 5:     V01    V01        GMD   HIST    DTA
+#> 6:     V01    V01        GMD   HIST    DTA
+```
+
+This returns a `data.table` with metadata about all `.dta` files available on the server.
+
+### What's in the Catalog?
+
+The catalog contains the following key columns:
+
+
+``` r
+# View column names
+colnames(catalog)
+#>  [1] "ServerAlias"    "Country"       
+#>  [3] "Year"           "Survey"        
+#>  [5] "FilePath"       "Ext"           
+#>  [7] "FileSize"       "Timestamp"     
+#>  [9] "Checksum"       "OnlySol"       
+#> [11] "FileName"       "Country_code"  
+#> [13] "Survey_year"    "Survey_acronym"
+#> [15] "Vermast"        "Veralt"        
+#> [17] "Collection"     "Module"        
+#> [19] "ext"
+
+# Check the structure
+str(catalog)
+#> Classes 'data.table' and 'data.frame':	11906 obs. of  19 variables:
+#>  $ ServerAlias   : chr  "GMD" "GMD" "GMD" "GMD" ...
+#>  $ Country       : chr  "VEN" "VEN" "VEN" "VEN" ...
+#>  $ Year          : int  2006 2005 2004 2003 2002 2001 1999 1998 1995 1992 ...
+#>  $ Survey        : chr  "EHM" "EHM" "EHM" "EHM" ...
+#>  $ FilePath      : chr  "VEN/VEN_2006_EHM/VEN_2006_EHM_v01_M_v01_A_GMD/Data/Harmonized/VEN_2006_EHM_v01_M_v01_A_GMD_HIST.dta" "VEN/VEN_2005_EHM/VEN_2005_EHM_v01_M_v01_A_GMD/Data/Harmonized/VEN_2005_EHM_v01_M_v01_A_GMD_HIST.dta" "VEN/VEN_2004_EHM/VEN_2004_EHM_v01_M_v01_A_GMD/Data/Harmonized/VEN_2004_EHM_v01_M_v01_A_GMD_HIST.dta" "VEN/VEN_2003_EHM/VEN_2003_EHM_v01_M_v01_A_GMD/Data/Harmonized/VEN_2003_EHM_v01_M_v01_A_GMD_HIST.dta" ...
+#>  $ Ext           : chr  "dta" "dta" "dta" "dta" ...
+#>  $ FileSize      : chr  "7.02 MB" "6.84 MB" "7.01 MB" "8.55 MB" ...
+#>  $ Timestamp     : chr  "May 14 2025 08:32 PM" "May 14 2025 08:31 PM" "May 14 2025 08:31 PM" "May 14 2025 08:31 PM" ...
+#>  $ Checksum      : chr  "e11b225b892a75fc66bac8ec1d432603" "dfe2aa7b1be7c3ad818966ea55e43f86" "17fd8ceb4dbcc39c5ab948e771e83273" "2ce1a74eaba62e9f99a3a66c22f939e5" ...
+#>  $ OnlySol       : logi  NA NA NA NA NA NA ...
+#>  $ FileName      : chr  "VEN_2006_EHM_v01_M_v01_A_GMD_HIST.dta" "VEN_2005_EHM_v01_M_v01_A_GMD_HIST.dta" "VEN_2004_EHM_v01_M_v01_A_GMD_HIST.dta" "VEN_2003_EHM_v01_M_v01_A_GMD_HIST.dta" ...
+#>  $ Country_code  : chr  "VEN" "VEN" "VEN" "VEN" ...
+#>  $ Survey_year   : chr  "2006" "2005" "2004" "2003" ...
+#>  $ Survey_acronym: chr  "EHM" "EHM" "EHM" "EHM" ...
+#>  $ Vermast       : chr  "V01" "V01" "V01" "V01" ...
+#>  $ Veralt        : chr  "V01" "V01" "V01" "V01" ...
+#>  $ Collection    : chr  "GMD" "GMD" "GMD" "GMD" ...
+#>  $ Module        : chr  "HIST" "HIST" "HIST" "HIST" ...
+#>  $ ext           : chr  "DTA" "DTA" "DTA" "DTA" ...
+#>  - attr(*, ".internal.selfref")=<externalptr> 
+#>  - attr(*, "index")= int(0) 
+#>   ..- attr(*, "__Survey")= int [1:11906] 5439 5440 5441 5442 5443 5444 5445 5446 5447 5448 ...
+#>   ..- attr(*, "__Module")= int [1:11906] 42 46 47 51 52 56 57 58 64 65 ...
+#>   ..- attr(*, "__Year")= int [1:11906] 296 292 293 294 295 288 289 290 291 284 ...
+#>   ..- attr(*, "__Year__Country")= int [1:11906] 296 292 293 294 295 288 289 290 291 284 ...
+```
+
+Key columns include:
+
+| Column | Description |
+|--------|-------------|
+| **FileName** | The file name (e.g., `COL_2022_GEIH_v01_M_v02_A_GMD_GPWG.dta`) |
+| **Country_code** | ISO3 country code (e.g., `COL`, `IND`, `BRA`) |
+| **Survey_year** | Year of the survey (integer) |
+| **Survey_acronym** | Survey acronym (e.g., `ECH`, `ENH`, `GEIH`, `HBS`) |
+| **Vermast** | Master version (e.g., `V01`, `V02`) |
+| **Veralt** | Alternative version (e.g., `V01`, `V02`) |
+| **Collection** | Collection name (e.g., `GMD`) |
+| **Module** | Module name (e.g., `ALL`, `GPWG`, `ASPIRE`, `HIST`, `GROUP`,  `BIN`) |
+
+## Exploring the Catalog
+
+### Count Datasets by Country
+
+
+``` r
+# How many datasets per country?
+catalog[, .(count = .N), by = Country_code][order(-count)]
+#>      Country_code count
+#>            <char> <int>
+#>   1:         <NA>   408
+#>   2:          PER   367
+#>   3:          CRI   317
+#>   4:          URY   316
+#>   5:          SLV   299
+#>  ---                   
+#> 172:          TTO     2
+#> 173:          GRD     2
+#> 174:          BRB     2
+#> 175:          TKM     1
+#> 176:          QAT     1
+```
+
+### Find All Surveys for a Specific Country
+
+
+``` r
+# Get all surveys for Colombia
+colombia <- catalog[Country_code == "COL"]
+
+# View unique surveys and years
+colombia[, .(count = .N), by = .(Survey_acronym, Survey_year)][order(Survey_year)]
+#>     Survey_acronym Survey_year count
+#>             <char>      <char> <int>
+#>  1:            ENH        1980     1
+#>  2:            ENH        1988     1
+#>  3:            ENH        1989     1
+#>  4:            ENH        1991     1
+#>  5:            ENH        1992     1
+#>  6:            ENH        1996     1
+#>  7:            ENH        1999     1
+#>  8:            ENH        2000     1
+#>  9:            ECH        2001     7
+#> 10:            ECH        2002     9
+#> 11:            ECH        2003     7
+#> 12:            ECH        2004     7
+#> 13:            ECH        2005     7
+#> 14:           GEIH        2008    13
+#> 15:           GEIH        2009    11
+#> 16:           GEIH        2010    11
+#> 17:           GEIH        2011    11
+#> 18:           GEIH        2012    12
+#> 19:           GEIH        2013     9
+#> 20:           GEIH        2014    11
+#> 21:           GEIH        2015    11
+#> 22:           GEIH        2016     8
+#> 23:           GEIH        2017     8
+#> 24:           GEIH        2018    13
+#> 25:           GEIH        2019     9
+#> 26:           GEIH        2020     8
+#> 27:           GEIH        2021    10
+#> 28:           GEIH        2022     6
+#> 29:           GEIH        2023     4
+#> 30:           GEIH        2024     2
+#>     Survey_acronym Survey_year count
+#>             <char>      <char> <int>
+```
+
+### Find the Latest Version of a Dataset
+
+
+``` r
+# Find the most recent survey for Colombia
+latest_col <- catalog[Country_code == "COL"][order(-Survey_year)][1]
+
+# View details
+latest_col[, .(Country_code, Survey_year, Survey_acronym, Vermast, Veralt, FileName)]
+#>    Country_code Survey_year Survey_acronym
+#>          <char>      <char>         <char>
+#> 1:          COL        2024           GEIH
+#>    Vermast Veralt
+#>     <char> <char>
+#> 1:     V01    V01
+#>                                 FileName
+#>                                   <char>
+#> 1: COL_2024_GEIH_V01_M_V01_A_GMD_ALL.dta
+```
+
+### Filter by Multiple Criteria
+
+
+``` r
+# Find all GEIH surveys from 2010 onwards
+geih_recent <- catalog[
+  Survey_acronym == "GEIH" & Survey_year >= 2010
+][order(Country_code, -Survey_year)]
+
+head(geih_recent)
+#>    ServerAlias Country  Year Survey
+#>         <char>  <char> <int> <char>
+#> 1:         GMD     COL  2024   GEIH
+#> 2:         GMD     COL  2024   GEIH
+#> 3:         GMD     COL  2023   GEIH
+#> 4:         GMD     COL  2023   GEIH
+#> 5:         GMD     COL  2023   GEIH
+#> 6:         GMD     COL  2023   GEIH
+#>                                                                                                  FilePath
+#>                                                                                                    <char>
+#> 1:  COL/COL_2024_GEIH/COL_2024_GEIH_V01_M_V01_A_GMD/Data/Harmonized/COL_2024_GEIH_V01_M_V01_A_GMD_ALL.dta
+#> 2: COL/COL_2024_GEIH/COL_2024_GEIH_V01_M_V01_A_GMD/Data/Harmonized/COL_2024_GEIH_V01_M_V01_A_GMD_GPWG.dta
+#> 3:  COL/COL_2023_GEIH/COL_2023_GEIH_V01_M_V02_A_GMD/Data/Harmonized/COL_2023_GEIH_V01_M_V02_A_GMD_ALL.dta
+#> 4: COL/COL_2023_GEIH/COL_2023_GEIH_V01_M_V02_A_GMD/Data/Harmonized/COL_2023_GEIH_V01_M_V02_A_GMD_GPWG.dta
+#> 5:  COL/COL_2023_GEIH/COL_2023_GEIH_V01_M_V01_A_GMD/Data/Harmonized/COL_2023_GEIH_v01_M_v01_A_GMD_ALL.dta
+#> 6: COL/COL_2023_GEIH/COL_2023_GEIH_V01_M_V01_A_GMD/Data/Harmonized/COL_2023_GEIH_v01_M_v01_A_GMD_GPWG.dta
+#>       Ext  FileSize            Timestamp
+#>    <char>    <char>               <char>
+#> 1:    dta 455.26 MB Feb 20 2026 08:30 PM
+#> 2:    dta  84.60 MB Feb 20 2026 08:30 PM
+#> 3:    dta 472.51 MB Feb 23 2026 08:20 PM
+#> 4:    dta  87.81 MB Feb 23 2026 08:20 PM
+#> 5:    dta 476.62 MB May 14 2025 07:19 PM
+#> 6:    dta  89.36 MB May 14 2025 07:19 PM
+#>                            Checksum OnlySol
+#>                              <char>  <lgcl>
+#> 1: d41d8cd98f00b204e9800998ecf8427e      NA
+#> 2: d41d8cd98f00b204e9800998ecf8427e      NA
+#> 3: d41d8cd98f00b204e9800998ecf8427e      NA
+#> 4: d41d8cd98f00b204e9800998ecf8427e      NA
+#> 5: 4a7923297982c28cd872714a9efe1228      NA
+#> 6: 447774875d1808239da4a4071aa663eb      NA
+#>                                  FileName
+#>                                    <char>
+#> 1:  COL_2024_GEIH_V01_M_V01_A_GMD_ALL.dta
+#> 2: COL_2024_GEIH_V01_M_V01_A_GMD_GPWG.dta
+#> 3:  COL_2023_GEIH_V01_M_V02_A_GMD_ALL.dta
+#> 4: COL_2023_GEIH_V01_M_V02_A_GMD_GPWG.dta
+#> 5:  COL_2023_GEIH_v01_M_v01_A_GMD_ALL.dta
+#> 6: COL_2023_GEIH_v01_M_v01_A_GMD_GPWG.dta
+#>    Country_code Survey_year Survey_acronym
+#>          <char>      <char>         <char>
+#> 1:          COL        2024           GEIH
+#> 2:          COL        2024           GEIH
+#> 3:          COL        2023           GEIH
+#> 4:          COL        2023           GEIH
+#> 5:          COL        2023           GEIH
+#> 6:          COL        2023           GEIH
+#>    Vermast Veralt Collection Module    ext
+#>     <char> <char>     <char> <char> <char>
+#> 1:     V01    V01        GMD    ALL    DTA
+#> 2:     V01    V01        GMD   GPWG    DTA
+#> 3:     V01    V02        GMD    ALL    DTA
+#> 4:     V01    V02        GMD   GPWG    DTA
+#> 5:     V01    V01        GMD    ALL    DTA
+#> 6:     V01    V01        GMD   GPWG    DTA
+```
+
+### Search by Module or Collection
+
+
+``` r
+# Find all datasets containing GPWG Module
+gpwg_data <- catalog[grepl("GPWG", Module, ignore.case = TRUE)]
+
+nrow(gpwg_data)  # How many?
+#> [1] 4975
+
+# View unique modules
+catalog[, .(count = .N), by = Module][order(-count)]
+#>     Module count
+#>     <char> <int>
+#>  1:   GPWG  4975
+#>  2:    ALL  3787
+#>  3:    BIN  1486
+#>  4:   <NA>   408
+#>  5: ASPIRE   366
+#>  6:  GROUP   176
+#>  7:      L   155
+#>  8:   HIST   118
+#>  9:     H3   101
+#> 10:    LOC   101
+#> 11:   SPAT   101
+#> 12: SSAPOV    36
+#> 13: CPIICP    14
+#> 14:    CPI    13
+#> 15:    INE    13
+#> 16:    KEY    13
+#> 17:    MPM    13
+#> 18:    POV    13
+#> 19:     SP    13
+#> 20:  SARMD     2
+#> 21:    NAT     1
+#> 22: SEDLAC     1
+#>     Module count
+#>     <char> <int>
+```
+
+## Using `dlw_server_inventory()` for Easier Filtering
+
+While `dlw_server_catalog()` returns the full catalog, `dlw_server_inventory()` provides a convenient wrapper for filtering:
+
+
+``` r
+# Filter by country and year
+inv <- dlw_server_inventory("COL", year = 2010)
+
+# This is equivalent to:
+inv_manual <- catalog[Country_code == "COL" & Year == 2010]
+
+# They should be identical
+identical(inv, inv_manual)
+#> [1] TRUE
+```
+
+## Understanding Caching
+
+By default, `dlw_server_catalog()` caches the catalog in memory during your R session. This improves performance for repeated calls:
+
+
+``` r
+# First call: queries the API (slower)
+system.time({
+  cat1 <- dlw_server_catalog()
+})
+#> ℹ Returning ServerCatalog_GMD from .dlwevn
+#>    user  system elapsed 
+#>    0.01    0.00    0.00
+
+# Second call: uses cache (much faster)
+system.time({
+  cat2 <- dlw_server_catalog()
+})
+#> ℹ Returning ServerCatalog_GMD from .dlwevn
+#>    user  system elapsed 
+#>       0       0       0
+
+# Force a fresh API call
+system.time({
+  cat_fresh <- dlw_server_catalog(force = TRUE)
+})
+#> ℹ Returning ServerCatalog_GMD from .dlwevn
+#> ℹ saving ServerCatalog_GMD in .dlwevn
+#>    user  system elapsed 
+#>    0.55    0.05    1.92
+```
+
+### When to Use `force = TRUE`
+
+- **Development/testing**: When you expect the server catalog to have changed
+- **Production workflows**: Occasionally refresh to catch new datasets
+- **Debugging**: When troubleshooting connectivity or data issues
+
+
+``` r
+# Refresh the catalog from the server
+catalog_latest <- dlw_server_catalog(force = TRUE, verbose = TRUE)
+#> ℹ Returning ServerCatalog_GMD from .dlwevn
+#> ℹ saving ServerCatalog_GMD in .dlwevn
+```
+
+## Advanced: Understanding Filename Structure
+
+The dlw package follows a strict naming convention for GMD files. Understanding this helps you work with datasets programmatically.
+
+### Filename Pattern
+
+The general pattern is:
+
+```
+<Country>_<Year>_<Acronym>_V<nn>_M_V<nn>_A_<Collection>_<Module>.dta
+```
+
+**Example:** `COL_2022_GEIH_V01_M_V02_A_GMD_GPWG.dta`
+
+**Breakdown:**
+
+- **COL**: Country code
+- **2022**: Survey year
+- **GEIH**: Survey acronym
+- **V01**: Master version
+- **M**: Marker (always present)
+- **V02**: Alternative version
+- **A**: Marker (always present)
+- **GMD**: Collection
+- **GPWG**: Module
+- **.dta**: File format (Stata)
+
+### Accessing Parsed Components
+
+The catalog automatically parses this structure into columns:
+
+
+``` r
+# Extract key components for a file
+file_info <- catalog[FileName == "COL_2022_GEIH_V01_M_V02_A_GMD_GPWG.dta"]
+
+data.frame(
+  Country = file_info$Country_code,
+  Year = file_info$Survey_year,
+  Acronym = file_info$Survey_acronym,
+  MasterVersion = file_info$Vermast,
+  AltVersion = file_info$Veralt,
+  Collection = file_info$Collection,
+  Module = file_info$Module)
+#>   Country Year Acronym MasterVersion
+#> 1     COL 2022    GEIH           V01
+#>   AltVersion Collection Module
+#> 1        V02        GMD   GPWG
+```
+
+### Downloading Data
+
+See `?dlw_get_data()` for more download options.
+
+## Best Practices
+
+1. **Cache wisely**: Use the default caching behavior for interactive work; use `force = TRUE` in automated scripts.
+2. **Validate filenames**: Always check that your filtered dataset contains the expected files before downloading.
+3. **Use descriptive filters**: Prefer filtering by country, year, and survey acronym rather than searching by module names.
+4. **Handle errors gracefully**: Wrap `dlw_get_data()` calls in `tryCatch()` for production workflows.
+
+## Troubleshooting
+
+### No Datasets Returned
+
+If your filter returns zero rows, verify:
+
+- Country code is correct (use 3-letter ISO code)
+- Survey year exists in the catalog
+- Survey acronym is spelled correctly
+
+### API Authentication Issues
+
+If you get authentication errors:
+
+1. Verify your token with `dlw_get_token()`
+2. Re-set your token with `dlw_set_token()`
+3. Try `dlw_server_catalog(force = TRUE)` to refresh
+
+
+## Summary
+
+The `dlw_server_catalog()` function provides a powerful way to:
+
+- Discover available datasets
+- Filter by country, year, survey, and topic
+- Understand dataset structure and versions
+- Prepare for data downloads
+
+### Related Functions
+
+- `dlw_server_catalog()` — Retrieve full server catalog
+- `dlw_server_inventory()` — Convenient filtering wrapper
+- `dlw_get_data()` — Download data using catalog filenames
+- `dlw_set_token()` — Set API authentication token
+- `dlw_get_token()` — Retrieve current API token
+
+For more information, use:
+
+```r
+?dlw_server_catalog
+?dlw_server_inventory
+?dlw_get_data
+```

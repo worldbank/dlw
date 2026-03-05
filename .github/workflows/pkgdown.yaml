@@ -3,7 +3,9 @@
 on:
   push:
     branches: [main, master, dev]
+    tags: ['*']
   pull_request:
+    branches: [main, master, dev]
   release:
     types: [published]
   workflow_dispatch:
@@ -23,6 +25,11 @@ jobs:
     permissions:
       contents: write
     steps:
+      - uses: insightsengineering/r-pkgdown-multiversion@v2
+        with:
+          default-landing-page: "master"
+          branches-or-tags-to-list: "master|dev"
+
       - uses: actions/checkout@v4
 
       - uses: r-lib/actions/setup-pandoc@v2

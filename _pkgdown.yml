@@ -3,6 +3,8 @@ url: https://worldbank.github.io/dlw/
 template:
   bootstrap: 5
   bootswatch: materia
+  bslib:
+    pkgdown-nav-height: 56px
 
 reference:
 - title: Configuration and Utility

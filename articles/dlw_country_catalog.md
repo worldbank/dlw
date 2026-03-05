@@ -1,0 +1,306 @@
+# Country Catalog
+
+## Introduction
+
+The **dlw** package provides granular access to country-specific dataset
+information from the Datalibweb (DLW) API. While
+[`dlw_server_catalog()`](https://worldbank.github.io/dlw/reference/dlw_server_catalog.md)
+gives you a complete list of all datasets across all countries,
+[`dlw_country_catalog()`](https://worldbank.github.io/dlw/reference/dlw_country_catalog.md)
+provides detailed, country-level metadata for a specific nation.
+
+This vignette covers:
+
+- Understanding the difference between server and country catalogs
+- Retrieving country-specific catalog information
+- Filtering and exploring country-level datasets
+- Leveraging caching for performance
+
+## Prerequisites
+
+Before using
+[`dlw_country_catalog()`](https://worldbank.github.io/dlw/reference/dlw_country_catalog.md),
+ensure you have:
+
+1.  Installed the **dlw** package
+2.  Set your API token using
+    [`dlw_set_token()`](https://worldbank.github.io/dlw/reference/token.md)
+
+``` r
+# Install dlw (if not already installed)
+# devtools::install_github("worldbank/dlw")
+
+# devtools::load_all(".")
+library(dlw)
+library(data.table)
+
+# Set your API token
+# dlw_set_token("your_api_token_here")
+```
+
+## Server Catalog vs. Country Catalog
+
+Before diving into
+[`dlw_country_catalog()`](https://worldbank.github.io/dlw/reference/dlw_country_catalog.md),
+understand the difference:
+
+| Aspect           | Server Catalog                                                                            | Country Catalog                                                                             |
+|------------------|-------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------|
+| **Scope**        | All datasets across all countries                                                         | Datasets for a single country                                                               |
+| **Function**     | [`dlw_server_catalog()`](https://worldbank.github.io/dlw/reference/dlw_server_catalog.md) | [`dlw_country_catalog()`](https://worldbank.github.io/dlw/reference/dlw_country_catalog.md) |
+| **Detail Level** | More information                                                                          | Country-specific info                                                                       |
+| **Use Case**     | Overview, across countries                                                                | Deep dive into a specific country                                                           |
+| **Size**         | Larger dataset                                                                            | Smaller, focused dataset                                                                    |
+
+**When to use each:**
+
+Use country catalog function to explore all available data for a
+particular country, e.g., Colombia
+
+``` r
+country_cat <- dlw_country_catalog("COL")
+head(country_cat)
+```
+
+Use server catalog function to get the list of datasets available across
+all countries.
+
+``` r
+server_cat <- dlw_server_catalog()
+head(server_cat)
+```
+
+## Basic Usage: Retrieve Country Catalog
+
+The simplest way to get a country catalog is:
+
+``` r
+# Retrieve the public catalog for Colombia
+catalog_col <- dlw_country_catalog(country_code = "COL")
+
+# View the first few rows
+head(catalog_col)
+
+# Check the dimensions
+dim(catalog_col)
+```
+
+This returns a `data.table` with detailed metadata about all datasets
+available for Colombia.
+
+### Understanding the Catalog Structure
+
+``` r
+# View column names
+colnames(catalog_col)
+
+# Check the structure
+str(catalog_col)
+```
+
+Key columns typically include:
+
+| Column          | Type      | Description                  |
+|-----------------|-----------|------------------------------|
+| **ServerAlias** | character | Server name                  |
+| **Country**     | character | ISO3 country code            |
+| **Year**        | integer   | Year of the survey           |
+| **FilePath**    | character | Full file path on the server |
+| **Ext**         | character | File extension               |
+| **FileSize**    | number    | File size                    |
+| **Timestamp**   | character | Date of data compilation     |
+| **Checksum**    | character | hash                         |
+
+## Exploring Country Catalog
+
+### Get Summary Statistics
+
+``` r
+# How many surveys for this country?
+unique_surveys <- catalog_col[, .(count = .N), by = Survey]
+print(unique_surveys)
+
+# Year range of surveys
+year_range <- catalog_col[, .(
+  min_year = min(Year, na.rm = TRUE),
+  max_year = max(Year, na.rm = TRUE),
+  num_years = uniqueN(Year)
+)]
+print(year_range)
+```
+
+### Filter by Survey Type
+
+``` r
+# Find all GEIH surveys
+geih_surveys <- catalog_col[Survey == "GEIH"]
+head(geih_surveys)
+
+# Find all surveys from 2010 onwards
+recent_surveys <- catalog_col[Year >= 2010]
+nrow(recent_surveys)
+
+# Find HBS surveys
+hbs_surveys <- catalog_col[Survey == "HBS"]
+if (nrow(hbs_surveys) > 0) {
+  print(hbs_surveys)
+} else {
+  cat("No HBS surveys found for this country\n")
+}
+```
+
+### Find Latest Versions
+
+``` r
+# For each survey, find the latest year
+latest_by_survey <- catalog_col[, .SD[which.max(Year)], by = Survey]
+print(latest_by_survey[, .(Survey, Year)])
+
+# Find the absolute latest survey
+latest_overall <- catalog_col[order(-Year)][1]
+print(latest_overall)
+```
+
+## Working with Multiple Countries
+
+Compare catalogs across different countries:
+
+``` r
+# Get catalogs for multiple countries
+countries <- c("COL", "BRA", "IND", "MEX")
+
+# Create a list to store catalogs
+catalogs <- lapply(countries, dlw_country_catalog)
+names(catalogs) <- countries
+
+# Compare dataset counts
+dataset_counts <- data.table(
+  Country = countries,
+  Datasets = sapply(catalogs, nrow)
+)
+print(dataset_counts)
+
+# Find common surveys across countries
+surveys_by_country <- lapply(catalogs, function(x) unique(x$Survey))
+common_surveys <- Reduce(intersect, surveys_by_country)
+cat("Surveys available in all countries:", paste(common_surveys, collapse = ", "), "\n")
+
+# Find unique surveys per country
+for (country in countries) {
+  unique_surveys <- setdiff(
+    unique(catalogs[[country]]$Survey),
+    common_surveys
+  )
+  if (length(unique_surveys) > 0) {
+    cat(country, "unique surveys:", paste(unique_surveys, collapse = ", "), "\n")
+  }
+}
+```
+
+## Understanding Caching
+
+By default,
+[`dlw_country_catalog()`](https://worldbank.github.io/dlw/reference/dlw_country_catalog.md)
+caches country catalogs in memory during your R session. This improves
+performance for repeated calls:
+
+``` r
+# First call: queries the API (slower)
+system.time({
+  cat1 <- dlw_country_catalog("COL")
+})
+
+# Second call: uses cache (much faster)
+system.time({
+  cat2 <- dlw_country_catalog("COL")
+})
+
+# Verify they're identical
+identical(cat1, cat2)
+
+# Force a fresh API call
+system.time({
+  cat_fresh <- dlw_country_catalog("COL", force = TRUE)
+})
+```
+
+### When to Use `force = TRUE`
+
+- **Development/testing**: When you expect the server catalog to have
+  changed
+- **Production workflows**: Occasionally refresh to catch new datasets
+- **Debugging**: When troubleshooting connectivity issues
+- **Multi-session workflows**: When data may have been updated
+
+``` r
+# Refresh the catalog from the server
+catalog_latest <- dlw_country_catalog(
+  country_code = "COL",
+  force = TRUE,
+  verbose = TRUE
+)
+```
+
+## Troubleshooting
+
+### No Data Returned
+
+If
+[`dlw_country_catalog()`](https://worldbank.github.io/dlw/reference/dlw_country_catalog.md)
+returns an empty result:
+
+``` r
+# Check if the country code is valid
+catalog <- dlw_country_catalog("COL")
+if (nrow(catalog) == 0) {
+  cat("No datasets found for this country\n")
+  
+  # Try refreshing
+  catalog <- dlw_country_catalog("COL", force = TRUE)
+}
+```
+
+### Authentication Errors
+
+If you get authentication errors:
+
+``` r
+# Verify token is set
+# token <- dlw_get_token()
+# if (is.null(token) || token == "") {
+  # dlw_set_token("your_api_token_here")
+# }
+```
+
+### API Connection Issues
+
+If you cannot reach the server:
+
+``` r
+# Force refresh to test connection
+tryCatch({
+  catalog <- dlw_country_catalog("COL", force = TRUE, verbose = TRUE)
+  cat("Connection successful\n")
+}, error = function(e) {
+  cat("Connection failed:", e$message, "\n")
+})
+```
+
+## Related Functions
+
+- [`dlw_server_catalog()`](https://worldbank.github.io/dlw/reference/dlw_server_catalog.md)
+  — List of all datasets across all countries
+- [`dlw_server_inventory()`](https://worldbank.github.io/dlw/reference/dlw_server_inventory.md)
+  — Filter server catalog by multiple criteria
+- [`dlw_get_data()`](https://worldbank.github.io/dlw/reference/dlw_get_data.md)
+  — Download data
+- [`dlw_set_token()`](https://worldbank.github.io/dlw/reference/token.md)
+  — Set API authentication token
+
+For more information, use:
+
+``` r
+?dlw_country_catalog
+?dlw_get_data
+?dlw_server_catalog
+```

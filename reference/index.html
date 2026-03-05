@@ -3,7 +3,7 @@
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
-    <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
+    <nav class="navbar navbar-expand-lg fixed-top bg-primary" data-bs-theme="dark" aria-label="Site navigation"><div class="container">
 
     <a class="navbar-brand me-2" href="../index.html">dlw</a>
 
@@ -19,7 +19,9 @@
 <li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/gmd_collection.html">GMD Collection</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/dlw_country_catalog.html">Country Catalog</a></li>
+    <li><a class="dropdown-item" href="../articles/dlw_server_catalog.html">Server Catalog</a></li>
+    <li><a class="dropdown-item" href="../articles/gmd_collection.html">GMD Collection</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -37,70 +39,11 @@
     </div>
 
     <div class="section level2">
-      <h2 id="gmd-data">GMD data<a class="anchor" aria-label="anchor" href="#gmd-data"></a></h2>
+      <h2 id="configuration-and-utility">Configuration and Utility<a class="anchor" aria-label="anchor" href="#configuration-and-utility"></a></h2>
 
-      <div class="section-desc"><p>Utilities for GMD data</p></div>
+      <div class="section-desc"><p>Functions for setting up authentication, managing environment variables, and providing general utilities required for interacting with the Datalibweb API.</p></div>
 
-
-    </div><div class="section level2">
-
-
-
-
-      <dl><dt>
-
-          <code><a href="dlw_get_gmd.html">dlw_get_gmd()</a></code>
-
-        </dt>
-        <dd>Get GMD data.</dd>
-      </dl><dl><dt>
-
-          <code><a href="dlw_get_gmd_support.html">dlw_get_gmd_support()</a></code>
-
-        </dt>
-        <dd>get Support files for GMD</dd>
-      </dl></div><div class="section level2">
-      <h2 id="get-data">Get data<a class="anchor" aria-label="anchor" href="#get-data"></a></h2>
-
-
-
-
-    </div><div class="section level2">
-
-
-
-
-      <dl><dt>
-
-          <code><a href="dlw_get_data.html">dlw_get_data()</a></code>
-
-        </dt>
-        <dd>Get data from datalibweb (refactored)</dd>
-      </dl><dl><dt>
-
-          <code><a href="dlw_country_catalog.html">dlw_country_catalog()</a></code>
-
-        </dt>
-        <dd>Get country catalog</dd>
-      </dl><dl><dt>
-
-          <code><a href="dlw_server_catalog.html">dlw_server_catalog()</a></code>
-
-        </dt>
-        <dd>Server catalog</dd>
-      </dl><dl><dt>
-
-          <code><a href="dlw_server_inventory.html">dlw_server_inventory()</a></code>
-
-        </dt>
-        <dd>filter server catolog to show inventory by country and other variables</dd>
-      </dl></div><div class="section level2">
-      <h2 id="token">Token<a class="anchor" aria-label="anchor" href="#token"></a></h2>
-
-
-
-
-    </div><div class="section level2">
+      <dl></dl></div><div class="section level2">
 
 
 
@@ -111,53 +54,100 @@
 
         </dt>
         <dd>Datalibweb Token utilities</dd>
-      </dl></div><div class="section level2">
-      <h2 id="dlw-repository">dlw repository<a class="anchor" aria-label="anchor" href="#dlw-repository"></a></h2>
 
+        <dt>
 
+          <code><a href="dlw_list_env.html">dlw_list_env()</a></code>
 
+        </dt>
+        <dd>List objects in an environment with their classes</dd>
 
-    </div><div class="section level2">
+        <dt>
 
+          <code><a href="dlwenv.html">get_dlwenv()</a></code> <code><a href="dlwenv.html">get_from_dlwenv()</a></code> <code><a href="dlwenv.html">set_in_dlwenv()</a></code>
 
+        </dt>
+        <dd>.dlwenv environment</dd>
 
-
-      <dl><dt>
+        <dt>
 
           <code><a href="repo.html">repo_create()</a></code> <code><a href="repo.html">repo_load()</a></code>
 
         </dt>
         <dd>dlw repository</dd>
       </dl></div><div class="section level2">
-      <h2 id="-dlwenv-environment">.dlwenv environment<a class="anchor" aria-label="anchor" href="#-dlwenv-environment"></a></h2>
+      <h2 id="preparing-input-arguments-for-downloading-dlw-data">Preparing Input Arguments for Downloading DLW Data<a class="anchor" aria-label="anchor" href="#preparing-input-arguments-for-downloading-dlw-data"></a></h2>
 
+      <div class="section-desc"><p>Functions for constructing API requests and retrieving metadata catalogs. These help users filter, select, and specify the datasets they want to download.</p></div>
 
-
-
-    </div><div class="section level2">
+      <dl></dl></div><div class="section level2">
 
 
 
 
       <dl><dt>
 
-          <code><a href="dlw_list_env.html">dlw_list_env()</a></code>
+          <code><a href="build_request.html">build_request()</a></code>
 
         </dt>
-        <dd>List objects in an environment with their classes</dd>
-      </dl><dl><dt>
+        <dd>Build request version 2</dd>
 
-          <code><a href="dlwenv.html">get_dlwenv()</a></code> <code><a href="dlwenv.html">get_from_dlwenv()</a></code> <code><a href="dlwenv.html">set_in_dlwenv()</a></code>
+        <dt>
+
+          <code><a href="dlw_country_catalog.html">dlw_country_catalog()</a></code>
 
         </dt>
-        <dd>.dlwenv environment</dd>
+        <dd>Get country catalog</dd>
+
+        <dt>
+
+          <code><a href="dlw_server_catalog.html">dlw_server_catalog()</a></code>
+
+        </dt>
+        <dd>Server catalog</dd>
+
+        <dt>
+
+          <code><a href="dlw_server_inventory.html">dlw_server_inventory()</a></code>
+
+        </dt>
+        <dd>filter server catolog to show inventory by country and other variables</dd>
       </dl></div><div class="section level2">
-      <h2 id="misc">Misc<a class="anchor" aria-label="anchor" href="#misc"></a></h2>
+      <h2 id="downloading-data">Downloading Data<a class="anchor" aria-label="anchor" href="#downloading-data"></a></h2>
+
+      <div class="section-desc"><p>Core functions for downloading, caching, and reading datasets from Datalibweb. These handle the full data retrieval workflow, including checking for local copies, downloading from the API, and reading data into R.</p></div>
+
+      <dl></dl></div><div class="section level2">
 
 
 
 
-    </div><div class="section level2">
+      <dl><dt>
+
+          <code><a href="dlw_get_data.html">dlw_get_data()</a></code>
+
+        </dt>
+        <dd>Get data from datalibweb (refactored)</dd>
+
+        <dt>
+
+          <code><a href="dlw_get_gmd.html">dlw_get_gmd()</a></code>
+
+        </dt>
+        <dd>Get GMD data.</dd>
+
+        <dt>
+
+          <code><a href="dlw_get_gmd_support.html">dlw_get_gmd_support()</a></code>
+
+        </dt>
+        <dd>get Support files for GMD</dd>
+      </dl></div><div class="section level2">
+      <h2 id="miscellaneous">Miscellaneous<a class="anchor" aria-label="anchor" href="#miscellaneous"></a></h2>
+
+      <div class="section-desc"><p>Miscellaneous functions, including print methods and other helpers.</p></div>
+
+      <dl></dl></div><div class="section level2">
 
 
 
@@ -178,7 +168,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>

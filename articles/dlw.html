@@ -16,7 +16,7 @@
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
-    <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
+    <nav class="navbar navbar-expand-lg fixed-top bg-primary" data-bs-theme="dark" aria-label="Site navigation"><div class="container">
 
     <a class="navbar-brand me-2" href="../index.html">dlw</a>
 
@@ -34,7 +34,9 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/gmd_collection.html">GMD Collection</a></li>
+<li><a class="dropdown-item" href="../articles/dlw_country_catalog.html">Country Catalog</a></li>
+    <li><a class="dropdown-item" href="../articles/dlw_server_catalog.html">Server Catalog</a></li>
+    <li><a class="dropdown-item" href="../articles/gmd_collection.html">GMD Collection</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -60,14 +62,15 @@
       <h1>dlw</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/worldbank/dlw/blob/master/vignettes/dlw.Rmd" class="external-link"><code>vignettes/dlw.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/worldbank/dlw/blob/dev/vignettes/dlw.Rmd" class="external-link"><code>vignettes/dlw.Rmd</code></a></small>
       <div class="d-none name"><code>dlw.Rmd</code></div>
     </div>
 
     
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/worldbank/dlw" class="external-link">dlw</a></span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/worldbank/dlw" class="external-link">dlw</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r-datatable.com" class="external-link">data.table</a></span><span class="op">)</span></span></code></pre></div>
 <p><a href="https://github.com/worldbank/dlw" class="external-link">dlw</a> is an R client of the internal <a href="https://datalibweb2.worldbank.org/" class="external-link">datalibweb</a> API of the
 World Bank. Datalibweb is a data system designed to enable users to
 seamlessly access microdata and documentation in the World Bank. Users
@@ -83,10 +86,106 @@ function.</p>
 following the instructions there. Once you have your token, set it in
 your R session as follows:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/token.html">dlw_set_token</a></span><span class="op">(</span><span class="st">"your_token_here"</span><span class="op">)</span></span></code></pre></div>
-<p>[TO COMPLETE]</p>
+<code class="sourceCode R"><span><span class="co"># dlw_set_token("your_token_here")</span></span></code></pre></div>
 </div>
-  </main>
+<div class="section level2">
+<h2 id="server-catalog">Server Catalog<a class="anchor" aria-label="anchor" href="#server-catalog"></a>
+</h2>
+<p>The server catalog provides a comprehensive list of all datasets
+available across all countries in the datalibweb system. You can
+retrieve the server catalog using the <code><a href="../reference/dlw_server_catalog.html">dlw_server_catalog()</a></code>
+function.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">server_cat</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dlw_server_catalog.html">dlw_server_catalog</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">server_cat</span><span class="op">)</span></span></code></pre></div>
+<div class="section level3">
+<h3 id="exploring-the-server-catalog">Exploring the Server Catalog<a class="anchor" aria-label="anchor" href="#exploring-the-server-catalog"></a>
+</h3>
+<p>You can filter and explore the server catalog to find datasets of
+interest.</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># For examples,</span></span>
+<span><span class="co"># to find list of all datasets related to HEIS surveys:</span></span>
+<span><span class="va">heis_datasets</span> <span class="op">&lt;-</span> <span class="va">server_cat</span><span class="op">[</span><span class="va">Survey</span> <span class="op">==</span> <span class="st">"HEIS"</span>, <span class="op">]</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">heis_datasets</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># to find list of all datasets for a specific module:</span></span>
+<span><span class="va">module_gpwg</span> <span class="op">&lt;-</span> <span class="va">server_cat</span><span class="op">[</span><span class="va">Module</span> <span class="op">==</span> <span class="st">"GPWG"</span>, <span class="op">]</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">module_gpwg</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># to find list of all datasets for a specific year:</span></span>
+<span><span class="va">year_2023</span> <span class="op">&lt;-</span> <span class="va">server_cat</span><span class="op">[</span><span class="va">Year</span> <span class="op">==</span> <span class="fl">2023</span>, <span class="op">]</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">year_2023</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># to find list of all datasets for a specific country and year:</span></span>
+<span><span class="va">country_year</span> <span class="op">&lt;-</span> <span class="va">server_cat</span><span class="op">[</span><span class="va">Country</span> <span class="op">==</span> <span class="st">"PRY"</span> <span class="op">&amp;</span> <span class="va">Year</span> <span class="op">==</span> <span class="fl">2020</span>, <span class="op">]</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">country_year</span><span class="op">)</span></span></code></pre></div>
+</div>
+</div>
+<div class="section level2">
+<h2 id="country-catalog">Country Catalog<a class="anchor" aria-label="anchor" href="#country-catalog"></a>
+</h2>
+<p>The country catalog provides detailed metadata for datasets specific
+to a single country. You can retrieve the country catalog using the
+<code><a href="../reference/dlw_country_catalog.html">dlw_country_catalog()</a></code> function by specifying the desired
+country code.</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">country_pry</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dlw_country_catalog.html">dlw_country_catalog</a></span><span class="op">(</span>country_code <span class="op">=</span> <span class="st">"PRY"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">country_pry</span><span class="op">)</span></span></code></pre></div>
+<div class="section level3">
+<h3 id="exploring-the-country-catalog">Exploring the Country Catalog<a class="anchor" aria-label="anchor" href="#exploring-the-country-catalog"></a>
+</h3>
+<p>You can filter and explore the country catalog to find list datasets
+of interest.</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># For examples </span></span>
+<span><span class="co"># to find list of all datasets related to EPH survey in Paraguay: </span></span>
+<span><span class="va">eph_pry</span> <span class="op">&lt;-</span> <span class="va">country_pry</span><span class="op">[</span><span class="va">Survey</span> <span class="op">==</span> <span class="st">"EPH"</span>, <span class="op">]</span> </span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">eph_pry</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># to find list of all datasets for a specific year:</span></span>
+<span><span class="va">year_2020_pry</span> <span class="op">&lt;-</span> <span class="va">country_pry</span><span class="op">[</span><span class="va">Year</span> <span class="op">==</span> <span class="fl">2020</span>, <span class="op">]</span> </span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">year_2020_pry</span><span class="op">)</span></span></code></pre></div>
+</div>
+</div>
+<div class="section level2">
+<h2 id="downloading-datasets">Downloading Datasets<a class="anchor" aria-label="anchor" href="#downloading-datasets"></a>
+</h2>
+<p>Once you have identified datasets of interest from either the server
+or country catalog, you can download them using the
+<code><a href="../reference/dlw_get_data.html">dlw_get_data()</a></code> function.</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/dlw_get_data.html">dlw_get_data</a></span><span class="op">(</span></span>
+<span>  country_code <span class="op">=</span> <span class="st">"PRY"</span>,</span>
+<span>  year <span class="op">=</span> <span class="fl">2020L</span>,</span>
+<span>  server <span class="op">=</span> <span class="st">"GMD"</span>,</span>
+<span>  survey <span class="op">=</span> <span class="st">"EPH"</span>,</span>
+<span>  module <span class="op">=</span> <span class="st">"GPWG"</span>,</span>
+<span>  filename <span class="op">=</span> <span class="st">"PRY_2020_EPH_V01_M_V03_A_GMD_GPWG.dta"</span>,</span>
+<span>  collection <span class="op">=</span> <span class="st">"GMD"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>Alternatively, you can use <code><a href="../reference/dlw_get_gmd.html">dlw_get_gmd()</a></code>, which is a
+convenient wrapper around <code><a href="../reference/dlw_get_data.html">dlw_get_data()</a></code>. To download the
+most recent version of a dataset, you only need to provide the country
+code, year, and module.</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">pry20</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dlw_get_gmd.html">dlw_get_gmd</a></span><span class="op">(</span>country_code <span class="op">=</span> <span class="st">"PRY"</span>, year <span class="op">=</span> <span class="fl">2020</span>, module <span class="op">=</span> <span class="st">"GPWG"</span><span class="op">)</span></span></code></pre></div>
+<p>To download a specific version of a dataset, you can provide
+additional arguments such as <code>survey</code>, <code>vermast</code>,
+and <code>veralt</code> to <code><a href="../reference/dlw_get_gmd.html">dlw_get_gmd()</a></code>.</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># this downloads version V02 of the EPH survey for Paraguay in 2020 within the GPWG module.</span></span>
+<span><span class="va">pry20_v2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dlw_get_gmd.html">dlw_get_gmd</a></span><span class="op">(</span></span>
+<span>  country_code <span class="op">=</span> <span class="st">"PRY"</span>,</span>
+<span>  year <span class="op">=</span> <span class="fl">2020</span>,</span>
+<span>  module <span class="op">=</span> <span class="st">"GPWG"</span>,</span>
+<span>  survey <span class="op">=</span> <span class="st">"EPH"</span>,</span>
+<span>  vermast <span class="op">=</span> <span class="st">"V01"</span>,</span>
+<span>  veralt <span class="op">=</span> <span class="st">"V02"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+</div>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
+    </nav></aside>
 </div>
 
 
@@ -96,7 +195,7 @@ your R session as follows:</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer>

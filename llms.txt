@@ -1,0 +1,237 @@
+# dlw
+
+[dlw](https://github.com/worldbank/dlw) is an R client of the internal
+[datalibweb](https://datalibweb2.worldbank.org/) API of the World Bank.
+Datalibweb is a data system designed to enable users to seamlessly
+access microdata and documentation in the World Bank. Users can access
+the most up-to-date and historical versions of harmonized data
+collections and raw/non-harmonized data for subsequent analysis
+
+## Installation
+
+Since [dlw](https://github.com/worldbank/dlw) is hosted in the World
+Bank’s GitHub organization, you need to authorize your Personal Access
+Token (PAT) for SAML Single Sign-On (SSO) before you can install it.
+Follow these steps to authorize your PAT:
+
+1.  Go to your GitHub account: Visit <https://github.com> and log in.
+
+2.  Check your PAT: Go to Settings → Developer settings → Personal
+    access tokens. Find the token you are using (or create a new one if
+    needed).
+
+3.  Authorize your PAT for SAML SSO: Go to
+    <https://github.com/settings/tokens>. Next to your token, You’ll see
+    a button that says “Configure SSO.” Click it to authorize your token
+    to the worldbank.
+
+4.  Try installing
+
+You can install the development version of dlw from
+[GitHub](https://github.com/) with:
+
+``` r
+# install.packages("pak")
+pak::pak("worldbank/dlw")
+# or
+remotes::github_install("worldbank/dlw")
+```
+
+## Usage
+
+``` r
+library(dlw)
+```
+
+### Token
+
+To begin working with [dlw](https://github.com/worldbank/dlw), you must
+provide your datalibweb API token using the
+[`dlw_set_token()`](https://worldbank.github.io/dlw/reference/token.md)
+function.
+
+You can obtain or renew your token by visiting the [datalibweb
+page](https://datalibweb2.worldbank.org/) and following the instructions
+there. Once you have your token, set it in your R session as follows:
+
+``` r
+dlw_set_token("your_token_here")
+```
+
+### server catalob
+
+After setting your token, you can download the catalog for the
+corresponding server using
+[`dlw_server_catalog()`](https://worldbank.github.io/dlw/reference/dlw_server_catalog.md).
+By default, this downloads the “GMD” catalog. The downloaded catalog is
+saved for the current session in a hidden environment within the
+[dlw](https://github.com/worldbank/dlw) package, allowing for easy and
+efficient access in subsequent operations.
+
+``` r
+ctl <- dlw_server_catalog()
+#> Pruning cache
+#> ℹ saving ServerCatalog_GMD in .dlwevn
+```
+
+The [dlw](https://github.com/worldbank/dlw) package returns results as
+`data.table` objects, enabling lightning-fast data manipulation and
+filtering using concise syntax. For example, you can instantly list all
+available files for Colombia in 2010 in module “ALL” of the GMD
+collection with a single line of code:
+
+``` r
+ctl[Country_code == "COL" & Module == "ALL" & Survey_year == 2010, 
+  .(FileName, Vermast, Veralt )]
+#>                                 FileName Vermast Veralt
+#>                                   <char>  <char> <char>
+#> 1: COL_2010_GEIH_V02_M_V09_A_GMD_ALL.dta     V02    V09
+#> 2: COL_2010_GEIH_V02_M_V08_A_GMD_ALL.dta     V02    V08
+#> 3: COL_2010_GEIH_v02_M_v07_A_GMD_ALL.dta     v02    v07
+```
+
+### Downloading files
+
+The workhorse function to download data is
+[`dlw_get_data()`](https://worldbank.github.io/dlw/reference/dlw_get_data.md).
+However, it requires several pieces of information that you may not have
+at hand, such as:
+
+``` r
+dlw_get_data(
+  country_code = "PRY",
+  year = 2011L,
+  server = "GMD",
+  survey = "EPH",
+  module = "GPWG",
+  filename = "PRY_2011_EPH_V01_M_V03_A_GMD_GPWG.dta",
+  collection = "GMD"
+)
+```
+
+To simplify this process, we have developed a wrapper function that
+works only for the GMD server:
+[`dlw_get_gmd()`](https://worldbank.github.io/dlw/reference/dlw_get_gmd.md).
+This function is much easier to use:
+
+``` r
+pry <- dlw_get_gmd(country_code = "PRY", year = 2011, module = "GPWG", vermast = "v01", veralt = "v03")
+#> 
+#> ── dlw_get_data Calls ──────────────────────────────────────────────────────────
+#> Call 1:
+#> dlw_get_data(
+#>   country_code = "PRY",
+#>   year = 2011L,
+#>   server = "GMD",
+#>   survey = "EPH",
+#>   module = "GPWG",
+#>   filename = "PRY_2011_EPH_V01_M_V03_A_GMD_GPWG.dta",
+#>   collection = "GMD"
+#> )
+#> ℹ saving last_req in .dlwevn
+#> ℹ saving last_raw_data in .dlwevn
+#> Creating new version '20250617T202722Z-662d2'
+#> Writing to pin 'PRY_2011_EPH_V01_M_V03_A_GMD_GPWG.parquet'
+pry[, weighted.mean(welfare, weight, na.rm = TRUE)]
+#> [1] 1099527
+```
+
+If you are interested in downloading the most recent version of a file,
+you can simply omit the version arguments:
+
+``` r
+pry <- dlw_get_gmd(country_code = "PRY", year = 2011, module = "GPWG")
+#> 
+#> ── dlw_get_data Calls ──────────────────────────────────────────────────────────
+#> Call 1:
+#> dlw_get_data(
+#>   country_code = "PRY",
+#>   year = 2011L,
+#>   server = "GMD",
+#>   survey = "EPH",
+#>   module = "GPWG",
+#>   filename = "PRY_2011_EPH_V02_M_V01_A_GMD_GPWG.dta",
+#>   collection = "GMD"
+#> )
+#> ℹ saving last_req in .dlwevn
+#> ℹ saving last_raw_data in .dlwevn
+#> Creating new version '20250617T202725Z-6bd54'
+#> Writing to pin 'PRY_2011_EPH_V02_M_V01_A_GMD_GPWG.parquet'
+pry[, weighted.mean(welfare, weight, na.rm = TRUE)]
+#> [1] 12675293
+```
+
+In this case, the most recent version available will be used (for
+example, master version v02 and alternative version v01).
+
+# Package index
+
+## Configuration and Utility
+
+Functions for setting up authentication, managing environment variables,
+and providing general utilities required for interacting with the
+Datalibweb API.
+
+- [`dlw_set_token()`](https://worldbank.github.io/dlw/reference/token.md)
+  [`dlw_get_token()`](https://worldbank.github.io/dlw/reference/token.md)
+  [`dlw_remove_token()`](https://worldbank.github.io/dlw/reference/token.md)
+  [`dlw_test_token()`](https://worldbank.github.io/dlw/reference/token.md)
+  : Datalibweb Token utilities
+- [`dlw_list_env()`](https://worldbank.github.io/dlw/reference/dlw_list_env.md)
+  : List objects in an environment with their classes
+- [`get_dlwenv()`](https://worldbank.github.io/dlw/reference/dlwenv.md)
+  [`get_from_dlwenv()`](https://worldbank.github.io/dlw/reference/dlwenv.md)
+  [`set_in_dlwenv()`](https://worldbank.github.io/dlw/reference/dlwenv.md)
+  : .dlwenv environment
+- [`repo_create()`](https://worldbank.github.io/dlw/reference/repo.md)
+  [`repo_load()`](https://worldbank.github.io/dlw/reference/repo.md) :
+  dlw repository
+
+## Preparing Input Arguments for Downloading DLW Data
+
+Functions for constructing API requests and retrieving metadata
+catalogs. These help users filter, select, and specify the datasets they
+want to download.
+
+- [`build_request()`](https://worldbank.github.io/dlw/reference/build_request.md)
+  : Build request version 2
+- [`dlw_country_catalog()`](https://worldbank.github.io/dlw/reference/dlw_country_catalog.md)
+  : Get country catalog
+- [`dlw_server_catalog()`](https://worldbank.github.io/dlw/reference/dlw_server_catalog.md)
+  : Server catalog
+- [`dlw_server_inventory()`](https://worldbank.github.io/dlw/reference/dlw_server_inventory.md)
+  : filter server catolog to show inventory by country and other
+  variables
+
+## Downloading Data
+
+Core functions for downloading, caching, and reading datasets from
+Datalibweb. These handle the full data retrieval workflow, including
+checking for local copies, downloading from the API, and reading data
+into R.
+
+- [`dlw_get_data()`](https://worldbank.github.io/dlw/reference/dlw_get_data.md)
+  : Get data from datalibweb (refactored)
+- [`dlw_get_gmd()`](https://worldbank.github.io/dlw/reference/dlw_get_gmd.md)
+  : Get GMD data.
+- [`dlw_get_gmd_support()`](https://worldbank.github.io/dlw/reference/dlw_get_gmd_support.md)
+  : get Support files for GMD
+
+## Miscellaneous
+
+Miscellaneous functions, including print methods and other helpers.
+
+- [`print(`*`<dlw_call_list>`*`)`](https://worldbank.github.io/dlw/reference/print.dlw_call_list.md)
+  : print gmd calls
+
+# Articles
+
+### All vignettes
+
+- [Country
+  Catalog](https://worldbank.github.io/dlw/articles/dlw_country_catalog.md):
+- [Server
+  Catalog](https://worldbank.github.io/dlw/articles/dlw_server_catalog.md):
+- [dlw](https://worldbank.github.io/dlw/articles/dlw.md):
+- [GMD
+  Collection](https://worldbank.github.io/dlw/articles/gmd_collection.md):

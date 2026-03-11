@@ -2,7 +2,6 @@
 
 ``` r
 library(dlw)
-library(data.table)
 ```
 
 [dlw](https://github.com/worldbank/dlw) is an R client of the internal
@@ -24,116 +23,7 @@ page](https://datalibweb2.worldbank.org/) and following the instructions
 there. Once you have your token, set it in your R session as follows:
 
 ``` r
-# dlw_set_token("your_token_here")
+dlw_set_token("your_token_here")
 ```
 
-## Server Catalog
-
-The server catalog provides a comprehensive list of all datasets
-available across all countries in the datalibweb system. You can
-retrieve the server catalog using the
-[`dlw_server_catalog()`](https://worldbank.github.io/dlw/reference/dlw_server_catalog.md)
-function.
-
-``` r
-server_cat <- dlw_server_catalog()
-head(server_cat)
-```
-
-### Exploring the Server Catalog
-
-You can filter and explore the server catalog to find datasets of
-interest.
-
-``` r
-# For examples,
-# to find list of all datasets related to HEIS surveys:
-heis_datasets <- server_cat[Survey == "HEIS", ]
-head(heis_datasets)
-
-# to find list of all datasets for a specific module:
-module_gpwg <- server_cat[Module == "GPWG", ]
-head(module_gpwg)
-
-# to find list of all datasets for a specific year:
-year_2023 <- server_cat[Year == 2023, ]
-head(year_2023)
-
-# to find list of all datasets for a specific country and year:
-country_year <- server_cat[Country == "PRY" & Year == 2020, ]
-head(country_year)
-```
-
-## Country Catalog
-
-The country catalog provides detailed metadata for datasets specific to
-a single country. You can retrieve the country catalog using the
-[`dlw_country_catalog()`](https://worldbank.github.io/dlw/reference/dlw_country_catalog.md)
-function by specifying the desired country code.
-
-``` r
-country_pry <- dlw_country_catalog(country_code = "PRY")
-head(country_pry)
-```
-
-### Exploring the Country Catalog
-
-You can filter and explore the country catalog to find list datasets of
-interest.
-
-``` r
-# For examples 
-# to find list of all datasets related to EPH survey in Paraguay: 
-eph_pry <- country_pry[Survey == "EPH", ] 
-head(eph_pry)
-
-# to find list of all datasets for a specific year:
-year_2020_pry <- country_pry[Year == 2020, ] 
-head(year_2020_pry)
-```
-
-## Downloading Datasets
-
-Once you have identified datasets of interest from either the server or
-country catalog, you can download them using the
-[`dlw_get_data()`](https://worldbank.github.io/dlw/reference/dlw_get_data.md)
-function.
-
-``` r
-dlw_get_data(
-  country_code = "PRY",
-  year = 2020L,
-  server = "GMD",
-  survey = "EPH",
-  module = "GPWG",
-  filename = "PRY_2020_EPH_V01_M_V03_A_GMD_GPWG.dta",
-  collection = "GMD"
-)
-```
-
-Alternatively, you can use
-[`dlw_get_gmd()`](https://worldbank.github.io/dlw/reference/dlw_get_gmd.md),
-which is a convenient wrapper around
-[`dlw_get_data()`](https://worldbank.github.io/dlw/reference/dlw_get_data.md).
-To download the most recent version of a dataset, you only need to
-provide the country code, year, and module.
-
-``` r
-pry20 <- dlw_get_gmd(country_code = "PRY", year = 2020, module = "GPWG")
-```
-
-To download a specific version of a dataset, you can provide additional
-arguments such as `survey`, `vermast`, and `veralt` to
-[`dlw_get_gmd()`](https://worldbank.github.io/dlw/reference/dlw_get_gmd.md).
-
-``` r
-# this downloads version V02 of the EPH survey for Paraguay in 2020 within the GPWG module.
-pry20_v2 <- dlw_get_gmd(
-  country_code = "PRY",
-  year = 2020,
-  module = "GPWG",
-  survey = "EPH",
-  vermast = "V01",
-  veralt = "V02"
-)
-```
+\[TO COMPLETE\]

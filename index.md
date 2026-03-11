@@ -1,5 +1,8 @@
 # dlw
 
+[![Ask
+DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/worldbank/dlw)
+
 [dlw](https://github.com/worldbank/dlw) is an R client of the internal
 [datalibweb](https://datalibweb2.worldbank.org/) API of the World Bank.
 Datalibweb is a data system designed to enable users to seamlessly

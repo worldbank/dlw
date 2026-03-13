@@ -1,9 +1,12 @@
 
+[![Ask
+DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/worldbank/dlw)
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 # dlw
 
 <!-- badges: start -->
+
 <!-- badges: end -->
 
 `{dlw}` is an R client of the internal
@@ -72,7 +75,8 @@ allowing for easy and efficient access in subsequent operations.
 
 ``` r
 ctl <- dlw_server_catalog()
-#> Pruning cache
+#> Pruning
+#> cache
 #> ℹ saving ServerCatalog_GMD in .dlwevn
 ```
 
@@ -86,9 +90,10 @@ ctl[Country_code == "COL" & Module == "ALL" & Survey_year == 2010,
   .(FileName, Vermast, Veralt )]
 #>                                 FileName Vermast Veralt
 #>                                   <char>  <char> <char>
-#> 1: COL_2010_GEIH_V02_M_V09_A_GMD_ALL.dta     V02    V09
-#> 2: COL_2010_GEIH_V02_M_V08_A_GMD_ALL.dta     V02    V08
-#> 3: COL_2010_GEIH_v02_M_v07_A_GMD_ALL.dta     v02    v07
+#> 1: COL_2010_GEIH_V04_M_V01_A_GMD_ALL.dta     V04    V01
+#> 2: COL_2010_GEIH_V02_M_V09_A_GMD_ALL.dta     V02    V09
+#> 3: COL_2010_GEIH_V02_M_V08_A_GMD_ALL.dta     V02    V08
+#> 4: COL_2010_GEIH_v02_M_v07_A_GMD_ALL.dta     V02    V07
 ```
 
 ### Downloading files
@@ -116,7 +121,7 @@ easier to use:
 ``` r
 pry <- dlw_get_gmd(country_code = "PRY", year = 2011, module = "GPWG", vermast = "v01", veralt = "v03")
 #> 
-#> ── dlw_get_data Calls ──────────────────────────────────────────────────────────
+#> ── dlw_get_
 #> Call 1:
 #> dlw_get_data(
 #>   country_code = "PRY",
@@ -127,10 +132,17 @@ pry <- dlw_get_gmd(country_code = "PRY", year = 2011, module = "GPWG", vermast =
 #>   filename = "PRY_2011_EPH_V01_M_V03_A_GMD_GPWG.dta",
 #>   collection = "GMD"
 #> )
-#> ℹ saving last_req in .dlwevn
-#> ℹ saving last_raw_data in .dlwevn
-#> Creating new version '20250617T202722Z-662d2'
-#> Writing to pin 'PRY_2011_EPH_V01_M_V03_A_GMD_GPWG.parquet'
+#> ✔ stamp
+#>   initialized
+#>   alias:
+#>   dlw
+#>   root:
+#>   C:/Users/WB308892/AppData/Local/Temp/RtmpEHCrN4
+#>   state:
+#>   C:/Users/WB308892/AppData/Local/Temp/RtmpEHCrN4/.stamp
+#> ✔ Saved [qs2] →
+#>   'c:/users/wb308892/appdata/local/temp/rtmpehcrn4/pry_2011_eph_v01_m_v03_a_gmd_gpwg.qs2'
+#>   @ version dfe89d4cd3898bd7
 pry[, weighted.mean(welfare, weight, na.rm = TRUE)]
 #> [1] 1099527
 ```
@@ -141,7 +153,7 @@ you can simply omit the version arguments:
 ``` r
 pry <- dlw_get_gmd(country_code = "PRY", year = 2011, module = "GPWG")
 #> 
-#> ── dlw_get_data Calls ──────────────────────────────────────────────────────────
+#> ── dlw_get_data Calls ───────────────
 #> Call 1:
 #> dlw_get_data(
 #>   country_code = "PRY",
@@ -152,10 +164,9 @@ pry <- dlw_get_gmd(country_code = "PRY", year = 2011, module = "GPWG")
 #>   filename = "PRY_2011_EPH_V02_M_V01_A_GMD_GPWG.dta",
 #>   collection = "GMD"
 #> )
-#> ℹ saving last_req in .dlwevn
-#> ℹ saving last_raw_data in .dlwevn
-#> Creating new version '20250617T202725Z-6bd54'
-#> Writing to pin 'PRY_2011_EPH_V02_M_V01_A_GMD_GPWG.parquet'
+#> ✔ Saved [qs2] →
+#>   'c:/users/wb308892/appdata/local/temp/rtmpehcrn4/pry_2011_eph_v02_m_v01_a_gmd_gpwg.qs2'
+#>   @ version 3eb405fd0fc580bd
 pry[, weighted.mean(welfare, weight, na.rm = TRUE)]
 #> [1] 12675293
 ```

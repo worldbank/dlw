@@ -1,0 +1,558 @@
+---
+title: "Country Catalog"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Country Catalog}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+
+## Introduction
+
+The **dlw** package provides granular access to country-specific dataset information from the Datalibweb (DLW) API. While `dlw_server_catalog()` gives you a complete list of all datasets across all countries, `dlw_country_catalog()` provides detailed, country-level metadata for a specific nation.
+
+This vignette covers:
+
+- Understanding the difference between server and country catalogs
+- Retrieving country-specific catalog information
+- Filtering and exploring country-level datasets
+- Leveraging caching for performance
+
+## Prerequisites
+
+Before using `dlw_country_catalog()`, ensure you have:
+
+1. Installed the **dlw** package
+2. Set your API token using `dlw_set_token()`
+
+
+``` r
+# Install dlw (if not already installed)
+# devtools::install_github("worldbank/dlw")
+
+# devtools::load_all(".")
+library(dlw)
+library(data.table)
+
+# Set your API token
+# dlw_set_token("your_api_token_here")
+```
+
+## Server Catalog vs. Country Catalog
+
+Before diving into `dlw_country_catalog()`, understand the difference:
+
+| Aspect | Server Catalog | Country Catalog |
+|--------|---|---|
+| **Scope** | All datasets across all countries | Datasets for a single country |
+| **Function** | `dlw_server_catalog()` | `dlw_country_catalog()` |
+| **Detail Level** | More information | Country-specific info |
+| **Use Case** | Overview, across countries | Deep dive into a specific country |
+| **Size** | Larger dataset | Smaller, focused dataset |
+
+**When to use each:**
+
+Use country catalog function to explore all available data for a particular country, e.g., Colombia
+
+``` r
+country_cat <- dlw_country_catalog("COL")
+#> ℹ saving CountryCatalog_COL in .dlwevn
+head(country_cat)
+#>    ServerAlias Country  Year Survey
+#>         <char>  <char> <int> <char>
+#> 1:         GMD     COL  2024   GEIH
+#> 2:         GMD     COL  2024   GEIH
+#> 3:         GMD     COL  2023   GEIH
+#> 4:         GMD     COL  2023   GEIH
+#> 5:         GMD     COL  2023   GEIH
+#> 6:         GMD     COL  2023   GEIH
+#>                                                                                                  FilePath
+#>                                                                                                    <char>
+#> 1:  COL/COL_2024_GEIH/COL_2024_GEIH_V01_M_V01_A_GMD/Data/Harmonized/COL_2024_GEIH_V01_M_V01_A_GMD_ALL.dta
+#> 2: COL/COL_2024_GEIH/COL_2024_GEIH_V01_M_V01_A_GMD/Data/Harmonized/COL_2024_GEIH_V01_M_V01_A_GMD_GPWG.dta
+#> 3:  COL/COL_2023_GEIH/COL_2023_GEIH_V01_M_V02_A_GMD/Data/Harmonized/COL_2023_GEIH_V01_M_V02_A_GMD_ALL.dta
+#> 4: COL/COL_2023_GEIH/COL_2023_GEIH_V01_M_V02_A_GMD/Data/Harmonized/COL_2023_GEIH_V01_M_V02_A_GMD_GPWG.dta
+#> 5:  COL/COL_2023_GEIH/COL_2023_GEIH_V01_M_V01_A_GMD/Data/Harmonized/COL_2023_GEIH_v01_M_v01_A_GMD_ALL.dta
+#> 6: COL/COL_2023_GEIH/COL_2023_GEIH_V01_M_V01_A_GMD/Data/Harmonized/COL_2023_GEIH_v01_M_v01_A_GMD_GPWG.dta
+#>       Ext  FileSize            Timestamp
+#>    <char>    <char>               <char>
+#> 1:    dta 455.26 MB Feb 20 2026 08:30 PM
+#> 2:    dta  84.60 MB Feb 20 2026 08:30 PM
+#> 3:    dta 472.51 MB Feb 23 2026 08:20 PM
+#> 4:    dta  87.81 MB Feb 23 2026 08:20 PM
+#> 5:    dta 476.62 MB May 14 2025 07:19 PM
+#> 6:    dta  89.36 MB May 14 2025 07:19 PM
+#>                            Checksum OnlySol
+#>                              <char>  <lgcl>
+#> 1: d41d8cd98f00b204e9800998ecf8427e      NA
+#> 2: d41d8cd98f00b204e9800998ecf8427e      NA
+#> 3: d41d8cd98f00b204e9800998ecf8427e      NA
+#> 4: d41d8cd98f00b204e9800998ecf8427e      NA
+#> 5: 4a7923297982c28cd872714a9efe1228      NA
+#> 6: 447774875d1808239da4a4071aa663eb      NA
+```
+
+Use server catalog function to get the list of datasets available across all countries.
+
+``` r
+server_cat <- dlw_server_catalog()
+#> ℹ Returning ServerCatalog_GMD from .dlwevn
+head(server_cat)
+#>    ServerAlias Country  Year Survey
+#>         <char>  <char> <int> <char>
+#> 1:         GMD     VEN  2006    EHM
+#> 2:         GMD     VEN  2005    EHM
+#> 3:         GMD     VEN  2004    EHM
+#> 4:         GMD     VEN  2003    EHM
+#> 5:         GMD     VEN  2002    EHM
+#> 6:         GMD     VEN  2001    EHM
+#>                                                                                               FilePath
+#>                                                                                                 <char>
+#> 1: VEN/VEN_2006_EHM/VEN_2006_EHM_v01_M_v01_A_GMD/Data/Harmonized/VEN_2006_EHM_v01_M_v01_A_GMD_HIST.dta
+#> 2: VEN/VEN_2005_EHM/VEN_2005_EHM_v01_M_v01_A_GMD/Data/Harmonized/VEN_2005_EHM_v01_M_v01_A_GMD_HIST.dta
+#> 3: VEN/VEN_2004_EHM/VEN_2004_EHM_v01_M_v01_A_GMD/Data/Harmonized/VEN_2004_EHM_v01_M_v01_A_GMD_HIST.dta
+#> 4: VEN/VEN_2003_EHM/VEN_2003_EHM_v01_M_v01_A_GMD/Data/Harmonized/VEN_2003_EHM_v01_M_v01_A_GMD_HIST.dta
+#> 5: VEN/VEN_2002_EHM/VEN_2002_EHM_v01_M_v01_A_GMD/Data/Harmonized/VEN_2002_EHM_v01_M_v01_A_GMD_HIST.dta
+#> 6: VEN/VEN_2001_EHM/VEN_2001_EHM_v01_M_v01_A_GMD/Data/Harmonized/VEN_2001_EHM_v01_M_v01_A_GMD_HIST.dta
+#>       Ext FileSize            Timestamp
+#>    <char>   <char>               <char>
+#> 1:    dta  7.02 MB May 14 2025 08:32 PM
+#> 2:    dta  6.84 MB May 14 2025 08:31 PM
+#> 3:    dta  7.01 MB May 14 2025 08:31 PM
+#> 4:    dta  8.55 MB May 14 2025 08:31 PM
+#> 5:    dta 10.12 MB May 14 2025 08:31 PM
+#> 6:    dta  8.63 MB May 14 2025 08:31 PM
+#>                            Checksum OnlySol
+#>                              <char>  <lgcl>
+#> 1: e11b225b892a75fc66bac8ec1d432603      NA
+#> 2: dfe2aa7b1be7c3ad818966ea55e43f86      NA
+#> 3: 17fd8ceb4dbcc39c5ab948e771e83273      NA
+#> 4: 2ce1a74eaba62e9f99a3a66c22f939e5      NA
+#> 5: 2ffd4868918885f4fc2394c55806dd48      NA
+#> 6: 608696c2fc617f4af9d6c8ed6303cadd      NA
+#>                                 FileName
+#>                                   <char>
+#> 1: VEN_2006_EHM_v01_M_v01_A_GMD_HIST.dta
+#> 2: VEN_2005_EHM_v01_M_v01_A_GMD_HIST.dta
+#> 3: VEN_2004_EHM_v01_M_v01_A_GMD_HIST.dta
+#> 4: VEN_2003_EHM_v01_M_v01_A_GMD_HIST.dta
+#> 5: VEN_2002_EHM_v01_M_v01_A_GMD_HIST.dta
+#> 6: VEN_2001_EHM_v01_M_v01_A_GMD_HIST.dta
+#>    Country_code Survey_year Survey_acronym
+#>          <char>      <char>         <char>
+#> 1:          VEN        2006            EHM
+#> 2:          VEN        2005            EHM
+#> 3:          VEN        2004            EHM
+#> 4:          VEN        2003            EHM
+#> 5:          VEN        2002            EHM
+#> 6:          VEN        2001            EHM
+#>    Vermast Veralt Collection Module    ext
+#>     <char> <char>     <char> <char> <char>
+#> 1:     V01    V01        GMD   HIST    DTA
+#> 2:     V01    V01        GMD   HIST    DTA
+#> 3:     V01    V01        GMD   HIST    DTA
+#> 4:     V01    V01        GMD   HIST    DTA
+#> 5:     V01    V01        GMD   HIST    DTA
+#> 6:     V01    V01        GMD   HIST    DTA
+```
+
+## Basic Usage: Retrieve Country Catalog
+
+The simplest way to get a country catalog is:
+
+
+``` r
+# Retrieve the public catalog for Colombia
+catalog_col <- dlw_country_catalog(country_code = "COL")
+#> ℹ Returning CountryCatalog_COL from .dlwevn
+
+# View the first few rows
+head(catalog_col)
+#>    ServerAlias Country  Year Survey
+#>         <char>  <char> <int> <char>
+#> 1:         GMD     COL  2024   GEIH
+#> 2:         GMD     COL  2024   GEIH
+#> 3:         GMD     COL  2023   GEIH
+#> 4:         GMD     COL  2023   GEIH
+#> 5:         GMD     COL  2023   GEIH
+#> 6:         GMD     COL  2023   GEIH
+#>                                                                                                  FilePath
+#>                                                                                                    <char>
+#> 1:  COL/COL_2024_GEIH/COL_2024_GEIH_V01_M_V01_A_GMD/Data/Harmonized/COL_2024_GEIH_V01_M_V01_A_GMD_ALL.dta
+#> 2: COL/COL_2024_GEIH/COL_2024_GEIH_V01_M_V01_A_GMD/Data/Harmonized/COL_2024_GEIH_V01_M_V01_A_GMD_GPWG.dta
+#> 3:  COL/COL_2023_GEIH/COL_2023_GEIH_V01_M_V02_A_GMD/Data/Harmonized/COL_2023_GEIH_V01_M_V02_A_GMD_ALL.dta
+#> 4: COL/COL_2023_GEIH/COL_2023_GEIH_V01_M_V02_A_GMD/Data/Harmonized/COL_2023_GEIH_V01_M_V02_A_GMD_GPWG.dta
+#> 5:  COL/COL_2023_GEIH/COL_2023_GEIH_V01_M_V01_A_GMD/Data/Harmonized/COL_2023_GEIH_v01_M_v01_A_GMD_ALL.dta
+#> 6: COL/COL_2023_GEIH/COL_2023_GEIH_V01_M_V01_A_GMD/Data/Harmonized/COL_2023_GEIH_v01_M_v01_A_GMD_GPWG.dta
+#>       Ext  FileSize            Timestamp
+#>    <char>    <char>               <char>
+#> 1:    dta 455.26 MB Feb 20 2026 08:30 PM
+#> 2:    dta  84.60 MB Feb 20 2026 08:30 PM
+#> 3:    dta 472.51 MB Feb 23 2026 08:20 PM
+#> 4:    dta  87.81 MB Feb 23 2026 08:20 PM
+#> 5:    dta 476.62 MB May 14 2025 07:19 PM
+#> 6:    dta  89.36 MB May 14 2025 07:19 PM
+#>                            Checksum OnlySol
+#>                              <char>  <lgcl>
+#> 1: d41d8cd98f00b204e9800998ecf8427e      NA
+#> 2: d41d8cd98f00b204e9800998ecf8427e      NA
+#> 3: d41d8cd98f00b204e9800998ecf8427e      NA
+#> 4: d41d8cd98f00b204e9800998ecf8427e      NA
+#> 5: 4a7923297982c28cd872714a9efe1228      NA
+#> 6: 447774875d1808239da4a4071aa663eb      NA
+
+# Check the dimensions
+dim(catalog_col)
+#> [1] 4824   10
+```
+
+This returns a `data.table` with detailed metadata about all datasets available for Colombia.
+
+### Understanding the Catalog Structure
+
+
+``` r
+# View column names
+colnames(catalog_col)
+#>  [1] "ServerAlias" "Country"     "Year"       
+#>  [4] "Survey"      "FilePath"    "Ext"        
+#>  [7] "FileSize"    "Timestamp"   "Checksum"   
+#> [10] "OnlySol"
+
+# Check the structure
+str(catalog_col)
+#> Classes 'data.table' and 'data.frame':	4824 obs. of  10 variables:
+#>  $ ServerAlias: chr  "GMD" "GMD" "GMD" "GMD" ...
+#>  $ Country    : chr  "COL" "COL" "COL" "COL" ...
+#>  $ Year       : int  2024 2024 2023 2023 2023 2023 2022 2022 2022 2022 ...
+#>  $ Survey     : chr  "GEIH" "GEIH" "GEIH" "GEIH" ...
+#>  $ FilePath   : chr  "COL/COL_2024_GEIH/COL_2024_GEIH_V01_M_V01_A_GMD/Data/Harmonized/COL_2024_GEIH_V01_M_V01_A_GMD_ALL.dta" "COL/COL_2024_GEIH/COL_2024_GEIH_V01_M_V01_A_GMD/Data/Harmonized/COL_2024_GEIH_V01_M_V01_A_GMD_GPWG.dta" "COL/COL_2023_GEIH/COL_2023_GEIH_V01_M_V02_A_GMD/Data/Harmonized/COL_2023_GEIH_V01_M_V02_A_GMD_ALL.dta" "COL/COL_2023_GEIH/COL_2023_GEIH_V01_M_V02_A_GMD/Data/Harmonized/COL_2023_GEIH_V01_M_V02_A_GMD_GPWG.dta" ...
+#>  $ Ext        : chr  "dta" "dta" "dta" "dta" ...
+#>  $ FileSize   : chr  "455.26 MB" "84.60 MB" "472.51 MB" "87.81 MB" ...
+#>  $ Timestamp  : chr  "Feb 20 2026 08:30 PM" "Feb 20 2026 08:30 PM" "Feb 23 2026 08:20 PM" "Feb 23 2026 08:20 PM" ...
+#>  $ Checksum   : chr  "d41d8cd98f00b204e9800998ecf8427e" "d41d8cd98f00b204e9800998ecf8427e" "d41d8cd98f00b204e9800998ecf8427e" "d41d8cd98f00b204e9800998ecf8427e" ...
+#>  $ OnlySol    : logi  NA NA NA NA NA NA ...
+#>  - attr(*, ".internal.selfref")=<externalptr>
+```
+
+Key columns typically include:
+
+| Column | Type | Description |
+|--------|------|-------------|
+| **ServerAlias** | character | Server name |
+| **Country** | character | ISO3 country code |
+| **Year** | integer | Year of the survey |
+| **FilePath** | character | Full file path on the server |
+| **Ext** | character | File extension |
+| **FileSize** | number | File size |
+| **Timestamp** | character | Date of data compilation |
+| **Checksum** | character | hash |
+
+## Exploring Country Catalog
+
+### Get Summary Statistics
+
+
+``` r
+# How many surveys for this country?
+unique_surveys <- catalog_col[, .(count = .N), by = Survey]
+print(unique_surveys)
+#>       Survey count
+#>       <char> <int>
+#>  1:     GEIH  4179
+#>  2:      ECH   404
+#>  3:      ENH    35
+#>  4:     PISA    23
+#>  5:    LLECE     6
+#>  6:    PIRLS    14
+#>  7:    TIMSS    12
+#>  8:   ENH-FT     2
+#>  9:     ENCV    13
+#> 10:      ECV    14
+#> 11: GEIH-Q04    23
+#> 12: GEIH-Q03    31
+#> 13: GEIH-Q02    33
+#> 14: GEIH-Q01    35
+
+# Year range of surveys
+year_range <- catalog_col[, .(
+  min_year = min(Year, na.rm = TRUE),
+  max_year = max(Year, na.rm = TRUE),
+  num_years = uniqueN(Year)
+)]
+print(year_range)
+#>    min_year max_year num_years
+#>       <int>    <int>     <int>
+#> 1:     1980     2024        32
+```
+
+### Filter by Survey Type
+
+
+``` r
+# Find all GEIH surveys
+geih_surveys <- catalog_col[Survey == "GEIH"]
+head(geih_surveys)
+#>    ServerAlias Country  Year Survey
+#>         <char>  <char> <int> <char>
+#> 1:         GMD     COL  2024   GEIH
+#> 2:         GMD     COL  2024   GEIH
+#> 3:         GMD     COL  2023   GEIH
+#> 4:         GMD     COL  2023   GEIH
+#> 5:         GMD     COL  2023   GEIH
+#> 6:         GMD     COL  2023   GEIH
+#>                                                                                                  FilePath
+#>                                                                                                    <char>
+#> 1:  COL/COL_2024_GEIH/COL_2024_GEIH_V01_M_V01_A_GMD/Data/Harmonized/COL_2024_GEIH_V01_M_V01_A_GMD_ALL.dta
+#> 2: COL/COL_2024_GEIH/COL_2024_GEIH_V01_M_V01_A_GMD/Data/Harmonized/COL_2024_GEIH_V01_M_V01_A_GMD_GPWG.dta
+#> 3:  COL/COL_2023_GEIH/COL_2023_GEIH_V01_M_V02_A_GMD/Data/Harmonized/COL_2023_GEIH_V01_M_V02_A_GMD_ALL.dta
+#> 4: COL/COL_2023_GEIH/COL_2023_GEIH_V01_M_V02_A_GMD/Data/Harmonized/COL_2023_GEIH_V01_M_V02_A_GMD_GPWG.dta
+#> 5:  COL/COL_2023_GEIH/COL_2023_GEIH_V01_M_V01_A_GMD/Data/Harmonized/COL_2023_GEIH_v01_M_v01_A_GMD_ALL.dta
+#> 6: COL/COL_2023_GEIH/COL_2023_GEIH_V01_M_V01_A_GMD/Data/Harmonized/COL_2023_GEIH_v01_M_v01_A_GMD_GPWG.dta
+#>       Ext  FileSize            Timestamp
+#>    <char>    <char>               <char>
+#> 1:    dta 455.26 MB Feb 20 2026 08:30 PM
+#> 2:    dta  84.60 MB Feb 20 2026 08:30 PM
+#> 3:    dta 472.51 MB Feb 23 2026 08:20 PM
+#> 4:    dta  87.81 MB Feb 23 2026 08:20 PM
+#> 5:    dta 476.62 MB May 14 2025 07:19 PM
+#> 6:    dta  89.36 MB May 14 2025 07:19 PM
+#>                            Checksum OnlySol
+#>                              <char>  <lgcl>
+#> 1: d41d8cd98f00b204e9800998ecf8427e      NA
+#> 2: d41d8cd98f00b204e9800998ecf8427e      NA
+#> 3: d41d8cd98f00b204e9800998ecf8427e      NA
+#> 4: d41d8cd98f00b204e9800998ecf8427e      NA
+#> 5: 4a7923297982c28cd872714a9efe1228      NA
+#> 6: 447774875d1808239da4a4071aa663eb      NA
+
+# Find all surveys from 2010 onwards
+recent_surveys <- catalog_col[Year >= 2010]
+nrow(recent_surveys)
+#> [1] 3801
+
+# Find HBS surveys
+hbs_surveys <- catalog_col[Survey == "HBS"]
+if (nrow(hbs_surveys) > 0) {
+  print(hbs_surveys)
+} else {
+  cat("No HBS surveys found for this country\n")
+}
+#> No HBS surveys found for this country
+```
+
+### Find Latest Versions
+
+
+``` r
+# For each survey, find the latest year
+latest_by_survey <- catalog_col[, .SD[which.max(Year)], by = Survey]
+print(latest_by_survey[, .(Survey, Year)])
+#>       Survey  Year
+#>       <char> <int>
+#>  1:     GEIH  2024
+#>  2:      ECH  2005
+#>  3:      ENH  2000
+#>  4:     PISA  2018
+#>  5:    LLECE  2013
+#>  6:    PIRLS  2011
+#>  7:    TIMSS  2007
+#>  8:   ENH-FT  1999
+#>  9:     ENCV  2014
+#> 10:      ECV  2014
+#> 11: GEIH-Q04  2024
+#> 12: GEIH-Q03  2024
+#> 13: GEIH-Q02  2024
+#> 14: GEIH-Q01  2024
+
+# Find the absolute latest survey
+latest_overall <- catalog_col[order(-Year)][1]
+print(latest_overall)
+#>    ServerAlias Country  Year Survey
+#>         <char>  <char> <int> <char>
+#> 1:         GMD     COL  2024   GEIH
+#>                                                                                                 FilePath
+#>                                                                                                   <char>
+#> 1: COL/COL_2024_GEIH/COL_2024_GEIH_V01_M_V01_A_GMD/Data/Harmonized/COL_2024_GEIH_V01_M_V01_A_GMD_ALL.dta
+#>       Ext  FileSize            Timestamp
+#>    <char>    <char>               <char>
+#> 1:    dta 455.26 MB Feb 20 2026 08:30 PM
+#>                            Checksum OnlySol
+#>                              <char>  <lgcl>
+#> 1: d41d8cd98f00b204e9800998ecf8427e      NA
+```
+
+## Working with Multiple Countries
+
+Compare catalogs across different countries:
+
+
+``` r
+# Get catalogs for multiple countries
+countries <- c("COL", "BRA", "IND", "MEX")
+
+# Create a list to store catalogs
+catalogs <- lapply(countries, dlw_country_catalog)
+#> ℹ Returning CountryCatalog_COL from .dlwevn
+#> ℹ saving CountryCatalog_BRA in .dlwevn
+#> ℹ saving CountryCatalog_IND in .dlwevn
+#> ℹ saving CountryCatalog_MEX in .dlwevn
+names(catalogs) <- countries
+
+# Compare dataset counts
+dataset_counts <- data.table(
+  Country = countries,
+  Datasets = sapply(catalogs, nrow)
+)
+print(dataset_counts)
+#>    Country Datasets
+#>     <char>    <int>
+#> 1:     COL     4824
+#> 2:     BRA     4157
+#> 3:     IND     2058
+#> 4:     MEX     4363
+
+# Find common surveys across countries
+surveys_by_country <- lapply(catalogs, function(x) unique(x$Survey))
+common_surveys <- Reduce(intersect, surveys_by_country)
+cat("Surveys available in all countries:", paste(common_surveys, collapse = ", "), "\n")
+#> Surveys available in all countries: PISA
+
+# Find unique surveys per country
+for (country in countries) {
+  unique_surveys <- setdiff(
+    unique(catalogs[[country]]$Survey),
+    common_surveys
+  )
+  if (length(unique_surveys) > 0) {
+    cat(country, "unique surveys:", paste(unique_surveys, collapse = ", "), "\n")
+  }
+}
+#> COL unique surveys: GEIH, ECH, ENH, LLECE, PIRLS, TIMSS, ENH-FT, ENCV, ECV, GEIH-Q04, GEIH-Q03, GEIH-Q02, GEIH-Q01 
+#> BRA unique surveys: PNADC-E1, PNADC-E5, PNAD, PNADC, NLA, EMIS, LLECE, POF, PNADC-Q04, PNADC-Q03, PNADC-Q02, PNADC-Q01, PME, PME-Q04, PME-Q03, PME-Q02, PME-Q01, AISH 
+#> IND unique surveys: HCES, CPHS, NSS-SCH2, NSS-SCH1, NSS, PLFS-URBAN-PANEL, PLFS, PLFS-Urban-Panel-thru-2021, EUS, SARPS, R75252E, R75250H, NSS68-SCH10, NSS68-SCH1.0-T1, NSS66-SCH1.0-T1, NSS61-SCH10, NSS61-SCH1.0, NSS50-SCH10, NSS50-SCH1.0, NLA, EGRA, NSS-SCH10, IHDS-II 
+#> MEX unique surveys: ENIGHNS, ENIGH, ENOE, ENOEN, LLECE, ENOE-Q03, ENOE-Q02, ENOE-Q01, ENOE-Q04
+```
+
+## Understanding Caching
+
+By default, `dlw_country_catalog()` caches country catalogs in memory during your R session. This improves performance for repeated calls:
+
+
+``` r
+# First call: queries the API (slower)
+system.time({
+  cat1 <- dlw_country_catalog("COL")
+})
+#> ℹ Returning CountryCatalog_COL from .dlwevn
+#>    user  system elapsed 
+#>       0       0       0
+
+# Second call: uses cache (much faster)
+system.time({
+  cat2 <- dlw_country_catalog("COL")
+})
+#> ℹ Returning CountryCatalog_COL from .dlwevn
+#>    user  system elapsed 
+#>    0.00    0.00    0.02
+
+# Verify they're identical
+identical(cat1, cat2)
+#> [1] TRUE
+
+# Force a fresh API call
+system.time({
+  cat_fresh <- dlw_country_catalog("COL", force = TRUE)
+})
+#> ℹ Returning CountryCatalog_COL from .dlwevn
+#> ℹ saving CountryCatalog_COL in .dlwevn
+#>    user  system elapsed 
+#>    0.15    0.00    0.59
+```
+
+### When to Use `force = TRUE`
+
+- **Development/testing**: When you expect the server catalog to have changed
+- **Production workflows**: Occasionally refresh to catch new datasets
+- **Debugging**: When troubleshooting connectivity issues
+- **Multi-session workflows**: When data may have been updated
+
+
+``` r
+# Refresh the catalog from the server
+catalog_latest <- dlw_country_catalog(
+  country_code = "COL",
+  force = TRUE,
+  verbose = TRUE
+)
+#> ℹ Returning CountryCatalog_COL from .dlwevn
+#> ℹ saving CountryCatalog_COL in .dlwevn
+```
+
+## Troubleshooting
+
+### No Data Returned
+
+If `dlw_country_catalog()` returns an empty result:
+
+
+``` r
+# Check if the country code is valid
+catalog <- dlw_country_catalog("COL")
+#> ℹ Returning CountryCatalog_COL from .dlwevn
+if (nrow(catalog) == 0) {
+  cat("No datasets found for this country\n")
+  
+  # Try refreshing
+  catalog <- dlw_country_catalog("COL", force = TRUE)
+}
+```
+
+### Authentication Errors
+
+If you get authentication errors:
+
+
+``` r
+# Verify token is set
+# token <- dlw_get_token()
+# if (is.null(token) || token == "") {
+  # dlw_set_token("your_api_token_here")
+# }
+
+```
+
+### API Connection Issues
+
+If you cannot reach the server:
+
+
+``` r
+# Force refresh to test connection
+tryCatch({
+  catalog <- dlw_country_catalog("COL", force = TRUE, verbose = TRUE)
+  cat("Connection successful\n")
+}, error = function(e) {
+  cat("Connection failed:", e$message, "\n")
+})
+#> ℹ Returning CountryCatalog_COL from .dlwevn
+#> ℹ saving CountryCatalog_COL in .dlwevn
+#> Connection successful
+```
+
+## Related Functions
+
+- `dlw_server_catalog()` — List of all datasets across all countries
+- `dlw_server_inventory()` — Filter server catalog by multiple criteria
+- `dlw_get_data()` — Download data
+- `dlw_set_token()` — Set API authentication token
+
+For more information, use:
+
+```r
+?dlw_country_catalog
+?dlw_get_data
+?dlw_server_catalog
+```

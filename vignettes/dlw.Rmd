@@ -7,15 +7,13 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
-)
-```
 
-```{r setup}
+
+
+``` r
 library(dlw)
+library(data.table)
+#> data.table 1.18.2.1 using 7 threads (see ?getDTthreads).  Latest news: r-datatable.com
 ```
 
 `{dlw}` is an R client of the internal [datalibweb](https://datalibweb2.worldbank.org/) API of the World Bank. Datalibweb is a data system designed to enable users to seamlessly access microdata and documentation in the World Bank. Users can access the most up-to-date and historical versions of harmonized data collections and raw/non-harmonized data for subsequent analysis
@@ -26,8 +24,661 @@ To begin working with `{dlw}`, you must provide your datalibweb API token using 
 
 You can obtain or renew your token by visiting the [datalibweb page](https://datalibweb2.worldbank.org/) and following the instructions there. Once you have your token, set it in your R session as follows:
 
-```{r, eval = FALSE}
-dlw_set_token("your_token_here")
+
+``` r
+# dlw_set_token("your_token_here")
 ```
 
-[TO COMPLETE]
+## Server Catalog
+
+The server catalog provides a comprehensive list of all datasets available across all countries in the datalibweb system. You can retrieve the server catalog using the `dlw_server_catalog()` function.
+
+
+``` r
+server_cat <- dlw_server_catalog()
+#> Pruning cache
+#> ℹ saving ServerCatalog_GMD in .dlwevn
+head(server_cat)
+#>    ServerAlias Country  Year Survey
+#>         <char>  <char> <int> <char>
+#> 1:         GMD     VEN  2006    EHM
+#> 2:         GMD     VEN  2005    EHM
+#> 3:         GMD     VEN  2004    EHM
+#> 4:         GMD     VEN  2003    EHM
+#> 5:         GMD     VEN  2002    EHM
+#> 6:         GMD     VEN  2001    EHM
+#>                                                                                               FilePath
+#>                                                                                                 <char>
+#> 1: VEN/VEN_2006_EHM/VEN_2006_EHM_v01_M_v01_A_GMD/Data/Harmonized/VEN_2006_EHM_v01_M_v01_A_GMD_HIST.dta
+#> 2: VEN/VEN_2005_EHM/VEN_2005_EHM_v01_M_v01_A_GMD/Data/Harmonized/VEN_2005_EHM_v01_M_v01_A_GMD_HIST.dta
+#> 3: VEN/VEN_2004_EHM/VEN_2004_EHM_v01_M_v01_A_GMD/Data/Harmonized/VEN_2004_EHM_v01_M_v01_A_GMD_HIST.dta
+#> 4: VEN/VEN_2003_EHM/VEN_2003_EHM_v01_M_v01_A_GMD/Data/Harmonized/VEN_2003_EHM_v01_M_v01_A_GMD_HIST.dta
+#> 5: VEN/VEN_2002_EHM/VEN_2002_EHM_v01_M_v01_A_GMD/Data/Harmonized/VEN_2002_EHM_v01_M_v01_A_GMD_HIST.dta
+#> 6: VEN/VEN_2001_EHM/VEN_2001_EHM_v01_M_v01_A_GMD/Data/Harmonized/VEN_2001_EHM_v01_M_v01_A_GMD_HIST.dta
+#>       Ext FileSize            Timestamp
+#>    <char>   <char>               <char>
+#> 1:    dta  7.02 MB May 14 2025 08:32 PM
+#> 2:    dta  6.84 MB May 14 2025 08:31 PM
+#> 3:    dta  7.01 MB May 14 2025 08:31 PM
+#> 4:    dta  8.55 MB May 14 2025 08:31 PM
+#> 5:    dta 10.12 MB May 14 2025 08:31 PM
+#> 6:    dta  8.63 MB May 14 2025 08:31 PM
+#>                            Checksum OnlySol
+#>                              <char>  <lgcl>
+#> 1: e11b225b892a75fc66bac8ec1d432603      NA
+#> 2: dfe2aa7b1be7c3ad818966ea55e43f86      NA
+#> 3: 17fd8ceb4dbcc39c5ab948e771e83273      NA
+#> 4: 2ce1a74eaba62e9f99a3a66c22f939e5      NA
+#> 5: 2ffd4868918885f4fc2394c55806dd48      NA
+#> 6: 608696c2fc617f4af9d6c8ed6303cadd      NA
+#>                                 FileName
+#>                                   <char>
+#> 1: VEN_2006_EHM_v01_M_v01_A_GMD_HIST.dta
+#> 2: VEN_2005_EHM_v01_M_v01_A_GMD_HIST.dta
+#> 3: VEN_2004_EHM_v01_M_v01_A_GMD_HIST.dta
+#> 4: VEN_2003_EHM_v01_M_v01_A_GMD_HIST.dta
+#> 5: VEN_2002_EHM_v01_M_v01_A_GMD_HIST.dta
+#> 6: VEN_2001_EHM_v01_M_v01_A_GMD_HIST.dta
+#>    Country_code Survey_year Survey_acronym
+#>          <char>      <char>         <char>
+#> 1:          VEN        2006            EHM
+#> 2:          VEN        2005            EHM
+#> 3:          VEN        2004            EHM
+#> 4:          VEN        2003            EHM
+#> 5:          VEN        2002            EHM
+#> 6:          VEN        2001            EHM
+#>    Vermast Veralt Collection Module    ext
+#>     <char> <char>     <char> <char> <char>
+#> 1:     V01    V01        GMD   HIST    DTA
+#> 2:     V01    V01        GMD   HIST    DTA
+#> 3:     V01    V01        GMD   HIST    DTA
+#> 4:     V01    V01        GMD   HIST    DTA
+#> 5:     V01    V01        GMD   HIST    DTA
+#> 6:     V01    V01        GMD   HIST    DTA
+```
+
+### Exploring the Server Catalog
+
+You can filter and explore the server catalog to find datasets of interest.
+
+
+``` r
+# For examples,
+# to find list of all datasets related to HEIS surveys:
+heis_datasets <- server_cat[Survey == "HEIS", ]
+head(heis_datasets)
+#>    ServerAlias Country  Year Survey
+#>         <char>  <char> <int> <char>
+#> 1:         GMD     JOR  2010   HEIS
+#> 2:         GMD     JOR  2010   HEIS
+#> 3:         GMD     JOR  2010   HEIS
+#> 4:         GMD     JOR  2010   HEIS
+#> 5:         GMD     JOR  2010   HEIS
+#> 6:         GMD     JOR  2010   HEIS
+#>                                                                                                    FilePath
+#>                                                                                                      <char>
+#> 1:    JOR/JOR_2010_HEIS/JOR_2010_HEIS_V01_M_V04_A_GMD/Data/Harmonized/JOR_2010_HEIS_V01_M_V04_A_GMD_ALL.dta
+#> 2:   JOR/JOR_2010_HEIS/JOR_2010_HEIS_V01_M_V04_A_GMD/Data/Harmonized/JOR_2010_HEIS_V01_M_V04_A_GMD_GPWG.dta
+#> 3:    JOR/JOR_2010_HEIS/JOR_2010_HEIS_V01_M_V03_A_GMD/Data/Harmonized/JOR_2010_HEIS_V01_M_V03_A_GMD_ALL.dta
+#> 4:   JOR/JOR_2010_HEIS/JOR_2010_HEIS_V01_M_V03_A_GMD/Data/Harmonized/JOR_2010_HEIS_V01_M_V03_A_GMD_GPWG.dta
+#> 5:    JOR/JOR_2010_HEIS/JOR_2010_HEIS_V01_M_V01_A_GMD/Data/Harmonized/JOR_2010_HEIS_V01_M_V01_A_GMD_ALL.dta
+#> 6: JOR/JOR_2010_HEIS/JOR_2010_HEIS_V01_M_V01_A_GMD/Data/Harmonized/JOR_2010_HEIS_V01_M_V01_A_GMD_ASPIRE.dta
+#>       Ext  FileSize            Timestamp
+#>    <char>    <char>               <char>
+#> 1:    dta  24.99 MB May 14 2025 07:43 PM
+#> 2:    dta   5.49 MB May 14 2025 07:43 PM
+#> 3:    dta  13.06 MB May 14 2025 07:43 PM
+#> 4:    dta   5.37 MB May 14 2025 07:43 PM
+#> 5:    dta  12.48 MB May 14 2025 07:43 PM
+#> 6:    dta 787.21 KB May 14 2025 07:43 PM
+#>                            Checksum OnlySol
+#>                              <char>  <lgcl>
+#> 1: 286563022fd66455e593e47be693cc47      NA
+#> 2: 4ba0d20ffff465cb0f8ba2b064380dda      NA
+#> 3: 6a097bc4a4f1653bff66efa423791cde      NA
+#> 4: c9314898696f8d9b9ecc40ffb833e5af      NA
+#> 5: e8889ceaa2c0e47c00d51ec5cdfc2048      NA
+#> 6: 20a28979bcea01bbe4ca1bffa99a898c      NA
+#>                                    FileName
+#>                                      <char>
+#> 1:    JOR_2010_HEIS_V01_M_V04_A_GMD_ALL.dta
+#> 2:   JOR_2010_HEIS_V01_M_V04_A_GMD_GPWG.dta
+#> 3:    JOR_2010_HEIS_V01_M_V03_A_GMD_ALL.dta
+#> 4:   JOR_2010_HEIS_V01_M_V03_A_GMD_GPWG.dta
+#> 5:    JOR_2010_HEIS_V01_M_V01_A_GMD_ALL.dta
+#> 6: JOR_2010_HEIS_V01_M_V01_A_GMD_ASPIRE.dta
+#>    Country_code Survey_year Survey_acronym
+#>          <char>      <char>         <char>
+#> 1:          JOR        2010           HEIS
+#> 2:          JOR        2010           HEIS
+#> 3:          JOR        2010           HEIS
+#> 4:          JOR        2010           HEIS
+#> 5:          JOR        2010           HEIS
+#> 6:          JOR        2010           HEIS
+#>    Vermast Veralt Collection Module    ext
+#>     <char> <char>     <char> <char> <char>
+#> 1:     V01    V04        GMD    ALL    DTA
+#> 2:     V01    V04        GMD   GPWG    DTA
+#> 3:     V01    V03        GMD    ALL    DTA
+#> 4:     V01    V03        GMD   GPWG    DTA
+#> 5:     V01    V01        GMD    ALL    DTA
+#> 6:     V01    V01        GMD ASPIRE    DTA
+
+# to find list of all datasets for a specific module:
+module_gpwg <- server_cat[Module == "GPWG", ]
+head(module_gpwg)
+#>    ServerAlias Country  Year Survey
+#>         <char>  <char> <int> <char>
+#> 1:         GMD     UZB  2025    HBS
+#> 2:         GMD     UZB  2024    HBS
+#> 3:         GMD     UZB  2024    HBS
+#> 4:         GMD     UZB  2023    HBS
+#> 5:         GMD     UZB  2022    HBS
+#> 6:         GMD     UZB  2021    HBS
+#>                                                                                               FilePath
+#>                                                                                                 <char>
+#> 1: UZB/UZB_2025_HBS/UZB_2025_HBS_V01_M_V01_A_GMD/Data/Harmonized/UZB_2025_HBS_V01_M_V01_A_GMD_GPWG.dta
+#> 2: UZB/UZB_2024_HBS/UZB_2024_HBS_V01_M_V02_A_GMD/Data/Harmonized/UZB_2024_HBS_V01_M_V02_A_GMD_GPWG.dta
+#> 3: UZB/UZB_2024_HBS/UZB_2024_HBS_V01_M_V01_A_GMD/Data/Harmonized/UZB_2024_HBS_V01_M_V01_A_GMD_GPWG.dta
+#> 4: UZB/UZB_2023_HBS/UZB_2023_HBS_V01_M_V01_A_GMD/Data/Harmonized/UZB_2023_HBS_V01_M_V01_A_GMD_GPWG.dta
+#> 5: UZB/UZB_2022_HBS/UZB_2022_HBS_V01_M_V01_A_GMD/Data/Harmonized/UZB_2022_HBS_V01_M_V01_A_GMD_GPWG.dta
+#> 6: UZB/UZB_2021_HBS/UZB_2021_HBS_V01_M_V01_A_GMD/Data/Harmonized/UZB_2021_HBS_V01_M_V01_A_GMD_GPWG.dta
+#>       Ext FileSize            Timestamp
+#>    <char>   <char>               <char>
+#> 1:    dta  7.14 MB Feb 20 2026 08:30 PM
+#> 2:    dta  9.26 MB Feb 20 2026 08:30 PM
+#> 3:    dta  8.37 MB Oct 24 2025 01:32 PM
+#> 4:    dta  6.80 MB May 14 2025 08:31 PM
+#> 5:    dta  5.26 MB May 14 2025 08:31 PM
+#> 6:    dta  3.69 MB May 14 2025 08:31 PM
+#>                            Checksum OnlySol
+#>                              <char>  <lgcl>
+#> 1: d41d8cd98f00b204e9800998ecf8427e      NA
+#> 2: d41d8cd98f00b204e9800998ecf8427e      NA
+#> 3: a3781e287748b35d363fa128c9a3a19e      NA
+#> 4: 62c75fba8f1b40f2000c5ea3b07ded09      NA
+#> 5: 43f3b80d3cfc0770ee8102a591134461      NA
+#> 6: fa508041ae7aec93f0b4c6d4edeb5d6a      NA
+#>                                 FileName
+#>                                   <char>
+#> 1: UZB_2025_HBS_V01_M_V01_A_GMD_GPWG.dta
+#> 2: UZB_2024_HBS_V01_M_V02_A_GMD_GPWG.dta
+#> 3: UZB_2024_HBS_V01_M_V01_A_GMD_GPWG.dta
+#> 4: UZB_2023_HBS_V01_M_V01_A_GMD_GPWG.dta
+#> 5: UZB_2022_HBS_V01_M_V01_A_GMD_GPWG.dta
+#> 6: UZB_2021_HBS_V01_M_V01_A_GMD_GPWG.dta
+#>    Country_code Survey_year Survey_acronym
+#>          <char>      <char>         <char>
+#> 1:          UZB        2025            HBS
+#> 2:          UZB        2024            HBS
+#> 3:          UZB        2024            HBS
+#> 4:          UZB        2023            HBS
+#> 5:          UZB        2022            HBS
+#> 6:          UZB        2021            HBS
+#>    Vermast Veralt Collection Module    ext
+#>     <char> <char>     <char> <char> <char>
+#> 1:     V01    V01        GMD   GPWG    DTA
+#> 2:     V01    V02        GMD   GPWG    DTA
+#> 3:     V01    V01        GMD   GPWG    DTA
+#> 4:     V01    V01        GMD   GPWG    DTA
+#> 5:     V01    V01        GMD   GPWG    DTA
+#> 6:     V01    V01        GMD   GPWG    DTA
+
+# to find list of all datasets for a specific year:
+year_2023 <- server_cat[Year == 2023, ]
+head(year_2023)
+#>    ServerAlias Country  Year       Survey
+#>         <char>  <char> <int>       <char>
+#> 1:         GMD     UZB  2023          HBS
+#> 2:         GMD     UZB  2023          HBS
+#> 3:         GMD     USA  2023 CPS-ASEC-LIS
+#> 4:         GMD     USA  2023 CPS-ASEC-LIS
+#> 5:         GMD     URY  2023          ECH
+#> 6:         GMD     URY  2023          ECH
+#>                                                                                                                         FilePath
+#>                                                                                                                           <char>
+#> 1:                            UZB/UZB_2023_HBS/UZB_2023_HBS_V01_M_V01_A_GMD/Data/Harmonized/UZB_2023_HBS_V01_M_V01_A_GMD_ALL.dta
+#> 2:                           UZB/UZB_2023_HBS/UZB_2023_HBS_V01_M_V01_A_GMD/Data/Harmonized/UZB_2023_HBS_V01_M_V01_A_GMD_GPWG.dta
+#> 3: USA/USA_2023_CPS-ASEC-LIS/USA_2023_CPS-ASEC-LIS_V01_M_V02_A_GMD/Data/Harmonized/USA_2023_CPS-ASEC-LIS_V01_M_V02_A_GMD_BIN.dta
+#> 4: USA/USA_2023_CPS-ASEC-LIS/USA_2023_CPS-ASEC-LIS_V01_M_V01_A_GMD/Data/Harmonized/USA_2023_CPS-ASEC-LIS_V01_M_V01_A_GMD_BIN.dta
+#> 5:                            URY/URY_2023_ECH/URY_2023_ECH_V01_M_V01_A_GMD/Data/Harmonized/URY_2023_ECH_V01_M_V01_A_GMD_ALL.dta
+#> 6:                           URY/URY_2023_ECH/URY_2023_ECH_V01_M_V01_A_GMD/Data/Harmonized/URY_2023_ECH_V01_M_V01_A_GMD_GPWG.dta
+#>       Ext FileSize            Timestamp
+#>    <char>   <char>               <char>
+#> 1:    dta 57.74 MB May 14 2025 08:31 PM
+#> 2:    dta  6.80 MB May 14 2025 08:31 PM
+#> 3:    dta 72.75 KB Jan 22 2026 07:28 PM
+#> 4:    dta 36.53 KB May 14 2025 08:31 PM
+#> 5:    dta 34.67 MB May 14 2025 08:20 PM
+#> 6:    dta  5.72 MB May 14 2025 08:20 PM
+#>                            Checksum OnlySol
+#>                              <char>  <lgcl>
+#> 1: 6b79fab477546bbfd1b114215f6ba276      NA
+#> 2: 62c75fba8f1b40f2000c5ea3b07ded09      NA
+#> 3: d41d8cd98f00b204e9800998ecf8427e      NA
+#> 4: ff02cadce6a0c572b7dc63ef000e6863      NA
+#> 5: 8e15ff737bf1042f1b03f5551cb405b6      NA
+#> 6: 7bd7555fa5bb19580ec2946fa2279a34      NA
+#>                                         FileName
+#>                                           <char>
+#> 1:          UZB_2023_HBS_V01_M_V01_A_GMD_ALL.dta
+#> 2:         UZB_2023_HBS_V01_M_V01_A_GMD_GPWG.dta
+#> 3: USA_2023_CPS-ASEC-LIS_V01_M_V02_A_GMD_BIN.dta
+#> 4: USA_2023_CPS-ASEC-LIS_V01_M_V01_A_GMD_BIN.dta
+#> 5:          URY_2023_ECH_V01_M_V01_A_GMD_ALL.dta
+#> 6:         URY_2023_ECH_V01_M_V01_A_GMD_GPWG.dta
+#>    Country_code Survey_year Survey_acronym
+#>          <char>      <char>         <char>
+#> 1:          UZB        2023            HBS
+#> 2:          UZB        2023            HBS
+#> 3:          USA        2023   CPS-ASEC-LIS
+#> 4:          USA        2023   CPS-ASEC-LIS
+#> 5:          URY        2023            ECH
+#> 6:          URY        2023            ECH
+#>    Vermast Veralt Collection Module    ext
+#>     <char> <char>     <char> <char> <char>
+#> 1:     V01    V01        GMD    ALL    DTA
+#> 2:     V01    V01        GMD   GPWG    DTA
+#> 3:     V01    V02        GMD    BIN    DTA
+#> 4:     V01    V01        GMD    BIN    DTA
+#> 5:     V01    V01        GMD    ALL    DTA
+#> 6:     V01    V01        GMD   GPWG    DTA
+
+# to find list of all datasets for a specific country and year:
+country_year <- server_cat[Country == "PRY" & Year == 2020, ]
+head(country_year)
+#>    ServerAlias Country  Year Survey
+#>         <char>  <char> <int> <char>
+#> 1:         GMD     PRY  2020    EPH
+#> 2:         GMD     PRY  2020    EPH
+#> 3:         GMD     PRY  2020    EPH
+#> 4:         GMD     PRY  2020    EPH
+#> 5:         GMD     PRY  2020    EPH
+#> 6:         GMD     PRY  2020    EPH
+#>                                                                                               FilePath
+#>                                                                                                 <char>
+#> 1:  PRY/PRY_2020_EPH/PRY_2020_EPH_V01_M_V03_A_GMD/Data/Harmonized/PRY_2020_EPH_V01_M_V03_A_GMD_ALL.dta
+#> 2: PRY/PRY_2020_EPH/PRY_2020_EPH_V01_M_V03_A_GMD/Data/Harmonized/PRY_2020_EPH_V01_M_V03_A_GMD_GPWG.dta
+#> 3:  PRY/PRY_2020_EPH/PRY_2020_EPH_V01_M_V02_A_GMD/Data/Harmonized/PRY_2020_EPH_V01_M_V02_A_GMD_ALL.dta
+#> 4: PRY/PRY_2020_EPH/PRY_2020_EPH_V01_M_V02_A_GMD/Data/Harmonized/PRY_2020_EPH_V01_M_V02_A_GMD_GPWG.dta
+#> 5:  PRY/PRY_2020_EPH/PRY_2020_EPH_V01_M_V01_A_GMD/Data/Harmonized/PRY_2020_EPH_V01_M_V01_A_GMD_ALL.dta
+#> 6: PRY/PRY_2020_EPH/PRY_2020_EPH_V01_M_V01_A_GMD/Data/Harmonized/PRY_2020_EPH_V01_M_V01_A_GMD_GPWG.dta
+#>       Ext FileSize            Timestamp
+#>    <char>   <char>               <char>
+#> 1:    dta 11.51 MB May 14 2025 08:03 PM
+#> 2:    dta  2.68 MB May 14 2025 08:03 PM
+#> 3:    dta 10.70 MB May 14 2025 08:03 PM
+#> 4:    dta  2.53 MB May 14 2025 08:03 PM
+#> 5:    dta  4.46 MB May 14 2025 08:03 PM
+#> 6:    dta  1.76 MB May 14 2025 08:03 PM
+#>                            Checksum OnlySol
+#>                              <char>  <lgcl>
+#> 1: 06a3f754dc1b3365f76a3c30528f113e      NA
+#> 2: 9da8378532194cf6acd8be8925dd6006      NA
+#> 3: 1770c99b5680b16133cf64ce03894505      NA
+#> 4: 0743ab3383791c724ce74d1750a34561      NA
+#> 5: b15a72c03bc7c825ff88d4cd1f50b467      NA
+#> 6: c948747e6c3654a564981823b34aa4f5      NA
+#>                                 FileName
+#>                                   <char>
+#> 1:  PRY_2020_EPH_V01_M_V03_A_GMD_ALL.dta
+#> 2: PRY_2020_EPH_V01_M_V03_A_GMD_GPWG.dta
+#> 3:  PRY_2020_EPH_V01_M_V02_A_GMD_ALL.dta
+#> 4: PRY_2020_EPH_V01_M_V02_A_GMD_GPWG.dta
+#> 5:  PRY_2020_EPH_V01_M_V01_A_GMD_ALL.dta
+#> 6: PRY_2020_EPH_V01_M_V01_A_GMD_GPWG.dta
+#>    Country_code Survey_year Survey_acronym
+#>          <char>      <char>         <char>
+#> 1:          PRY        2020            EPH
+#> 2:          PRY        2020            EPH
+#> 3:          PRY        2020            EPH
+#> 4:          PRY        2020            EPH
+#> 5:          PRY        2020            EPH
+#> 6:          PRY        2020            EPH
+#>    Vermast Veralt Collection Module    ext
+#>     <char> <char>     <char> <char> <char>
+#> 1:     V01    V03        GMD    ALL    DTA
+#> 2:     V01    V03        GMD   GPWG    DTA
+#> 3:     V01    V02        GMD    ALL    DTA
+#> 4:     V01    V02        GMD   GPWG    DTA
+#> 5:     V01    V01        GMD    ALL    DTA
+#> 6:     V01    V01        GMD   GPWG    DTA
+```
+
+## Country Catalog
+
+The country catalog provides detailed metadata for datasets specific to a single country. You can retrieve the country catalog using the `dlw_country_catalog()` function by specifying the desired country code.
+
+
+``` r
+country_pry <- dlw_country_catalog(country_code = "PRY")
+#> ℹ saving CountryCatalog_PRY in .dlwevn
+head(country_pry)
+#>    ServerAlias Country  Year Survey
+#>         <char>  <char> <int> <char>
+#> 1:         GMD     PRY  2024   EPHC
+#> 2:         GMD     PRY  2024   EPHC
+#> 3:         GMD     PRY  2023   EPHC
+#> 4:         GMD     PRY  2023   EPHC
+#> 5:         GMD     PRY  2023   EPHC
+#> 6:         GMD     PRY  2023   EPHC
+#>                                                                                                  FilePath
+#>                                                                                                    <char>
+#> 1:  PRY/PRY_2024_EPHC/PRY_2024_EPHC_V01_M_V01_A_GMD/Data/Harmonized/PRY_2024_EPHC_V01_M_V01_A_GMD_ALL.dta
+#> 2: PRY/PRY_2024_EPHC/PRY_2024_EPHC_V01_M_V01_A_GMD/Data/Harmonized/PRY_2024_EPHC_V01_M_V01_A_GMD_GPWG.dta
+#> 3:  PRY/PRY_2023_EPHC/PRY_2023_EPHC_V02_M_V01_A_GMD/Data/Harmonized/PRY_2023_EPHC_V02_M_V01_A_GMD_ALL.dta
+#> 4: PRY/PRY_2023_EPHC/PRY_2023_EPHC_V02_M_V01_A_GMD/Data/Harmonized/PRY_2023_EPHC_V02_M_V01_A_GMD_GPWG.dta
+#> 5:  PRY/PRY_2023_EPHC/PRY_2023_EPHC_V01_M_V01_A_GMD/Data/Harmonized/PRY_2023_EPHC_V01_M_V01_A_GMD_ALL.dta
+#> 6: PRY/PRY_2023_EPHC/PRY_2023_EPHC_V01_M_V01_A_GMD/Data/Harmonized/PRY_2023_EPHC_V01_M_V01_A_GMD_GPWG.dta
+#>       Ext FileSize            Timestamp
+#>    <char>   <char>               <char>
+#> 1:    dta 36.36 MB Aug 15 2025 07:40 PM
+#> 2:    dta  6.92 MB Aug 15 2025 07:40 PM
+#> 3:    dta 36.62 MB Aug 15 2025 07:40 PM
+#> 4:    dta  6.96 MB Aug 15 2025 07:40 PM
+#> 5:    dta 37.89 MB May 14 2025 08:03 PM
+#> 6:    dta  5.97 MB May 14 2025 08:03 PM
+#>                            Checksum OnlySol
+#>                              <char>  <lgcl>
+#> 1: d41d8cd98f00b204e9800998ecf8427e      NA
+#> 2: d41d8cd98f00b204e9800998ecf8427e      NA
+#> 3: d41d8cd98f00b204e9800998ecf8427e      NA
+#> 4: d41d8cd98f00b204e9800998ecf8427e      NA
+#> 5: 2ec26933942ea00ac0815d65c513ca35      NA
+#> 6: 257b606f428e16f27b2f30614f419f7a      NA
+```
+
+### Exploring the Country Catalog
+
+You can filter and explore the country catalog to find list datasets of interest.
+
+``` r
+# For examples 
+# to find list of all datasets related to EPH survey in Paraguay: 
+eph_pry <- country_pry[Survey == "EPH", ] 
+head(eph_pry)
+#>    ServerAlias Country  Year Survey
+#>         <char>  <char> <int> <char>
+#> 1:         GMD     PRY  2022    EPH
+#> 2:         GMD     PRY  2022    EPH
+#> 3:         GMD     PRY  2022    EPH
+#> 4:         GMD     PRY  2022    EPH
+#> 5:         GMD     PRY  2021    EPH
+#> 6:         GMD     PRY  2021    EPH
+#>                                                                                               FilePath
+#>                                                                                                 <char>
+#> 1:  PRY/PRY_2022_EPH/PRY_2022_EPH_V01_M_V02_A_GMD/Data/Harmonized/PRY_2022_EPH_V01_M_V02_A_GMD_ALL.dta
+#> 2: PRY/PRY_2022_EPH/PRY_2022_EPH_V01_M_V02_A_GMD/Data/Harmonized/PRY_2022_EPH_V01_M_V02_A_GMD_GPWG.dta
+#> 3:  PRY/PRY_2022_EPH/PRY_2022_EPH_V01_M_V01_A_GMD/Data/Harmonized/PRY_2022_EPH_V01_M_V01_A_GMD_ALL.dta
+#> 4: PRY/PRY_2022_EPH/PRY_2022_EPH_V01_M_V01_A_GMD/Data/Harmonized/PRY_2022_EPH_V01_M_V01_A_GMD_GPWG.dta
+#> 5:  PRY/PRY_2021_EPH/PRY_2021_EPH_V01_M_V03_A_GMD/Data/Harmonized/PRY_2021_EPH_V01_M_V03_A_GMD_ALL.dta
+#> 6: PRY/PRY_2021_EPH/PRY_2021_EPH_V01_M_V03_A_GMD/Data/Harmonized/PRY_2021_EPH_V01_M_V03_A_GMD_GPWG.dta
+#>       Ext FileSize            Timestamp
+#>    <char>   <char>               <char>
+#> 1:    dta 10.67 MB May 14 2025 08:03 PM
+#> 2:    dta  1.88 MB May 14 2025 08:03 PM
+#> 3:    dta  4.77 MB May 14 2025 08:03 PM
+#> 4:    dta  1.63 MB May 14 2025 08:03 PM
+#> 5:    dta 10.71 MB May 14 2025 08:03 PM
+#> 6:    dta  2.40 MB May 14 2025 08:03 PM
+#>                            Checksum OnlySol
+#>                              <char>  <lgcl>
+#> 1: 37299ca45846dc35c6d650b624ba2d68      NA
+#> 2: be3752dd69d16f666be14735de52c4e2      NA
+#> 3: 7f698e1667f4df29e98d2a9786520009      NA
+#> 4: aea111432ee717eead2eb99a5cf29275      NA
+#> 5: a90ca729e8125d4be6a5f5e894025c78      NA
+#> 6: 3e6f31def4c2f19822f10753f3c77cd5      NA
+
+# to find list of all datasets for a specific year:
+year_2020_pry <- country_pry[Year == 2020, ] 
+head(year_2020_pry)
+#>    ServerAlias Country  Year Survey
+#>         <char>  <char> <int> <char>
+#> 1:         GMD     PRY  2020    EPH
+#> 2:         GMD     PRY  2020    EPH
+#> 3:         GMD     PRY  2020    EPH
+#> 4:         GMD     PRY  2020    EPH
+#> 5:         GMD     PRY  2020    EPH
+#> 6:         GMD     PRY  2020    EPH
+#>                                                                                               FilePath
+#>                                                                                                 <char>
+#> 1:  PRY/PRY_2020_EPH/PRY_2020_EPH_V01_M_V03_A_GMD/Data/Harmonized/PRY_2020_EPH_V01_M_V03_A_GMD_ALL.dta
+#> 2: PRY/PRY_2020_EPH/PRY_2020_EPH_V01_M_V03_A_GMD/Data/Harmonized/PRY_2020_EPH_V01_M_V03_A_GMD_GPWG.dta
+#> 3:  PRY/PRY_2020_EPH/PRY_2020_EPH_V01_M_V02_A_GMD/Data/Harmonized/PRY_2020_EPH_V01_M_V02_A_GMD_ALL.dta
+#> 4: PRY/PRY_2020_EPH/PRY_2020_EPH_V01_M_V02_A_GMD/Data/Harmonized/PRY_2020_EPH_V01_M_V02_A_GMD_GPWG.dta
+#> 5:  PRY/PRY_2020_EPH/PRY_2020_EPH_V01_M_V01_A_GMD/Data/Harmonized/PRY_2020_EPH_V01_M_V01_A_GMD_ALL.dta
+#> 6: PRY/PRY_2020_EPH/PRY_2020_EPH_V01_M_V01_A_GMD/Data/Harmonized/PRY_2020_EPH_V01_M_V01_A_GMD_GPWG.dta
+#>       Ext FileSize            Timestamp
+#>    <char>   <char>               <char>
+#> 1:    dta 11.51 MB May 14 2025 08:03 PM
+#> 2:    dta  2.68 MB May 14 2025 08:03 PM
+#> 3:    dta 10.70 MB May 14 2025 08:03 PM
+#> 4:    dta  2.53 MB May 14 2025 08:03 PM
+#> 5:    dta  4.46 MB May 14 2025 08:03 PM
+#> 6:    dta  1.76 MB May 14 2025 08:03 PM
+#>                            Checksum OnlySol
+#>                              <char>  <lgcl>
+#> 1: 06a3f754dc1b3365f76a3c30528f113e      NA
+#> 2: 9da8378532194cf6acd8be8925dd6006      NA
+#> 3: 1770c99b5680b16133cf64ce03894505      NA
+#> 4: 0743ab3383791c724ce74d1750a34561      NA
+#> 5: b15a72c03bc7c825ff88d4cd1f50b467      NA
+#> 6: c948747e6c3654a564981823b34aa4f5      NA
+```
+
+## Downloading Datasets
+Once you have identified datasets of interest from either the server or country catalog, you can download them using the `dlw_get_data()` function.
+
+``` r
+dlw_get_data(
+  country_code = "PRY",
+  year = 2020L,
+  server = "GMD",
+  survey = "EPH",
+  module = "GPWG",
+  filename = "PRY_2020_EPH_V01_M_V03_A_GMD_GPWG.dta",
+  collection = "GMD"
+)
+#> ✔ stamp initialized
+#>   alias: dlw
+#>   root:
+#>   C:/Users/WB308892/AppData/Local/Temp/Rtmpu6kXN5
+#>   state:
+#>   C:/Users/WB308892/AppData/Local/Temp/Rtmpu6kXN5/.stamp
+#> ✔ Saved [qs2] →
+#>   ']8;;file://c:/users/wb308892/appdata/local/temp/rtmpu6kxn5/pry_2020_eph_v01_m_v03_a_gmd_gpwg.qs2c:/users/wb308892/appdata/local/temp/rtmpu6kxn5/pry_2020_eph_v01_m_v03_a_gmd_gpwg.qs2]8;;'
+#>   @ version 954d05a220c4e28f
+#>        countrycode  year      hhid   pid
+#>             <char> <num>    <char> <num>
+#>     1:         pry  2020 001060011     1
+#>     2:         pry  2020 001060011     2
+#>     3:         pry  2020 001060031     1
+#>     4:         pry  2020 001060041     2
+#>     5:         pry  2020 001060041     3
+#>    ---                                  
+#> 17485:         pry  2020 286880131     3
+#> 17486:         pry  2020 286880181     1
+#> 17487:         pry  2020 286880181     2
+#> 17488:         pry  2020 286880181     3
+#> 17489:         pry  2020 286880181     4
+#>        hsize  welfare welfaredef welfarenom
+#>        <num>    <num>      <num>      <num>
+#>     1:     2 12689241   12689241   12689241
+#>     2:     2 12689241   12689241   12689241
+#>     3:     1 36671200   36671200   36671200
+#>     4:     6 14402758   14402758   14402758
+#>     5:     6 14402758   14402758   14402758
+#>    ---                                     
+#> 17485:     3 30408284   30408284   26440002
+#> 17486:     4 14146062   14146062   12300001
+#> 17487:     4 14146062   14146062   12300001
+#> 17488:     4 14146062   14146062   12300001
+#> 17489:     4 14146062   14146062   12300001
+#>        welfareother welfareothertype
+#>               <num>           <char>
+#>     1:     12689241              INC
+#>     2:     12689241              INC
+#>     3:     36671200              INC
+#>     4:     14402758              INC
+#>     5:     14402758              INC
+#>    ---                              
+#> 17485:     30408284              INC
+#> 17486:     14146062              INC
+#> 17487:     14146062              INC
+#> 17488:     14146062              INC
+#> 17489:     14146062              INC
+#>        welfshprosperity welfaretype
+#>                   <num>      <char>
+#>     1:         12689241         INC
+#>     2:         12689241         INC
+#>     3:         36671200         INC
+#>     4:         14402758         INC
+#>     5:         14402758         INC
+#>    ---                             
+#> 17485:         30408284         INC
+#> 17486:         14146062         INC
+#> 17487:         14146062         INC
+#> 17488:         14146062         INC
+#> 17489:         14146062         INC
+#>                              subnatid1
+#>                                 <char>
+#>     1: 1 - Area Metropolitana Asuncion
+#>     2: 1 - Area Metropolitana Asuncion
+#>     3: 1 - Area Metropolitana Asuncion
+#>     4: 1 - Area Metropolitana Asuncion
+#>     5: 1 - Area Metropolitana Asuncion
+#>    ---                                
+#> 17485:                 5 - Resto Rural
+#> 17486:                 5 - Resto Rural
+#> 17487:                 5 - Resto Rural
+#> 17488:                 5 - Resto Rural
+#> 17489:                 5 - Resto Rural
+#>                         subnatid1_prev
+#>                                 <char>
+#>     1: 1 - Area Metropolitana Asuncion
+#>     2: 1 - Area Metropolitana Asuncion
+#>     3: 1 - Area Metropolitana Asuncion
+#>     4: 1 - Area Metropolitana Asuncion
+#>     5: 1 - Area Metropolitana Asuncion
+#>    ---                                
+#> 17485:                 5 - Resto Rural
+#> 17486:                 5 - Resto Rural
+#> 17487:                 5 - Resto Rural
+#> 17488:                 5 - Resto Rural
+#> 17489:                 5 - Resto Rural
+#>        subnatid2_prev subnatid3_prev
+#>                <char>         <char>
+#>     1:   0 - Asuncion               
+#>     2:   0 - Asuncion               
+#>     3:   0 - Asuncion               
+#>     4:   0 - Asuncion               
+#>     5:   0 - Asuncion               
+#>    ---                              
+#> 17485:     20 - Resto               
+#> 17486:     20 - Resto               
+#> 17487:     20 - Resto               
+#> 17488:     20 - Resto               
+#> 17489:     20 - Resto               
+#>        gaul_adm1_code gaul_adm2_code
+#>                 <num>          <num>
+#>     1:           2311             NA
+#>     2:           2311             NA
+#>     3:           2311             NA
+#>     4:           2311             NA
+#>     5:           2311             NA
+#>    ---                              
+#> 17485:             NA             NA
+#> 17486:             NA             NA
+#> 17487:             NA             NA
+#> 17488:             NA             NA
+#> 17489:             NA             NA
+#>        gaul_adm3_code subnatid2 subnatid3
+#>                 <num>    <char>    <char>
+#>     1:             NA         .         .
+#>     2:             NA         .         .
+#>     3:             NA         .         .
+#>     4:             NA         .         .
+#>     5:             NA         .         .
+#>    ---                                   
+#> 17485:             NA         .         .
+#> 17486:             NA         .         .
+#> 17487:             NA         .         .
+#> 17488:             NA         .         .
+#> 17489:             NA         .         .
+#>        subnatidsurvey            urban
+#>                <char> <haven_labelled>
+#>     1:   0 - Asuncion                1
+#>     2:   0 - Asuncion                1
+#>     3:   0 - Asuncion                1
+#>     4:   0 - Asuncion                1
+#>     5:   0 - Asuncion                1
+#>    ---                                
+#> 17485:     20 - Resto                0
+#> 17486:     20 - Resto                0
+#> 17487:     20 - Resto                0
+#> 17488:     20 - Resto                0
+#> 17489:     20 - Resto                0
+#>                    male   age weight   code
+#>        <haven_labelled> <num>  <num> <char>
+#>     1:                1    70    180    PRY
+#>     2:                0    65    180    PRY
+#>     3:                1    42    407    PRY
+#>     4:                1    34    451    PRY
+#>     5:                0    31    451    PRY
+#>    ---                                     
+#> 17485:                1    18    127    PRY
+#> 17486:                1    40    194    PRY
+#> 17487:                0    27    194    PRY
+#> 17488:                1     6    194    PRY
+#> 17489:                1     3    194    PRY
+```
+
+Alternatively, you can use `dlw_get_gmd()`, which is a convenient wrapper around `dlw_get_data()`. To download the most recent version of a dataset, you only need to provide the country code, year, and module.
+
+``` r
+pry20 <- dlw_get_gmd(country_code = "PRY", year = 2020, module = "GPWG")
+#> 
+#> ── dlw_get_data Calls ────────────────────────
+#> Call 1:
+#> ]8;;x-r-help:dlw::dlw_get_datadlw_get_data]8;;(
+#>   country_code = "PRY",
+#>   year = 2020L,
+#>   server = "GMD",
+#>   survey = "EPH",
+#>   module = "GPWG",
+#>   filename = "PRY_2020_EPH_V01_M_V03_A_GMD_GPWG.dta",
+#>   collection = "GMD"
+#> )
+#> ✔ Skip save (reason: no_change_policy) for
+#>   ']8;;file://c:/users/wb308892/appdata/local/temp/rtmpu6kxn5/pry_2020_eph_v01_m_v03_a_gmd_gpwg.qs2c:/users/wb308892/appdata/local/temp/rtmpu6kxn5/pry_2020_eph_v01_m_v03_a_gmd_gpwg.qs2]8;;'
+```
+
+To download a specific version of a dataset, you can provide additional arguments such as `survey`, `vermast`, and `veralt` to `dlw_get_gmd()`.
+
+``` r
+# this downloads version V02 of the EPH survey for Paraguay in 2020 within the GPWG module.
+pry20_v2 <- dlw_get_gmd(
+  country_code = "PRY",
+  year = 2020,
+  module = "GPWG",
+  survey = "EPH",
+  vermast = "V01",
+  veralt = "V02"
+)
+#> 
+#> ── dlw_get_data Calls ────────────────────────
+#> Call 1:
+#> ]8;;x-r-help:dlw::dlw_get_datadlw_get_data]8;;(
+#>   country_code = "PRY",
+#>   year = 2020L,
+#>   server = "GMD",
+#>   survey = "EPH",
+#>   module = "GPWG",
+#>   filename = "PRY_2020_EPH_V01_M_V02_A_GMD_GPWG.dta",
+#>   collection = "GMD"
+#> )
+#> ✔ Saved [qs2] →
+#>   ']8;;file://c:/users/wb308892/appdata/local/temp/rtmpu6kxn5/pry_2020_eph_v01_m_v02_a_gmd_gpwg.qs2c:/users/wb308892/appdata/local/temp/rtmpu6kxn5/pry_2020_eph_v01_m_v02_a_gmd_gpwg.qs2]8;;'
+#>   @ version b7d6cceb360513d4
+```

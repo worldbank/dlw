@@ -31,7 +31,7 @@ in option dlw.local_dir which is set initially as "".}
 is TRUE if `local_dir` exists.}
 
 \item{format}{character: File format to use for pinning data ('parquet'
-[default] or 'qs')}
+[default] or 'qs2')}
 
 \item{local_overwrite}{logical. Whether to overwrite any saved data. Default
 is FALSE}
@@ -48,5 +48,18 @@ vermast, veralt, collection, module)}
 data base request as data.table
 }
 \description{
-Get data from datalibweb (refactored)
+`dlw_get_data()` function is the main user-facing function for 
+retrieving datasets from the Datalibweb (DLW) API. It handles 
+downloading, caching, and reading datasets, supporting both local 
+and temporary storage.
+
+**How it works:**
+1. Checks if the requested file exists locally (unless `local_overwrite = TRUE`).
+2. If it exists, reads it using `.dlw_read()`.
+3. If not, downloads the data from the DLW API using `.dlw_download()`, saves 
+   it in the specified format, and returns it as a `data.table`.
+4. Handles directory management and caching via `.get_wrk_board()`.
+
+This function streamlines access to DLW datasets, automatically 
+managing download, storage, and retrieval.
 }

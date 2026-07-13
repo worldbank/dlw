@@ -89,7 +89,7 @@ dlw_download <- function(country_code,
 
   # prepare the args for request
   dots <- list(...)
-  endpoint <- "FileInformation/GetFileInfo"
+  endpoint <- "FileInformationInternal/GetFileInfo"
   args <- c(list(Country = country_code,
                  method = "POST",
                  Server = server,

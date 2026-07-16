@@ -9,8 +9,8 @@
 #'   in option dlw.local_dir which is set initially as "".
 #' @param local logical: whether or not to save and read data locally. default
 #'   is TRUE if `local_dir` exists.
-#' @param format character: File format to use for pinning data ('parquet'
-#'   [default] or 'qs')
+#' @param format character: File format to use for pinning data ('qs2'
+#'   [default] or 'parquet')
 #' @param local_overwrite logical. Whether to overwrite any saved data. Default
 #'   is FALSE
 #' @param version numeric: Version of the pin to read (for pinning data
@@ -69,7 +69,7 @@ dlw_get_data <- function(country_code,
 #' @inheritParams dlw_get_data
 #' @inheritParams dlw_read
 #' @param filename character: Name of the file to save/read (required)
-#' @param format character: File format to use for pinning data ('qs'
+#' @param format character: File format to use for pinning data ('qs2'
 #'   [default] or 'parquet')
 #' @returns A list with the board and pin_name used
 #' @keywords internal
@@ -89,7 +89,7 @@ dlw_download <- function(country_code,
 
   # prepare the args for request
   dots <- list(...)
-  endpoint <- "FileInformation/GetFileInfo"
+  endpoint <- "FileInformationInternal/GetFileInfo"
   args <- c(list(Country = country_code,
                  method = "POST",
                  Server = server,

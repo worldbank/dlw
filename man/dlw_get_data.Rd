@@ -30,8 +30,8 @@ in option dlw.local_dir which is set initially as "".}
 \item{local}{logical: whether or not to save and read data locally. default
 is TRUE if `local_dir` exists.}
 
-\item{format}{character: File format to use for pinning data ('parquet'
-[default] or 'qs')}
+\item{format}{character: File format to use for pinning data ('qs2'
+[default] or 'parquet')}
 
 \item{local_overwrite}{logical. Whether to overwrite any saved data. Default
 is FALSE}

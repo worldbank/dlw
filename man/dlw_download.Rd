@@ -24,7 +24,7 @@ dlw_download(
 
 \item{pin_name}{The name of the pin (as returned by dlw_download)}
 
-\item{format}{character: File format to use for pinning data ('qs'
+\item{format}{character: File format to use for pinning data ('qs2'
 [default] or 'parquet')}
 
 \item{server}{character: in case we have more than one server. default is  GMD}

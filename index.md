@@ -34,6 +34,7 @@ You can install the development version of dlw from
 [GitHub](https://github.com/) with:
 
 ``` r
+
 # install.packages("pak")
 pak::pak("worldbank/dlw")
 # or
@@ -43,6 +44,7 @@ remotes::github_install("worldbank/dlw")
 ## Usage
 
 ``` r
+
 library(dlw)
 ```
 
@@ -58,6 +60,7 @@ page](https://datalibweb2.worldbank.org/) and following the instructions
 there. Once you have your token, set it in your R session as follows:
 
 ``` r
+
 dlw_set_token("your_token_here")
 ```
 
@@ -72,6 +75,7 @@ saved for the current session in a hidden environment within the
 efficient access in subsequent operations.
 
 ``` r
+
 ctl <- dlw_server_catalog()
 #> Pruning cache
 #> ℹ saving ServerCatalog_GMD in .dlwevn
@@ -84,6 +88,7 @@ available files for Colombia in 2010 in module “ALL” of the GMD
 collection with a single line of code:
 
 ``` r
+
 ctl[Country_code == "COL" & Module == "ALL" & Survey_year == 2010, 
   .(FileName, Vermast, Veralt )]
 #>                                 FileName Vermast Veralt
@@ -101,6 +106,7 @@ However, it requires several pieces of information that you may not have
 at hand, such as:
 
 ``` r
+
 dlw_get_data(
   country_code = "PRY",
   year = 2011L,
@@ -118,6 +124,7 @@ works only for the GMD server:
 This function is much easier to use:
 
 ``` r
+
 pry <- dlw_get_gmd(country_code = "PRY", year = 2011, module = "GPWG", vermast = "v01", veralt = "v03")
 #> 
 #> ── dlw_get_data Calls ──────────────────────────────────────────────────────────
@@ -143,6 +150,7 @@ If you are interested in downloading the most recent version of a file,
 you can simply omit the version arguments:
 
 ``` r
+
 pry <- dlw_get_gmd(country_code = "PRY", year = 2011, module = "GPWG")
 #> 
 #> ── dlw_get_data Calls ──────────────────────────────────────────────────────────

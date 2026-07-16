@@ -45,8 +45,8 @@ dlw_get_data(
 
 - format:
 
-  character: File format to use for pinning data ('parquet' \[default\]
-  or 'qs')
+  character: File format to use for pinning data ('qs2' \[default\] or
+  'parquet')
 
 - local_overwrite:
 

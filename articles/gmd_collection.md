@@ -21,6 +21,7 @@ Multidimensional Poverty Measure (WB MPM), the Global Database of Shared
 Prosperity (GDSP), and the Poverty, Prosperity and Planet Reports.
 
 ``` r
+
 # devtools::load_all(".")
 library(dlw)
 ```
@@ -38,6 +39,7 @@ If you do not specify a server, the default is
 `dlw_server_catalog(server = "GMD")`.
 
 ``` r
+
 ctl <- dlw_server_catalog(server = "GMD")
 #> ℹ Returning ServerCatalog_GMD from .dlwevn
 names(ctl)
@@ -54,6 +56,7 @@ For example, let’s examine the data available for Paraguay in 2020
 within the GPWG module:
 
 ``` r
+
 # Variables to display
 vars_to_see <- c("FileName", "Country_code", "Survey_year", "Survey_acronym", "Vermast", "Veralt")
 
@@ -79,6 +82,7 @@ function, which is the main function for downloading data in the
 [dlw](https://github.com/worldbank/dlw) package. For example:
 
 ``` r
+
 dlw_get_data(
   country_code = "PRY",
   year = 2020L,
@@ -103,6 +107,7 @@ you only need to provide the country code, year, and module, and it will
 automatically download the most recent version of the data for you.
 
 ``` r
+
 pry20 <- dlw_get_gmd(country_code = "PRY", year = 2020, module = "GPWG")
 #> 
 #> ── dlw_get_data Calls ─────────────────────────────────────────────────────────
@@ -135,6 +140,7 @@ available for that year. This allows you to review and select the
 specific version you wish to download.
 
 ``` r
+
 calls_pry20 <- dlw_get_gmd(country_code = "PRY",
                      year = 2020,
                      module = "GPWG",
@@ -185,6 +191,7 @@ differ by country and module), set `latest_year = TRUE`. This will
 ensure you get the latest available data for your selection.
 
 ``` r
+
 pry23 <- dlw_get_gmd(country_code = "PRY",
                      module = "GPWG",
                      latest_year = TRUE)
@@ -211,6 +218,7 @@ For example, if you want to download the second version of the Paraguay
 2020 survey, you can do so as follows:
 
 ``` r
+
 pry20_v2 <- dlw_get_gmd(country_code = "PRY",
                      year = 2020,
                      module = "GPWG",

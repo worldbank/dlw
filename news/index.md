@@ -1,5 +1,7 @@
 # Changelog
 
+## dlw 0.1.2
+
 ## dlw 0.1.1
 
 - fixes issue in [\#14](https://github.com/worldbank/dlw/issues/14)

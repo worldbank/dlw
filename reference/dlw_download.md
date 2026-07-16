@@ -37,7 +37,7 @@ dlw_download(
 
 - format:
 
-  character: File format to use for pinning data ('qs' \[default\] or
+  character: File format to use for pinning data ('qs2' \[default\] or
   'parquet')
 
 - server:

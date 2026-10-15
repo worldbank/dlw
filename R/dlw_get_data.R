@@ -1,5 +1,11 @@
 #' Get data from datalibweb (refactored)
 #'
+#' Downloads a file and pins it, so later calls read it from the board. Files
+#' with extension dta, sav, csv, tsv, rds or parquet are read as tables and
+#' pinned as `format`. Any other file (e.g., .do, .R, .pdf, .zip) is pinned as
+#' is and its path is returned. To save a file without pinning it, see
+#' [dlw_download_file].
+#'
 #' @param filename character: Name of the file to save/read (required)
 #' @inheritParams dlw_country_catalog
 #' @inheritParams dlw_server_catalog
@@ -19,7 +25,9 @@
 #'   is FALSE
 #' @param version numeric: Version of the pin to read (for pinning data
 #'   retrieval only)
-#' @returns data base request as data.table
+#' @returns data base request as data.table; for a file that is not a table,
+#'   the path to its pinned copy. If the server holds several versions of
+#'   `filename` and none could be chosen, a data.table with the versions.
 #' @export
 dlw_get_data <- function(country_code,
                          filename,
@@ -47,10 +55,8 @@ dlw_get_data <- function(country_code,
                          local_dir = local_dir)
 
   # an explicit file version is part of the pin name so versions do not collide
-  pin_name <- c(fs::path_ext_remove(filename),
-                get_version_arg(list(...))) |>
-    paste(collapse = "_") |>
-    fs::path(ext = format)
+  pin_name <- get_pin_name(filename, get_version_arg(list(...)), format,
+                           country_code, list(...)[["year"]])
 
   # set in dlwenv
   set_in_dlwenv("current_board", board)
@@ -82,7 +88,9 @@ dlw_get_data <- function(country_code,
 #' @param filename character: Name of the file to save/read (required)
 #' @param format character: File format to use for pinning data ('qs2'
 #'   [default] or 'parquet')
-#' @returns A list with the board and pin_name used
+#' @returns The table as data.table, or the path to the pinned copy of a file
+#'   that is not a table, or the data.table of file versions (see
+#'   [dlw_get_data]).
 #' @keywords internal
 dlw_download <- function(country_code,
                          filename,
@@ -106,20 +114,107 @@ dlw_download <- function(country_code,
     return(file)
   }
 
-  # Save raw data to a temp file for reading
-  tmpfile <- fs::file_temp(ext =  "dta")
+  # Save raw data to a temp file for reading, under the name of the API
+  tmpdir <- fs::file_temp()
+  fs::dir_create(tmpdir)
+  on.exit(unlink(tmpdir, recursive = TRUE))
+  tmpfile <- fs::path(tmpdir, c(file$filename, filename)[[1]])
   writeBin(file$body, tmpfile)
 
-  # Read .dta and pin as parquet or qs
-  dt <- haven::read_dta(tmpfile, encoding = "latin1") |>
+  # Anything but tabular data is pinned as is
+  ext <- tolower(fs::path_ext(filename))
+  if (!ext %in% tabular_formats) {
+    # pins fails if an identical file is pinned twice within a second
+    pinned <- if (pin_name %in% pins::pin_list(board)) {
+      dlw_read(board = board, pin_name = pin_name)
+    }
+    if (is.null(pinned) ||
+        tools::md5sum(pinned) != tools::md5sum(tmpfile)) {
+      pins::pin_upload(board = board,
+                       paths = tmpfile,
+                       name  = pin_name,
+                       versioned = TRUE)
+    }
+    return(dlw_read(board = board, pin_name = pin_name))
+  }
+
+  # Read the table and pin as parquet or qs
+  dt <- read_table(tmpfile, ext = ext, filename = filename) |>
     setDT()
-  unlink(tmpfile)
   pins::pin_write(board = board,
                   x     = dt,
                   name  = pin_name,
                   type  = format,
                   versioned = TRUE)
   dt
+}
+
+
+#' File extensions that are read as tables
+#' @keywords internal
+tabular_formats <- c("dta", "sav", "csv", "tsv", "rds", "parquet")
+
+
+#' Read a table by its file extension
+#'
+#' @param path character: path to the file
+#' @param ext character: extension, one of `tabular_formats`
+#' @param filename character: name of the file, for messages
+#' @returns data.frame
+#' @keywords internal
+read_table <- function(path, ext, filename) {
+  out <- switch(ext,
+                dta     = haven::read_dta(path, encoding = "latin1"),
+                sav     = haven::read_sav(path),
+                csv     = ,
+                tsv     = fread(path, data.table = TRUE),
+                rds     = readRDS(path),
+                parquet = {
+                  rlang::check_installed("arrow", "to read parquet files.")
+                  arrow::read_parquet(path)
+                })
+  if (!is.data.frame(out)) {
+    cli::cli_abort(c("{.file {filename}} does not contain a table.",
+                     "i" = "Use {.fn dlw_download_file} to save it."))
+  }
+  out
+}
+
+
+#' Name of the pin of a file
+#'
+#' The pin of a dta file is named after the file, with the pin format as
+#' extension. Other tables also keep their extension in the name, so that
+#' files like "a.csv" and "a.dta" do not collide. Files that are not tables are
+#' pinned as is, with their own name. Unless the name of such a file is that of
+#' a harmonized file (which holds country and year), the country and year are
+#' part of the pin name, as the same name can be used in several of them.
+#'
+#' @param filename character: name of the file
+#' @param version_arg character: explicit file version (see
+#'   [get_version_arg]) or NULL.
+#' @param year numeric: year of the request
+#' @inheritParams dlw_get_data
+#' @returns character
+#' @keywords internal
+get_pin_name <- function(filename, version_arg, format, country_code = NULL,
+                         year = NULL) {
+  ext <- fs::path_ext(filename)
+  id  <- if (is.null(filename_collection(filename))) {
+    c(toupper(country_code), year)
+  }
+  stem <- \(id = NULL) c(fs::path_ext_remove(filename), id, version_arg) |>
+    paste(collapse = "_")
+
+  if (tolower(ext) == "dta") {
+    fs::path(stem(), ext = format)
+  } else if (tolower(ext) %in% tabular_formats) {
+    fs::path(paste(stem(id), tolower(ext), sep = "_"), ext = format)
+  } else if (nzchar(ext)) {
+    fs::path(stem(id), ext = ext)
+  } else {
+    fs::path(stem(id))
+  }
 }
 
 
@@ -355,12 +450,16 @@ latest_version <- function(versions) {
 #' @param pin_name The name of the pin (as returned by dlw_download)
 #' @param version numeric: Version of the pin to read (for pinning data
 #'   retrieval only)
-#' @returns data.table
+#' @returns data.table; or the path to the file if the pin is a file that is
+#'   not a table.
 #' @keywords internal
 dlw_read <- function(board, pin_name, version = NULL) {
 
   if (!(pin_name %in% pins::pin_list(board))) {
     cli::cli_abort("File {.file {pin_name}} not found in the provided board.")
+  }
+  if (pins::pin_meta(board, pin_name, version = version)$type == "file") {
+    return(pins::pin_download(board, pin_name, version = version)[[1]])
   }
   pins::pin_read(board, pin_name, version = version) |>
     setDT()

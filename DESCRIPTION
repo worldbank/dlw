@@ -30,8 +30,10 @@ Imports:
     qs2,
     rlang,
     stats,
+    tools,
     utils
 Suggests:
+    arrow,
     usethis,
     testthat (>= 3.0.0),
     withr,

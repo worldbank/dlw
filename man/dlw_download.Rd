@@ -30,7 +30,10 @@ dlw_download(
 \item{server}{character: in case we have more than one server. default is  GMD}
 
 \item{...}{additional filtering arguments (e.g.,survey_year, survey_acronym,
-vermast, veralt, collection, module)}
+vermast, veralt, collection, module). When `filename` exists in several
+versions on the server, `vermast` and `veralt` (e.g., "v02") select one
+(sent to the API as `para1`); if neither is given, the latest version is
+used.}
 
 \item{verbose}{logical: whether to display info}
 }

@@ -74,17 +74,19 @@ handle_resp <- function(req) {
         if (file_type == "csv") {
           rs <- resp |>
             httr2::resp_body_string() |>
-            strsplit("\r\n") |>
+            strsplit("\r\n|\r|\n") |>
             unlist() |>
             paste(collapse = "\n") |>
-            fread(data.table = TRUE)
+            fread(text = _, data.table = TRUE)
 
-          # It here a variables with error
+          # It here a variables with error. Only single-row responses are
+          # errors; multi-row responses are lists of file versions where
+          # ErrorCode is a status.
           error_found <- names(rs) |>
             tolower() |>
             grepl("error", x = _) |>
             any()
-          if (error_found) {
+          if (error_found && nrow(rs) == 1) {
             abort_dlw_error(rs)
           }
           rs

@@ -42,7 +42,10 @@ retrieval only)}
 \item{verbose}{logical: whether to display info}
 
 \item{...}{additional filtering arguments (e.g.,survey_year, survey_acronym,
-vermast, veralt, collection, module)}
+vermast, veralt, collection, module). When `filename` exists in several
+versions on the server, `vermast` and `veralt` (e.g., "v02") select one
+(sent to the API as `para1`); if neither is given, the latest version is
+used.}
 }
 \value{
 data base request as data.table

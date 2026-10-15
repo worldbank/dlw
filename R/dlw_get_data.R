@@ -4,7 +4,10 @@
 #' @inheritParams dlw_country_catalog
 #' @inheritParams dlw_server_catalog
 #' @param ... additional filtering arguments (e.g.,survey_year, survey_acronym,
-#'   vermast, veralt, collection, module)
+#'   vermast, veralt, collection, module). When `filename` exists in several
+#'   versions on the server, `vermast` and `veralt` (e.g., "v02") select one
+#'   (sent to the API as `para1`); if neither is given, the latest version is
+#'   used.
 #' @param local_dir character: Local directory to save data. Default available
 #'   in option dlw.local_dir which is set initially as "".
 #' @param local logical: whether or not to save and read data locally. default
@@ -37,8 +40,10 @@ dlw_get_data <- function(country_code,
   board <- get_wrk_board(local = local,
                          local_dir = local_dir)
 
-  pin_name <- filename |>
-    fs::path_ext_remove() |>
+  # an explicit file version is part of the pin name so versions do not collide
+  pin_name <- c(fs::path_ext_remove(filename),
+                get_version_arg(list(...))) |>
+    paste(collapse = "_") |>
     fs::path(ext = format)
 
   # set in dlwenv
@@ -90,15 +95,50 @@ dlw_download <- function(country_code,
   # prepare the args for request
   dots <- list(...)
   endpoint <- "FileInformationInternal/GetFileInfo"
-  args <- c(list(Country = country_code,
-                 method = "POST",
-                 Server = server,
-                 endpoint = endpoint,
-                 filename = filename),
-            dots)
 
-  raw_data <- do.call("build_request", args) |>
-    get_raw_data()
+  # the API selects a version of an ambiguous file through `para1`
+  version_arg <- get_version_arg(dots)
+  if (!is.null(version_arg)) dots[["para1"]] <- version_arg
+
+  request_file <- \(dots) {
+    args <- c(list(Country = country_code,
+                   method = "POST",
+                   Server = server,
+                   endpoint = endpoint,
+                   filename = filename),
+              dots)
+    do.call("build_request", args) |>
+      get_raw_data()
+  }
+
+  raw_data <- request_file(dots)
+
+  # A CSV response (one row per version) means the file name is ambiguous.
+  # Without a requested version, repeat the request with the latest one.
+  if (is.data.frame(raw_data) && nrow(raw_data) > 0 && is.null(version_arg)) {
+    latest <- latest_version(raw_data)
+    if (!is.null(latest)) {
+      cli::cli_alert_info(paste0("{.file {filename}} has {nrow(raw_data)} ",
+                                 "versions on the server. Using the latest: ",
+                                 "{.val {latest}}."))
+      dots[["para1"]] <- latest
+      raw_data <- request_file(dots)
+    }
+  }
+
+  # A CSV response without rows means no file matched the request.
+  if (is.data.frame(raw_data) && nrow(raw_data) == 0) {
+    cli::cli_abort("No file {.file {filename}} found for the requested
+                   arguments.")
+  }
+
+  # Could not choose a version: let the user decide.
+  if (is.data.frame(raw_data)) {
+    cli::cli_alert_warning(paste0("{.file {filename}} has {nrow(raw_data)} ",
+                                  "versions on the server. Returning the ",
+                                  "version list instead of data."))
+    return(raw_data)
+  }
 
   # Save raw data to a temp file for reading
   tmpfile <- fs::file_temp(ext =  "dta")
@@ -115,6 +155,47 @@ dlw_download <- function(country_code,
                   versioned = TRUE)
   dt
 }
+
+#' Version argument of the API request
+#'
+#' Builds the value of the `para1` request parameter from `vermast` and
+#' `veralt` (e.g., "V12_M", "V12_M_V01_A"), unless `para1` is already given.
+#'
+#' @param dots list of additional arguments of [dlw_get_data]
+#' @returns character or NULL
+#' @keywords internal
+get_version_arg <- function(dots) {
+  if (!is.null(dots[["para1"]])) {
+    return(dots[["para1"]])
+  }
+  version <- c(if (!is.null(dots[["vermast"]])) paste0(dots[["vermast"]], "_M"),
+               if (!is.null(dots[["veralt"]])) paste0(dots[["veralt"]], "_A"))
+  if (length(version) == 0) {
+    return(NULL)
+  }
+  toupper(paste(version, collapse = "_"))
+}
+
+
+#' Latest master version in a list of file versions
+#'
+#' @param versions data.table of file versions returned by the API, with the
+#'   version folder (e.g., "Survey_2005_CPI_V15_M") in `FileSharePath`.
+#' @returns character like "V15_M", or NULL if no version could be identified.
+#' @keywords internal
+latest_version <- function(versions) {
+  if (!"FileSharePath" %in% names(versions)) {
+    return(NULL)
+  }
+  path <- versions$FileSharePath
+  ver  <- regmatches(path, regexpr("_[Vv][0-9]+_M/", path))
+  if (length(ver) == 0) {
+    return(NULL)
+  }
+  ver <- toupper(sub("^_(.*)/$", "\\1", ver))
+  ver[which.max(as.integer(gsub("\\D", "", ver)))]
+}
+
 
 #' Read data from a pin (local or temp)
 #'

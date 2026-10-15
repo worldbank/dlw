@@ -93,6 +93,51 @@ dlw_download <- function(country_code,
                          ...,
                          verbose = getOption("dlw.verbose")) {
 
+  file <- fetch_file(country_code = country_code,
+                     filename     = filename,
+                     server       = server,
+                     ...)
+
+  # Could not choose a version: let the user decide.
+  if (is.data.frame(file)) {
+    cli::cli_alert_warning(paste0("{.file {filename}} has {nrow(file)} ",
+                                  "versions on the server. Returning the ",
+                                  "version list instead of data."))
+    return(file)
+  }
+
+  # Save raw data to a temp file for reading
+  tmpfile <- fs::file_temp(ext =  "dta")
+  writeBin(file$body, tmpfile)
+
+  # Read .dta and pin as parquet or qs
+  dt <- haven::read_dta(tmpfile, encoding = "latin1") |>
+    setDT()
+  unlink(tmpfile)
+  pins::pin_write(board = board,
+                  x     = dt,
+                  name  = pin_name,
+                  type  = format,
+                  versioned = TRUE)
+  dt
+}
+
+
+#' Request a file from datalibweb
+#'
+#' Sends the request, selects the version of an ambiguous file and checks the
+#' response, but does not read the file.
+#'
+#' @inheritParams dlw_get_data
+#' @returns A list with the raw `body`, `filename`, `content_type` and `status`
+#'   of the file (see [handle_file_resp]); or, if the server holds several
+#'   versions of `filename` and none could be chosen, a data.table with the
+#'   versions.
+#' @keywords internal
+fetch_file <- function(country_code,
+                       filename,
+                       server = NULL,
+                       ...) {
 
   if (missing(filename) || is.null(filename)) {
     cli::cli_abort("{.arg filename} is a required argument.")
@@ -101,6 +146,10 @@ dlw_download <- function(country_code,
   # prepare the args for request
   server <- select_server(server)
   dots <- list(...)
+
+  if (is.null(dots[["year"]])) {
+    cli::cli_abort("{.arg year} is required to request a file from the API.")
+  }
   endpoint <- "FileInformationInternal/GetFileInfo"
 
   # the API checks the subscription by collection
@@ -144,29 +193,104 @@ dlw_download <- function(country_code,
                    arguments.")
   }
 
-  # Could not choose a version: let the user decide.
-  if (is.data.frame(raw_data)) {
-    cli::cli_alert_warning(paste0("{.file {filename}} has {nrow(raw_data)} ",
-                                  "versions on the server. Returning the ",
-                                  "version list instead of data."))
-    return(raw_data)
+  raw_data
+}
+
+
+#' Download a file from datalibweb as is
+#'
+#' Downloads any file (data, programs, documents) without reading or pinning
+#' it. Use [dlw_get_data] to read data files.
+#'
+#' @inheritParams dlw_get_data
+#' @param path character: where to save the file. If a directory, the file is
+#'   saved in it with the name given by the API. If `NULL` (default), the
+#'   file is not saved but returned as raw bytes.
+#' @param overwrite logical: whether to replace an existing file at `path`.
+#'   Default is FALSE.
+#' @param ... additional request arguments (e.g., `year`, which is required,
+#'   `vermast`, `veralt`, `collection`), as in [dlw_get_data].
+#'
+#' @returns If `path` is `NULL`, the raw bytes of the file, with attributes
+#'   `filename`, `content_type` and `status`. Otherwise, invisibly, a list with
+#'   the `path` of the saved file, `filename`, `size` in bytes,
+#'   `content_type` and `status`. If the server holds several versions of
+#'   `filename` and none could be chosen, a data.table with the versions.
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' dlw_download_file("WLD", "WLD_2026_ALL_V02_M_V01_A_GMI_INE.do",
+#'                   year = 2026, path = tempdir())
+#' }
+dlw_download_file <- function(country_code,
+                              filename,
+                              server    = NULL,
+                              path      = NULL,
+                              overwrite = FALSE,
+                              ...) {
+
+  # fail before the request if the target is known
+  if (!is.null(path) && !is_dir_path(path) && fs::file_exists(path) &&
+      !overwrite) {
+    cli::cli_abort(c("File {.file {path}} already exists.",
+                     "i" = "Use {.code overwrite = TRUE} to replace it."))
   }
 
-  # Save raw data to a temp file for reading
-  tmpfile <- fs::file_temp(ext =  "dta")
-  writeBin(raw_data, tmpfile)
+  file <- fetch_file(country_code = country_code,
+                     filename     = filename,
+                     server       = server,
+                     ...)
 
-  # Read .dta and pin as parquet or qs
-  dt <- haven::read_dta(tmpfile, encoding = "latin1") |>
-    setDT()
-  unlink(tmpfile)
-  pins::pin_write(board = board,
-                  x     = dt,
-                  name  = pin_name,
-                  type  = format,
-                  versioned = TRUE)
-  dt
+  if (is.data.frame(file)) {
+    cli::cli_alert_warning(paste0("{.file {filename}} has {nrow(file)} ",
+                                  "versions on the server. Returning the ",
+                                  "version list instead of the file."))
+    return(file)
+  }
+
+  # the name given by the API; if it is missing, the requested one
+  file$filename <- c(file$filename, filename)[[1]]
+
+  if (is.null(path)) {
+    return(structure(file$body,
+                     filename     = file$filename,
+                     content_type = file$content_type,
+                     status       = file$status))
+  }
+
+  if (is_dir_path(path)) {
+    path <- fs::path(path, file$filename)
+  }
+  if (fs::file_exists(path) && !overwrite) {
+    cli::cli_abort(c("File {.file {path}} already exists.",
+                     "i" = "Use {.code overwrite = TRUE} to replace it."))
+  }
+
+  # write beside the target, then move it: no partial file if interrupted
+  fs::dir_create(fs::path_dir(path))
+  tmpfile <- fs::file_temp(tmp_dir = fs::path_dir(path), pattern = ".dlw-")
+  on.exit(unlink(tmpfile))
+  writeBin(file$body, tmpfile)
+  fs::file_move(tmpfile, path)
+
+  invisible(list(path         = as.character(fs::path_abs(path)),
+                 filename     = file$filename,
+                 size         = length(file$body),
+                 content_type = file$content_type,
+                 status       = file$status))
 }
+
+
+#' Is `path` a directory, or meant to be one?
+#'
+#' @param path character
+#' @returns logical
+#' @keywords internal
+is_dir_path <- function(path) {
+  fs::is_dir(path) || grepl("[/\\\\]$", path)
+}
+
 
 #' Collection of a harmonized file
 #'
@@ -253,7 +377,7 @@ dlw_read <- function(board, pin_name, version = NULL) {
 #' @keywords internal
 get_raw_data <- \(req) {
 
-  raw_data <- handle_resp(req)
+  raw_data <- handle_file_resp(req)
 
   set_in_dlwenv(key = "last_raw_data", value = raw_data)
 

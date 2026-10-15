@@ -42,7 +42,7 @@ test_that("dlw_download returns version list for multi-row response", {
                         get_raw_data = \(req) versions)
   expect_message(
     out <- dlw_download("SUPPORT", "a.dta", board = NULL, pin_name = "a",
-                        format = "qs2"),
+                        format = "qs2", year = 2005),
     "2 versions"
   )
   expect_equal(out, versions)
@@ -55,12 +55,6 @@ version_list <- function() {
                            c("V09", "V15", "V10"), "_M/Data/Stata/a.dta"),
     ErrorCode = 2L
   )
-}
-
-dta_bytes <- function() {
-  tmp <- withr::local_tempfile(fileext = ".dta")
-  haven::write_dta(data.frame(x = 1:3), tmp)
-  readBin(tmp, "raw", file.size(tmp))
 }
 
 test_that("get_version_arg builds para1 from vermast and veralt", {
@@ -95,7 +89,7 @@ test_that("dlw_download repeats request with latest version", {
   )
   expect_message(
     out <- dlw_download("SUPPORT", "a.dta", board = pins::board_temp(),
-                        pin_name = "a.qs2", format = "qs2"),
+                        pin_name = "a.qs2", format = "qs2", year = 2005),
     "V15_M"
   )
   expect_length(rec$sent, 2)
@@ -118,7 +112,8 @@ test_that("dlw_download maps vermast to para1 without listing versions", {
     }
   )
   dlw_download("SUPPORT", "a.dta", board = pins::board_temp(),
-               pin_name = "a.qs2", format = "qs2", vermast = "v12")
+               pin_name = "a.qs2", format = "qs2", year = 2005,
+               vermast = "v12")
   expect_length(rec$sent, 1)
   expect_equal(rec$sent[[1]]$para1, "V12_M")
 })
@@ -175,7 +170,7 @@ test_that("dlw_download errors when no file matches", {
   local_mocked_bindings(build_request = \(...) "req",
                         get_raw_data = \(req) data.table::data.table(FileName = character()))
   expect_error(dlw_download("SUPPORT", "a.dta", board = NULL, pin_name = "a",
-                            format = "qs2"),
+                            format = "qs2", year = 2005),
                "No file")
 })
 

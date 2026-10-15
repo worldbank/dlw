@@ -66,6 +66,8 @@ dlw_get_gmd <- function(country_code,
     veralt = veralt
   )
   ctl <- do.call(dlw_server_inventory, ctl_args)
+  # the catalog lists all file types (e.g., programs, zip), but only dta is data
+  ctl <- ctl[tolower(Ext) == "dta"]
 
   if (nrow(ctl) == 0) {
     arg_str <- paste(
@@ -169,7 +171,7 @@ dlw_get_gmd_support <- function(module = c("CPIICP", "CPI"),
   # catalog stores country in upper case (e.g., "SUPPORT")
   ctl <- ctl[toupper(Country) == toupper(country_code) &
                toupper(Country_code) == toupper(country_code) &
-               Module == module]
+               Module == module & tolower(Ext) == "dta"]
 
   # get latest by default.
 

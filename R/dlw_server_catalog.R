@@ -41,7 +41,10 @@ dlw_server_catalog <- function(server = NULL,
 
   ctl[, FileName := fs::path_file(FilePath)]
 
-  ctl <- ctl[tolower(Ext) %chin% getOption("dlw.download_formats"), ]
+  formats <- getOption("dlw.download_formats")
+  if (!is.null(formats)) {
+    ctl <- ctl[tolower(Ext) %chin% tolower(formats), ]
+  }
 
   add_gmd_vars(ctl)
 
@@ -126,7 +129,8 @@ add_gmd_vars <- function(ctl) {
 
   ptt <- "^[A-Za-z]+_[0-9]{4}_[^_]+_[Vv][0-9]{2}_M_[Vv][0-9]{2}_A_[^_]+_[^_]+\\.[A-Za-z]+$"
   ctl[grepl(ptt, FileName),
-      (vars) := tstrsplit(FileName, split = "_|[.]", fill = NA)
+      (vars) := tstrsplit(FileName, split = "_|[.]", fill = NA,
+                          keep = seq_along(vars))
   ][, (vars) := lapply(.SD, toupper),
     .SDcols = vars
     ][,

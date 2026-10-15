@@ -123,6 +123,54 @@ test_that("dlw_download maps vermast to para1 without listing versions", {
   expect_equal(rec$sent[[1]]$para1, "V12_M")
 })
 
+test_that("filename_collection reads the collection of harmonized files", {
+  expect_equal(filename_collection("COL_2010_GEIH_V04_M_V01_A_GMD_ALL.dta"),
+               "GMD")
+  expect_equal(filename_collection("WLD_2026_ALL_v02_M_v01_A_gmi_INE.dta"),
+               "GMI")
+  expect_null(filename_collection("Monthly_CPI.dta"))
+  expect_null(filename_collection("CPS_2020_ind.dta"))
+})
+
+test_that("dlw_download sends server and collection by default", {
+  rec <- new.env()
+  local_mocked_bindings(
+    build_request = \(...) {
+      rec$sent <- list(...)
+      "req"
+    },
+    get_raw_data = \(req) {
+      force(req)
+      dta_bytes()
+    }
+  )
+  dlw_download("LAO", "LAO_2012_LECS_V02_M_V03_A_GMD_ALL.dta",
+               board = pins::board_temp(), pin_name = "a.qs2", format = "qs2",
+               year = 2012)
+  expect_equal(rec$sent$Server, "GMD")
+  expect_equal(rec$sent$collection, "GMD")
+
+  dlw_download("LAO", "LAO_2012_LECS_V02_M_V03_A_GMD_ALL.dta",
+               board = pins::board_temp(), pin_name = "a.qs2", format = "qs2",
+               server = "FDP", year = 2012, collection = "GMDRAW")
+  expect_equal(rec$sent$Server, "FDP")
+  expect_equal(rec$sent$collection, "GMDRAW")
+
+  dlw_download("Support", "Monthly_CPI.dta", board = pins::board_temp(),
+               pin_name = "a.qs2", format = "qs2", year = 2005)
+  expect_false("collection" %in% names(rec$sent))
+})
+
+test_that("dlw_get_data requires year, even when the file is cached", {
+  dir <- withr::local_tempdir()
+  pins::pin_write(pins::board_folder(dir), data.frame(x = 1), "a.qs2",
+                  type = "qs2")
+  expect_error(dlw_get_data("COL", "a.dta", local = TRUE, local_dir = dir),
+               "year")
+  expect_equal(dlw_get_data("COL", "a.dta", year = 2010, local = TRUE,
+                            local_dir = dir)$x, 1)
+})
+
 test_that("dlw_download errors when no file matches", {
   local_mocked_bindings(build_request = \(...) "req",
                         get_raw_data = \(req) data.table::data.table(FileName = character()))

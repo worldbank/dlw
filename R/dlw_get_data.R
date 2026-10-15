@@ -7,7 +7,8 @@
 #'   vermast, veralt, collection, module). When `filename` exists in several
 #'   versions on the server, `vermast` and `veralt` (e.g., "v02") select one
 #'   (sent to the API as `para1`); if neither is given, the latest version is
-#'   used.
+#'   used. `year` is required. If `collection` is not given, it is taken from
+#'   harmonized file names (e.g., "GMD" in "COL_2010_GEIH_V04_M_V01_A_GMD_ALL.dta").
 #' @param local_dir character: Local directory to save data. Default available
 #'   in option dlw.local_dir which is set initially as "".
 #' @param local logical: whether or not to save and read data locally. default
@@ -34,6 +35,11 @@ dlw_get_data <- function(country_code,
 
   if (missing(filename) || is.null(filename)) {
     cli::cli_abort("{.arg filename} is a required argument.")
+  }
+
+  # checked before reading the cache so a cached file cannot hide it
+  if (is.null(list(...)[["year"]])) {
+    cli::cli_abort("{.arg year} is required to request a file from the API.")
   }
 
   # Construct board and pin_name for reading
@@ -93,8 +99,14 @@ dlw_download <- function(country_code,
   }
 
   # prepare the args for request
+  server <- select_server(server)
   dots <- list(...)
   endpoint <- "FileInformationInternal/GetFileInfo"
+
+  # the API checks the subscription by collection
+  if (is.null(dots[["collection"]])) {
+    dots[["collection"]] <- filename_collection(filename)
+  }
 
   # the API selects a version of an ambiguous file through `para1`
   version_arg <- get_version_arg(dots)
@@ -155,6 +167,22 @@ dlw_download <- function(country_code,
                   versioned = TRUE)
   dt
 }
+
+#' Collection of a harmonized file
+#'
+#' @param filename character: file name
+#' @returns character in upper case, e.g. "GMD", taken from a file name like
+#'   "COL_2010_GEIH_V04_M_V01_A_GMD_ALL.dta"; NULL for any other file name.
+#' @keywords internal
+filename_collection <- function(filename) {
+  # same pattern as in add_gmd_vars()
+  ptt <- "^[A-Za-z]+_[0-9]{4}_[^_]+_[Vv][0-9]{2}_M_[Vv][0-9]{2}_A_[^_]+_[^_]+\\.[A-Za-z]+$"
+  if (!grepl(ptt, filename)) {
+    return(NULL)
+  }
+  toupper(strsplit(filename, "_|[.]")[[1]][8])
+}
+
 
 #' Version argument of the API request
 #'

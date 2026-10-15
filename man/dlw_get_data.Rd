@@ -45,7 +45,8 @@ retrieval only)}
 vermast, veralt, collection, module). When `filename` exists in several
 versions on the server, `vermast` and `veralt` (e.g., "v02") select one
 (sent to the API as `para1`); if neither is given, the latest version is
-used.}
+used. `year` is required. If `collection` is not given, it is taken from
+harmonized file names (e.g., "GMD" in "COL_2010_GEIH_V04_M_V01_A_GMD_ALL.dta").}
 }
 \value{
 data base request as data.table

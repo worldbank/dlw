@@ -24,7 +24,7 @@ Imports:
     data.table,
     fs,
     haven,
-    httr2,
+    httr2 (>= 1.1.0),
     keyring,
     pins,
     qs2,

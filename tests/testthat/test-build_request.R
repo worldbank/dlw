@@ -131,6 +131,88 @@ test_that("dlw_download errors when no file matches", {
                "No file")
 })
 
+http_error <- function(status, body = "", type = "text/plain", headers = list()) {
+  local_mocked_bindings(dlw_get_token = \(...) "secret-token",
+                        .env = parent.frame())
+  httr2::local_mocked_responses(
+    \(req) httr2::response(status_code = status,
+                           headers = c(list(`Content-Type` = type), headers),
+                           body = charToRaw(body)),
+    env = parent.frame()
+  )
+  req <- build_request(endpoint = "FileInformationInternal/GetFileInfo",
+                       method = "POST", Country = "COL", filename = "a.dta")
+  rlang::catch_cnd(handle_req_perform(req), classes = "error")
+}
+
+test_that("HTTP errors keep status, endpoint, parameters and body", {
+  cnd <- http_error(404, '{"title":"Not Found","status":404}',
+                    type = "application/problem+json")
+  expect_s3_class(cnd, "dlw_http_404")
+  expect_s3_class(cnd, "dlw_http_error")
+  expect_s3_class(cnd, "dlw_api_error")
+  expect_equal(cnd$status, 404L)
+  expect_equal(cnd$reason, "Not Found")
+  expect_equal(cnd$endpoint, "FileInformationInternal/GetFileInfo")
+  expect_equal(unclass(cnd$params$filename), "a.dta")
+  expect_match(cnd$response_body, "Not Found")
+  expect_match(conditionMessage(cnd), "API message: Not Found")
+})
+
+test_that("401, 403, 429 and 5xx give different errors", {
+  e401 <- http_error(401, "Status Code: 401; Unauthorized")
+  e403 <- http_error(403, "Forbidden")
+  e429 <- http_error(429, "slow down", headers = list(`Retry-After` = "30"))
+  e500 <- http_error(500, "System.NullReferenceException: boom\n   at x")
+
+  expect_s3_class(e401, "dlw_http_401")
+  expect_match(conditionMessage(e401), "Token invalid")
+  expect_s3_class(e403, "dlw_http_403")
+  expect_match(conditionMessage(e403), "does not have access")
+  expect_s3_class(e429, "dlw_http_429")
+  expect_equal(e429$retry_after, "30")
+  expect_match(conditionMessage(e429), "Retry after 30 seconds")
+  expect_s3_class(e500, "dlw_http_500")
+  expect_match(conditionMessage(e500), "Server-side failure")
+  expect_match(conditionMessage(e500), "NullReferenceException: boom")
+  expect_no_match(conditionMessage(e500), "at x")
+})
+
+test_that("HTTP errors never contain the token", {
+  cnd <- http_error(500, "Authorization: Bearer secret-token\nsecret-token")
+  # the backtrace is left out: it records this test's own call
+  fields <- cnd[setdiff(names(cnd), c("trace", "call"))]
+  txt <- rawToChar(serialize(fields, NULL, ascii = TRUE))
+  expect_false(grepl("secret-token", txt, fixed = TRUE))
+  expect_match(cnd$response_body, "Authorization: Bearer [REDACTED]",
+               fixed = TRUE)
+  expect_null(cnd$request$headers$Authorization)
+})
+
+test_that("JSON error messages never contain the token", {
+  cnd <- http_error(500,
+                    '{"detail":"Header Authorization=Bearer secret-token rejected"}',
+                    type = "application/problem+json")
+  fields <- cnd[setdiff(names(cnd), c("trace", "call"))]
+  txt <- rawToChar(serialize(fields, NULL, ascii = TRUE))
+  expect_false(grepl("secret-token", txt, fixed = TRUE))
+  expect_match(conditionMessage(cnd), "rejected")
+})
+
+test_that("transport failures keep the underlying error", {
+  local_mocked_bindings(dlw_get_token = \(...) "secret-token")
+  httr2::local_mocked_responses(\(req) {
+    cnd <- structure(class = c("curl_error", "error", "condition"),
+                     list(message = "Could not resolve host", call = NULL))
+    rlang::abort("Failed to perform HTTP request.", class = "httr2_failure",
+                 parent = cnd)
+  })
+  req <- build_request(endpoint = "x")
+  cnd <- rlang::catch_cnd(handle_req_perform(req), classes = "error")
+  expect_s3_class(cnd, "dlw_transport_error")
+  expect_s3_class(cnd$parent, "curl_error")
+})
+
 test_that("build_request errors with missing or wrong endpoint", {
   expect_error(build_request(dlw_url = "prod"))
   build_request(endpoint = "test",

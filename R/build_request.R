@@ -134,23 +134,17 @@ handle_req_perform <- \(req) {
 
     }, # end of expr section
     httr2_failure = \(e) {
-      cli::cli_abort(" the connection is dropped or the server doesn't exist")
+      cli::cli_abort("The connection is dropped or the server doesn't exist.",
+                     # the underlying curl error, not `e`, which holds the request
+                     parent = e$parent,
+                     .subclass = c("dlw_transport_error", "dlw_api_error",
+                                   "api_error"))
 
     },
     error = \(e) {
-      # I had to do it this way because, for some reason, the datalibweb API is
-      # not returning the right code in the response, so I could not use the
-      # handle httr2_http_401 of httr2
-      resp <- httr2::last_response()
-      status <- httr2::resp_status(resp)
-      if (status == 401) {
-        cli::cli_abort("DatalibWeb Token invalid.
-                    Go to {.href [Datalibweb](http://datalibweb/)} website, generate a new token,
-                    and then use {.code dlw::dlw_set_token()}")
-      } else {
-        cli::cli_abort("Error with the DLW request", conditionMessage(e))
-      }
-
+      # not an HTTP error: nothing to translate
+      if (!inherits(e, "httr2_http")) rlang::cnd_signal(e)
+      abort_http_error(e, req)
     },
     # httr2_http_401 = \(e) {
     #   cli::cli_abort("DatalibWeb Token invalid.
@@ -168,6 +162,107 @@ handle_req_perform <- \(req) {
   ) # End of trycatch
 
   out
+}
+
+
+#' abort with the details of a failed HTTP request
+#'
+#' The condition keeps the status, reason phrase, endpoint, form parameters,
+#' response body, `Retry-After` header and the request (without its
+#' Authorization header).
+#'
+#' @param e httr2 HTTP error (class `httr2_http`) from [httr2::req_perform].
+#' @param req The httr2 request that failed.
+#'
+#' @returns error of class `dlw_http_<status>`, `dlw_http_error`,
+#'   `dlw_api_error` and `api_error`.
+#' @keywords internal
+abort_http_error <- function(e, req) {
+  resp        <- e$resp
+  status      <- httr2::resp_status(resp)
+  reason      <- httr2::resp_status_desc(resp)
+  endpoint    <- sub("^.*/v[0-9]+/", "", req$url)
+  params      <- req$body$data
+  retry_after <- httr2::resp_header(resp, "Retry-After")
+  # the API can echo request headers (i.e., the token) in its error body
+  body        <- tryCatch(httr2::resp_body_string(resp), error = \(e) "") |>
+    redact_token(req)
+  # a JSON body is parsed again from the response, so redact its message too
+  api_msg     <- http_error_message(resp, body) |>
+    redact_token(req)
+
+  hint <- if (status == 401) {
+    "DatalibWeb Token invalid.
+     Go to {.href [Datalibweb](http://datalibweb/)} website, generate a new token,
+     and then use {.code dlw::dlw_set_token()}"
+  } else if (status == 403) {
+    "Your account does not have access to this resource."
+  } else if (status == 404) {
+    "The requested resource was not found."
+  } else if (status == 429) {
+    paste0("Too many requests.",
+           if (!is.null(retry_after)) " Retry after {retry_after} seconds.")
+  } else if (status >= 500) {
+    "Server-side failure."
+  }
+
+  params_txt <- vapply(params, \(x) paste(x, collapse = ","), character(1)) |>
+    (\(x) paste(names(x), x, sep = "=", collapse = ", "))()
+
+  msg <- c("DatalibWeb request failed [{status} {reason}]",
+           "i" = hint,
+           "i" = "Endpoint: {.val {endpoint}}",
+           "i" = if (length(params) > 0) "Parameters: {params_txt}",
+           "x" = if (nzchar(api_msg)) "API message: {api_msg}")
+
+  cli::cli_abort(msg,
+                 .subclass = c(paste0("dlw_http_", status), "dlw_http_error",
+                               "dlw_api_error", "api_error"),
+                 status = status,
+                 reason = reason,
+                 endpoint = endpoint,
+                 params = params,
+                 response_body = body,
+                 retry_after = retry_after,
+                 request = httr2::req_headers(req, Authorization = NULL))
+}
+
+
+#' remove the token of a request from text
+#'
+#' @param x character
+#' @param req httr2 request
+#'
+#' @returns `x` without the bearer token or any Authorization header.
+#' @keywords internal
+redact_token <- function(x, req) {
+  auth  <- httr2::req_get_headers(req, redacted = "reveal")$Authorization
+  token <- sub("^Bearer ", "", auth)
+  if (length(token) == 1 && nzchar(token)) {
+    x <- gsub(token, "[REDACTED]", x, fixed = TRUE)
+  }
+  gsub("(?i)(authorization:\\s*(bearer\\s+)?)\\S+", "\\1[REDACTED]", x,
+       perl = TRUE)
+}
+
+
+#' short message from the body of an error response
+#'
+#' @param resp httr2 response.
+#' @param body character: body of `resp` as text.
+#'
+#' @returns character: `detail` or `title` of a JSON body, or the first line of
+#'   a text body. Empty string if there is none.
+#' @keywords internal
+http_error_message <- function(resp, body) {
+  if (grepl("json", httr2::resp_content_type(resp))) {
+    parsed <- tryCatch(httr2::resp_body_json(resp), error = \(e) NULL)
+    body   <- c(parsed[["detail"]], parsed[["title"]], "")[[1]]
+  }
+  strsplit(body, "\r?\n")[[1]][1] |>
+    trimws() |>
+    substr(1, 200) |>
+    (\(x) if (is.na(x)) "" else x)()
 }
 
 

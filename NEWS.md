@@ -10,6 +10,7 @@
 
 * `dlw_download_file()` downloads any file as is, as raw bytes or to a path (#22).
 * `dlw_get_data()` reads csv, tsv, sav, rds, parquet, xls and xlsx files. Other files (e.g., .do, .pdf) are pinned unchanged and their path is returned (#4).
+* `dlw_get_gmd_support()` gets any other Support file with `filename` (e.g., `"Monthly_CPI.dta"`, `vermast = "v15"`).
 * HTTP errors keep their status, endpoint and API message, with the token redacted (#23).
 
 ## Fixes

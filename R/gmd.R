@@ -166,8 +166,9 @@ dlw_get_gmd_support <- function(module = c("CPIICP", "CPI"),
   module       <- match.arg(module)
   country_code <- "Support"
   ctl <- dlw_server_catalog(server = "GMD")
-  ctl <- ctl[Country == country_code &
-               Country_code == country_code &
+  # catalog stores country in upper case (e.g., "SUPPORT")
+  ctl <- ctl[toupper(Country) == toupper(country_code) &
+               toupper(Country_code) == toupper(country_code) &
                Module == module]
 
   # get latest by default.
@@ -175,7 +176,11 @@ dlw_get_gmd_support <- function(module = c("CPIICP", "CPI"),
   if (is.null(vermast)) {
     ctl <- ctl[Vermast == max(Vermast, na.rm = TRUE)]
   } else {
-    ctl <- ctl[Vermast == Vermast]
+    ctl <- ctl[Vermast == toupper(vermast)]
+  }
+
+  if (nrow(ctl) == 0) {
+    cli::cli_abort("Requested support file is not available in the catalog.")
   }
 
   calls <- gmd_calls(ctl, country_code = country_code)

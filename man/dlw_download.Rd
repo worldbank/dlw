@@ -39,7 +39,9 @@ harmonized file names (e.g., "GMD" in "COL_2010_GEIH_V04_M_V01_A_GMD_ALL.dta").}
 \item{verbose}{logical: whether to display info}
 }
 \value{
-A list with the board and pin_name used
+The table as data.table, or the path to the pinned copy of a file
+  that is not a table, or the data.table of file versions (see
+  [dlw_get_data]).
 }
 \description{
 Download data from datalibweb and save as a pin

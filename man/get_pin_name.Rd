@@ -4,7 +4,7 @@
 \alias{get_pin_name}
 \title{Name of the pin of a file}
 \usage{
-get_pin_name(filename, version_arg, format)
+get_pin_name(filename, version_arg, format, country_code = NULL, year = NULL)
 }
 \arguments{
 \item{filename}{character: name of the file}
@@ -14,6 +14,10 @@ get_pin_name(filename, version_arg, format)
 
 \item{format}{character: File format to use for pinning data ('qs2'
 [default] or 'parquet')}
+
+\item{country_code}{character: ISO3 code}
+
+\item{year}{numeric: year of the request}
 }
 \value{
 character
@@ -22,6 +26,8 @@ character
 The pin of a dta file is named after the file, with the pin format as
 extension. Other tables also keep their extension in the name, so that
 files like "a.csv" and "a.dta" do not collide. Files that are not tables are
-pinned as is, with their own name.
+pinned as is, with their own name. Unless the name of such a file is that of
+a harmonized file (which holds country and year), the country and year are
+part of the pin name, as the same name can be used in several of them.
 }
 \keyword{internal}

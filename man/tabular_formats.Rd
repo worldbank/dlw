@@ -5,7 +5,7 @@
 \alias{tabular_formats}
 \title{File extensions that are read as tables}
 \format{
-An object of class \code{character} of length 6.
+An object of class \code{character} of length 8.
 }
 \usage{
 tabular_formats

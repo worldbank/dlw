@@ -50,12 +50,13 @@ harmonized file names (e.g., "GMD" in "COL_2010_GEIH_V04_M_V01_A_GMD_ALL.dta").}
 }
 \value{
 data base request as data.table; for a file that is not a table,
-  the path to its pinned copy.
+  the path to its pinned copy. If the server holds several versions of
+  `filename` and none could be chosen, a data.table with the versions.
 }
 \description{
 Downloads a file and pins it, so later calls read it from the board. Files
-with extension dta, sav, csv, tsv, rds or parquet are read as tables and
-pinned as `format`. Any other file (e.g., .do, .R, .pdf, .zip) is pinned as
-is and its path is returned. To save a file without pinning it, see
-[dlw_download_file].
+with extension dta, sav, csv, tsv, rds, parquet, xls or xlsx are read as
+tables (the first sheet of an Excel file) and pinned as `format`. Any other
+file (e.g., .do, .R, .pdf, .zip) is pinned as is and its path is returned.
+To save a file without pinning it, see [dlw_download_file].
 }

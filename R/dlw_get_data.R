@@ -1,10 +1,10 @@
 #' Get data from datalibweb (refactored)
 #'
 #' Downloads a file and pins it, so later calls read it from the board. Files
-#' with extension dta, sav, csv, tsv, rds or parquet are read as tables and
-#' pinned as `format`. Any other file (e.g., .do, .R, .pdf, .zip) is pinned as
-#' is and its path is returned. To save a file without pinning it, see
-#' [dlw_download_file].
+#' with extension dta, sav, csv, tsv, rds, parquet, xls or xlsx are read as
+#' tables (the first sheet of an Excel file) and pinned as `format`. Any other
+#' file (e.g., .do, .R, .pdf, .zip) is pinned as is and its path is returned.
+#' To save a file without pinning it, see [dlw_download_file].
 #'
 #' @param filename character: Name of the file to save/read (required)
 #' @inheritParams dlw_country_catalog
@@ -152,7 +152,8 @@ dlw_download <- function(country_code,
 
 #' File extensions that are read as tables
 #' @keywords internal
-tabular_formats <- c("dta", "sav", "csv", "tsv", "rds", "parquet")
+tabular_formats <- c("dta", "sav", "csv", "tsv", "rds", "parquet", "xls",
+                     "xlsx")
 
 
 #' Read a table by its file extension
@@ -172,6 +173,11 @@ read_table <- function(path, ext, filename) {
                 parquet = {
                   rlang::check_installed("arrow", "to read parquet files.")
                   arrow::read_parquet(path)
+                },
+                xls     = ,
+                xlsx    = {
+                  rlang::check_installed("readxl", "to read Excel files.")
+                  readxl::read_excel(path)
                 })
   if (!is.data.frame(out)) {
     cli::cli_abort(c("{.file {filename}} does not contain a table.",

@@ -32,7 +32,7 @@ write_fixture <- function(ext) {
 
 test_that("read_table reads each tabular format", {
   skip_if_not_installed("arrow")
-  for (ext in tabular_formats) {
+  for (ext in setdiff(tabular_formats, c("xls", "xlsx"))) {
     out <- read_table(write_fixture(ext), ext, paste0("a.", ext))
     expect_s3_class(out, "data.frame")
     expect_equal(dim(out), c(3, 2), info = ext)
@@ -147,4 +147,27 @@ test_that("dlw_get_data pins a binary file byte for byte", {
                        local = TRUE, local_dir = dir)
   expect_identical(readBin(path, "raw", 100), bytes)
   expect_equal(basename(path), "Some Manual - v2.zip")
+})
+
+test_that("read_table reads the first sheet of xls and xlsx files", {
+  skip_if_not_installed("readxl")
+  for (ext in c("xls", "xlsx")) {
+    path <- readxl::readxl_example(paste0("datasets.", ext))
+    out <- read_table(path, ext, paste0("a.", ext))
+    expect_s3_class(out, "data.frame")
+    expect_equal(dim(out), c(32, 11), info = ext)
+    expect_equal(names(out)[1], "mpg", info = ext)
+  }
+})
+
+test_that("dlw_get_data pins an Excel file as a table", {
+  skip_if_not_installed("readxl")
+  dir <- withr::local_tempdir()
+  path <- readxl::readxl_example("datasets.xlsx")
+  rec <- mock_download(readBin(path, "raw", file.size(path)), "a.xlsx")
+  out <- dlw_get_data("COL", "a.xlsx", year = 2010, local = TRUE,
+                      local_dir = dir)
+  expect_s3_class(out, "data.table")
+  expect_equal(dim(out), c(32, 11))
+  expect_equal(pins::pin_list(pins::board_folder(dir)), "a_COL_2010_xlsx.qs2")
 })

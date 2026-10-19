@@ -14,6 +14,10 @@ access microdata and documentation in the World Bank. Users can access
 the most up-to-date and historical versions of harmonized data
 collections and raw/non-harmonized data for subsequent analysis
 
+The package can list all files available on a server, read common tabular
+formats, and download other files such as programs and documents without
+changing their contents.
+
 ## Installation
 
 Since `{dlw}` is hosted in the World Bank’s GitHub organization, you
@@ -63,11 +67,14 @@ there. Once you have your token, set it in your R session as follows:
 dlw_set_token("your_token_here")
 ```
 
-### server catalob
+### Server catalog
 
 After setting your token, you can download the catalog for the
 corresponding server using `dlw_server_catalog()`. By default, this
-downloads the “GMD” catalog. The downloaded catalog is saved for the
+downloads the “GMD” catalog and lists all file types, including data,
+programs, and documents. To restrict the catalog to specific extensions,
+set `options(dlw.download_formats = "dta")` (or a vector of extensions)
+before requesting it. The downloaded catalog is saved for the
 current session in a hidden environment within the `{dlw}` package,
 allowing for easy and efficient access in subsequent operations.
 
@@ -111,8 +118,8 @@ dlw_get_data(
 ```
 
 To simplify this process, we have developed a wrapper function that
-works only for the GMD server: `dlw_get_gmd()`. This function is much
-easier to use:
+works only for the GMD server: `dlw_get_gmd()`. It chooses the latest
+master and alternative versions by default and is easier to use:
 
 ``` r
 pry <- dlw_get_gmd(country_code = "PRY", year = 2011, module = "GPWG", vermast = "v01", veralt = "v03")
@@ -162,4 +169,23 @@ pry[, weighted.mean(welfare, weight, na.rm = TRUE)]
 ```
 
 In this case, the most recent version available will be used (for
-example, master version v02 and alternative version v01).
+example, master version v02 and alternative version v01). To inspect
+calls for all matching versions instead, use `latest_version = FALSE`.
+
+`dlw_get_data()` reads Stata, SPSS, CSV, TSV, RDS, Parquet, XLS, and XLSX
+files as tables. Reading Parquet files requires the suggested `arrow`
+package; reading Excel files requires `readxl`. Other file types are
+pinned unchanged and the path to the pinned file is returned. To download
+any file without pinning it, use `dlw_download_file()`: it returns raw
+bytes by default or saves the file when `path` is supplied. Both
+functions require `year` for the API request.
+
+``` r
+# Return the file contents as raw bytes
+code <- dlw_download_file("WLD", "WLD_2026_ALL_V02_M_V01_A_GMI_INE.do",
+                          year = 2026)
+
+# Save a file to a directory
+dlw_download_file("WLD", "WLD_2026_ALL_V02_M_V01_A_GMI_INE.do",
+                  year = 2026, path = tempdir())
+```

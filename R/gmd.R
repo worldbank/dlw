@@ -169,8 +169,8 @@ gmd_calls <- function(ctl,
 #' }
 dlw_get_gmd_support <- function(module = c("CPIICP", "CPI"),
                                 vermast = NULL,
-                                filename = NULL,
-                                verbose =  getOption("dlw.verbose")) {
+                                verbose =  getOption("dlw.verbose"),
+                                filename = NULL) {
 
   module       <- match.arg(module)
   country_code <- "Support"

@@ -34,6 +34,14 @@ test_that("dlw_get_gmd_support honors vermast", {
   expect_error(dlw_get_gmd_support(vermast = "v99", verbose = FALSE))
 })
 
+test_that("dlw_get_gmd_support keeps verbose as the third argument", {
+  local_mocked_bindings(
+    dlw_server_catalog = \(...) support_ctl(),
+    eval_gmd_call = \(calls, verbose) verbose
+  )
+  expect_false(dlw_get_gmd_support("CPIICP", NULL, FALSE))
+})
+
 test_that("dlw_get_gmd_support ignores files that are not dta", {
   ctl <- rbind(support_ctl(),
                data.table::copy(support_ctl()[2])[, `:=`(Vermast = "V13",

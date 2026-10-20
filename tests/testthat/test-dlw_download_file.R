@@ -74,6 +74,32 @@ test_that("handle_file_resp keeps a csv file but parses API csv reports", {
 
   out <- perform_file(file_resp(info, "text/csv"))
   expect_s3_class(out, "data.table")
+
+  out <- perform_file(file_resp(body, "text/csv"))
+  expect_identical(out$body, body)
+  expect_null(out$filename)
+
+  err <- charToRaw("ErrorCode,ErrorMessage\r\n674,No access\r\n")
+  expect_error(perform_file(file_resp(err, "text/csv")),
+               class = "dlw_api_error")
+})
+
+test_that("unnamed CSV files are saved and pinned as files, not reports", {
+  body <- charToRaw("a,b\r\n1,2\r\n")
+  local_mocked_bindings(
+    build_request = \(...) "req",
+    handle_req_perform = \(req) file_resp(body, "text/csv")
+  )
+  dir <- withr::local_tempdir()
+  path <- file.path(dir, "a.csv")
+  out <- dlw_download_file("COL", "a.csv", year = 2010, path = path)
+  expect_equal(out$filename, "a.csv")
+  expect_identical(readBin(path, "raw", 100), body)
+
+  out <- dlw_get_data("COL", "a.csv", year = 2010, local = TRUE,
+                      local_dir = dir)
+  expect_equal(out, data.table::data.table(a = 1L, b = 2L))
+  expect_equal(pins::pin_list(pins::board_folder(dir)), "a_COL_2010_csv.qs2")
 })
 
 test_that("handle_file_resp aborts on API errors and empty bodies", {

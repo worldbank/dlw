@@ -174,8 +174,9 @@ test_that("dlw_download errors when no file matches", {
                "No file")
 })
 
-http_error <- function(status, body = "", type = "text/plain", headers = list()) {
-  local_mocked_bindings(dlw_get_token = \(...) "secret-token",
+http_error <- function(status, body = "", type = "text/plain", headers = list(),
+                        token = "secret-token") {
+  local_mocked_bindings(dlw_get_token = \(...) token,
                         .env = parent.frame())
   httr2::local_mocked_responses(
     \(req) httr2::response(status_code = status,
@@ -242,6 +243,16 @@ test_that("JSON error messages never contain the token", {
   expect_match(conditionMessage(cnd), "rejected")
 })
 
+test_that("JSON error messages redact tokens before truncating", {
+  token <- paste0("secret-token-", strrep("x", 200))
+  body <- paste0('{"detail":"', strrep("a", 180), token, ' rejected"}')
+  cnd <- http_error(500, body, type = "application/problem+json", token = token)
+  expect_s3_class(cnd, "dlw_http_500")
+  expect_no_match(conditionMessage(cnd), "secret-token", fixed = TRUE)
+  expect_match(conditionMessage(cnd), "[REDACTED]", fixed = TRUE)
+  expect_no_match(cnd$response_body, token, fixed = TRUE)
+})
+
 test_that("transport failures keep the underlying error", {
   local_mocked_bindings(dlw_get_token = \(...) "secret-token")
   httr2::local_mocked_responses(\(req) {
@@ -263,4 +274,3 @@ test_that("build_request errors with missing or wrong endpoint", {
                 api_version = "v1") |>
     expect_error()
 })
-

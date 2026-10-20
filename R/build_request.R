@@ -134,9 +134,9 @@ resp_csv <- function(resp) {
 #' perform request and keep the file as returned by the API
 #'
 #' Unlike [handle_resp], the body of any file type is returned as raw bytes,
-#' with no parsing. A CSV response is a file only when the API names it after
-#' the requested file; the CSV that the API uses to report errors and lists of
-#' file versions (`ECAFileinfo.csv`) is parsed as in [handle_resp].
+#' with no parsing. The CSV that the API uses to report errors and lists of
+#' file versions (`ECAFileinfo.csv`, or an unnamed CSV with `ErrorCode`) is
+#' parsed as in [handle_resp].
 #'
 #' @param req A httr2 request object.
 #'
@@ -158,9 +158,14 @@ handle_file_resp <- function(req) {
                    .subclass = c("dlw_api_error", "api_error"))
   }
 
-  if (identical(file_type, "csv") &&
-      (is.null(filename) || tolower(filename) == "ecafileinfo.csv")) {
-    return(resp_csv(resp))
+  if (identical(file_type, "csv")) {
+    report <- if (is.null(filename)) {
+      cols <- fread(text = httr2::resp_body_string(resp), nrows = 0)
+      "errorcode" %in% tolower(names(cols))
+    } else {
+      tolower(filename) == "ecafileinfo.csv"
+    }
+    if (report) return(resp_csv(resp))
   }
 
   list(body         = body,
@@ -275,9 +280,7 @@ abort_http_error <- function(e, req) {
   # the API can echo request headers (i.e., the token) in its error body
   body        <- tryCatch(httr2::resp_body_string(resp), error = \(e) "") |>
     redact_token(req)
-  # a JSON body is parsed again from the response, so redact its message too
-  api_msg     <- http_error_message(resp, body) |>
-    redact_token(req)
+  api_msg     <- http_error_message(resp, body, req)
 
   hint <- if (status == 401) {
     "DatalibWeb Token invalid.
@@ -338,15 +341,18 @@ redact_token <- function(x, req) {
 #'
 #' @param resp httr2 response.
 #' @param body character: body of `resp` as text.
+#' @param req httr2 request.
 #'
 #' @returns character: `detail` or `title` of a JSON body, or the first line of
 #'   a text body. Empty string if there is none.
 #' @keywords internal
-http_error_message <- function(resp, body) {
+http_error_message <- function(resp, body, req) {
   if (grepl("json", httr2::resp_content_type(resp))) {
     parsed <- tryCatch(httr2::resp_body_json(resp), error = \(e) NULL)
     body   <- c(parsed[["detail"]], parsed[["title"]], "")[[1]]
   }
+  # redact after JSON decoding, before a token can be cut short
+  body <- redact_token(body, req)
   strsplit(body, "\r?\n")[[1]][1] |>
     trimws() |>
     substr(1, 200) |>

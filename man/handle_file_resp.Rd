@@ -16,8 +16,8 @@ a data.table if the response is a CSV report of the API. Otherwise
 }
 \description{
 Unlike [handle_resp], the body of any file type is returned as raw bytes,
-with no parsing. A CSV response is a file only when the API names it after
-the requested file; the CSV that the API uses to report errors and lists of
-file versions (`ECAFileinfo.csv`) is parsed as in [handle_resp].
+with no parsing. The CSV that the API uses to report errors and lists of
+file versions (`ECAFileinfo.csv`, or an unnamed CSV with `ErrorCode`) is
+parsed as in [handle_resp].
 }
 \keyword{internal}

@@ -4,12 +4,14 @@
 \alias{http_error_message}
 \title{short message from the body of an error response}
 \usage{
-http_error_message(resp, body)
+http_error_message(resp, body, req)
 }
 \arguments{
 \item{resp}{httr2 response.}
 
 \item{body}{character: body of `resp` as text.}
+
+\item{req}{httr2 request.}
 }
 \value{
 character: `detail` or `title` of a JSON body, or the first line of

@@ -24,6 +24,7 @@ utils::globalVariables(
     "Vermast",
     "Country",
     "Country_code",
+    "Ext",
     "Module",
     "Year"
   )

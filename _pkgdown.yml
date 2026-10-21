@@ -10,6 +10,7 @@ reference:
 - title: Get data
 - contents:
   - dlw_get_data
+  - dlw_download_file
   - has_concept("catalogs")
 - title: Token
 - contents:

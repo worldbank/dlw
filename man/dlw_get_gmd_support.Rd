@@ -7,7 +7,8 @@
 dlw_get_gmd_support(
   module = c("CPIICP", "CPI"),
   vermast = NULL,
-  verbose = getOption("dlw.verbose")
+  verbose = getOption("dlw.verbose"),
+  filename = NULL
 )
 }
 \arguments{
@@ -17,6 +18,12 @@ dlw_get_gmd_support(
 X is a number of two digits like "01" or "02".}
 
 \item{verbose}{logical: whether to display info}
+
+\item{filename}{character: Name of any other file of the Support collection
+in the catalog (e.g., "Monthly_CPI.dta"). If given, `module` is ignored and
+`vermast` selects the version of the file ("v15" for the folder
+"Support_2005_CPI_V15_M"); the latest by default. See
+`dlw_server_inventory("Support")` for the files.}
 }
 \value{
 data.table
@@ -28,6 +35,7 @@ get Support files for GMD
 \dontrun{
 dlw_get_gmd_support()
 dlw_get_gmd_support(vermast = "v10")
+dlw_get_gmd_support(filename = "Monthly_CPI.dta", vermast = "v15")
 }
 }
 \seealso{

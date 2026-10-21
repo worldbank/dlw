@@ -8,6 +8,10 @@ vignette: >
 ---
 
 
+```{r, include = FALSE}
+# Examples call the authenticated API and are shown without making live requests.
+knitr::opts_chunk$set(eval = FALSE)
+```
 
 ## Introduction
 The Global Monitoring Database ([GMD](https://worldbankgroup.sharepoint.com/:u:/r/sites/WBPoverty/SitePages/PublishingPages/Global-Monitoring-Database-GMD-02062020-093339.aspx?csf=1&web=1&e=dVCBX4)) is the World Bank’s central repository of harmonized, multitopic household income and expenditure surveys. These surveys, collected by national statistical offices, are compiled and processed by the Data for Goals (D4G) team, with support from regional statistics teams in the Poverty and Equity Global Practice. The Global Poverty & Inequality Data Team (GPID) in the Development Economics Data Group (DECDG) also contributes historical and external data, including from the Luxembourg Income Study (LIS).
@@ -38,7 +42,7 @@ names(ctl)
 #> [17] "Module"         "ext"
 ```
 
-The catalog contains all the metadata required to download any dataset from the GMD collection, provided you have the necessary access rights. For example, let’s examine the data available for Paraguay in 2020 within the GPWG module:
+The catalog includes data and other file types. `dlw_get_gmd()` uses Stata (`dta`) files from the GMD collection. For example, examine the data available for Paraguay in 2020 within the GPWG module:
 
 
 ``` r
@@ -97,7 +101,7 @@ pry20 <- dlw_get_gmd(country_code = "PRY", year = 2020, module = "GPWG")
 Notice that `dlw_get_gmd()` prints the actual call to `dlw_get_data()` in the console for your reference and verification.
 
 ### All versions
-By default, `dlw_get_gmd()` returns the most recent version of the data for a particular year. However, if you set the argument `latest_version = FALSE`, the function will instead return a list of calls—one for each survey version available for that year. This allows you to review and select the specific version you wish to download.
+By default, `dlw_get_gmd()` selects the most recent master and alternative versions for each matching year. Set `latest_version = FALSE` to get a list of calls for all matching versions, which you can review and evaluate selectively.
 
 
 ``` r
@@ -163,8 +167,8 @@ pry23 <- dlw_get_gmd(country_code = "PRY",
 #> )
 ```
 
-### Old version
-It is possible that, depending on the country and module, you may need to access an older version of the data. In such cases, you can specify the `veralt` argument to indicate which version you want to download. For example, if you want to download the second version of the Paraguay 2020 survey, you can do so as follows:
+### Select a version
+To access a specific version, supply `vermast` for the master version, `veralt` for the alternative version, or both. For example, select alternative version two of the Paraguay 2020 survey:
 
 ``` r
 pry20_v2 <- dlw_get_gmd(country_code = "PRY",
@@ -185,3 +189,21 @@ pry20_v2 <- dlw_get_gmd(country_code = "PRY",
 #> )
 ```
 
+## Other file types
+
+`dlw_get_data()` reads `dta`, `sav`, `csv`, `tsv`, `rds`, `parquet`, `xls`, and `xlsx` files as tables. Reading Parquet requires the suggested `arrow` package; reading Excel files requires `readxl`. Other file types listed in the server catalog, such as programs and documents, can be downloaded with `dlw_download_file()` without being pinned, or with `dlw_get_data()` to pin them unchanged and return the local path. Both functions require the `year` argument.
+
+``` r
+# Return an unchanged file as raw bytes
+program <- dlw_download_file(
+  "WLD", "WLD_2026_ALL_V02_M_V01_A_GMI_INE.do", year = 2026
+)
+
+# Save it directly to disk
+dlw_download_file(
+  "WLD", "WLD_2026_ALL_V02_M_V01_A_GMI_INE.do",
+  year = 2026, path = tempdir()
+)
+```
+
+For Support files, `dlw_get_gmd_support()` returns the latest matching version by default. Use `vermast` to select a master version or `filename` to retrieve another file listed for the Support collection.

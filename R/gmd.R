@@ -66,6 +66,8 @@ dlw_get_gmd <- function(country_code,
     veralt = veralt
   )
   ctl <- do.call(dlw_server_inventory, ctl_args)
+  # the catalog lists all file types (e.g., programs, zip), but only dta is data
+  ctl <- ctl[tolower(Ext) == "dta"]
 
   if (nrow(ctl) == 0) {
     arg_str <- paste(
@@ -149,6 +151,11 @@ gmd_calls <- function(ctl,
 #'
 #' @inheritParams dlw_get_gmd
 #' @param module character: As of now, either CPIICP (the default) or CPI.
+#' @param filename character: Name of any other file of the Support collection
+#'   in the catalog (e.g., "Monthly_CPI.dta"). If given, `module` is ignored and
+#'   `vermast` selects the version of the file ("v15" for the folder
+#'   "Support_2005_CPI_V15_M"); the latest by default. See
+#'   `dlw_server_inventory("Support")` for the files.
 #'
 #' @family GMD utilities
 #' @returns data.table
@@ -158,24 +165,52 @@ gmd_calls <- function(ctl,
 #' \dontrun{
 #' dlw_get_gmd_support()
 #' dlw_get_gmd_support(vermast = "v10")
+#' dlw_get_gmd_support(filename = "Monthly_CPI.dta", vermast = "v15")
 #' }
 dlw_get_gmd_support <- function(module = c("CPIICP", "CPI"),
                                 vermast = NULL,
-                                verbose =  getOption("dlw.verbose")) {
+                                verbose =  getOption("dlw.verbose"),
+                                filename = NULL) {
 
   module       <- match.arg(module)
   country_code <- "Support"
   ctl <- dlw_server_catalog(server = "GMD")
-  ctl <- ctl[Country == country_code &
-               Country_code == country_code &
-               Module == module]
+
+  if (!is.null(filename)) {
+    file <- ctl[toupper(Country) == toupper(country_code) &
+                  toupper(FileName) == toupper(filename)]
+    if (nrow(file) == 0) {
+      cli::cli_abort(c("{.val {filename}} is not a Support file in the catalog.",
+                       "i" = "See {.code dlw_server_inventory(\"Support\")}."))
+    }
+    year <- unique(file$Year)
+    if (length(year) > 1) {
+      cli::cli_abort("{.val {filename}} is available in several years:
+                     {year}.")
+    }
+    return(do.call(dlw_get_data,
+                   c(list(country_code = country_code,
+                          filename     = file$FileName[1],
+                          year         = year,
+                          verbose      = verbose),
+                     if (!is.null(vermast)) list(vermast = vermast))))
+  }
+
+  # catalog stores country in upper case (e.g., "SUPPORT")
+  ctl <- ctl[toupper(Country) == toupper(country_code) &
+               toupper(Country_code) == toupper(country_code) &
+               Module == module & tolower(Ext) == "dta"]
 
   # get latest by default.
 
   if (is.null(vermast)) {
     ctl <- ctl[Vermast == max(Vermast, na.rm = TRUE)]
   } else {
-    ctl <- ctl[Vermast == Vermast]
+    ctl <- ctl[Vermast == toupper(vermast)]
+  }
+
+  if (nrow(ctl) == 0) {
+    cli::cli_abort("Requested support file is not available in the catalog.")
   }
 
   calls <- gmd_calls(ctl, country_code = country_code)

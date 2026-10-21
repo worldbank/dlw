@@ -2,6 +2,7 @@
 
 S3method(print,dlw_call_list)
 export(dlw_country_catalog)
+export(dlw_download_file)
 export(dlw_get_data)
 export(dlw_get_gmd)
 export(dlw_get_gmd_support)

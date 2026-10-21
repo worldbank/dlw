@@ -47,7 +47,12 @@ dlw_download(
 - ...:
 
   additional filtering arguments (e.g.,survey_year, survey_acronym,
-  vermast, veralt, collection, module)
+  vermast, veralt, collection, module). When \`filename\` exists in
+  several versions on the server, \`vermast\` and \`veralt\` (e.g.,
+  "v02") select one (sent to the API as \`para1\`); if neither is given,
+  the latest version is used. \`year\` is required. If \`collection\` is
+  not given, it is taken from harmonized file names (e.g., "GMD" in
+  "COL_2010_GEIH_V04_M_V01_A_GMD_ALL.dta").
 
 - verbose:
 
@@ -55,4 +60,6 @@ dlw_download(
 
 ## Value
 
-A list with the board and pin_name used
+The table as data.table, or the path to the pinned copy of a file that
+is not a table, or the data.table of file versions (see
+\[dlw_get_data\]).

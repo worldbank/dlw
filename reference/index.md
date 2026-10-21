@@ -13,6 +13,8 @@ Utilities for GMD data
 
 - [`dlw_get_data()`](https://worldbank.github.io/dlw/reference/dlw_get_data.md)
   : Get data from datalibweb (refactored)
+- [`dlw_download_file()`](https://worldbank.github.io/dlw/reference/dlw_download_file.md)
+  : Download a file from datalibweb as is
 - [`dlw_country_catalog()`](https://worldbank.github.io/dlw/reference/dlw_country_catalog.md)
   : Get country catalog
 - [`dlw_server_catalog()`](https://worldbank.github.io/dlw/reference/dlw_server_catalog.md)

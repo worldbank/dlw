@@ -4,21 +4,21 @@
 
 - **R.Andres Castaneda**. Author, maintainer.
 
-- **Ben Brunckhorst**. Contributor.
+- **Ben Brunckhorst**. Author.
 
 ## Citation
 
 Source:
 [`DESCRIPTION`](https://github.com/worldbank/dlw/blob/master/DESCRIPTION)
 
-Castaneda R (2026). *dlw: R Client for the internal Datalibweb API of
-the World Bank*. R package version 0.1.2,
+Castaneda R, Brunckhorst B (2026). *dlw: R Client for the internal
+Datalibweb API of the World Bank*. R package version 0.2.0,
 <https://github.com/worldbank/dlw>.
 
     @Manual{,
       title = {dlw: R Client for the internal Datalibweb API of the World Bank},
-      author = {R.Andres Castaneda},
+      author = {R.Andres Castaneda and Ben Brunckhorst},
       year = {2026},
-      note = {R package version 0.1.2},
+      note = {R package version 0.2.0},
       url = {https://github.com/worldbank/dlw},
     }

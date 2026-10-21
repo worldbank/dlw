@@ -1,0 +1,65 @@
+# Download a file from datalibweb as is
+
+Downloads any file (data, programs, documents) without reading or
+pinning it. Use \[dlw_get_data\] to read data files.
+
+## Usage
+
+``` r
+dlw_download_file(
+  country_code,
+  filename,
+  server = NULL,
+  path = NULL,
+  overwrite = FALSE,
+  ...
+)
+```
+
+## Arguments
+
+- country_code:
+
+  character: ISO3 code
+
+- filename:
+
+  character: Name of the file to save/read (required)
+
+- server:
+
+  character: in case we have more than one server. default is GMD
+
+- path:
+
+  character: where to save the file. If a directory, the file is saved
+  in it with the name given by the API. If \`NULL\` (default), the file
+  is not saved but returned as raw bytes.
+
+- overwrite:
+
+  logical: whether to replace an existing file at \`path\`. Default is
+  FALSE.
+
+- ...:
+
+  additional request arguments (e.g., \`year\`, which is required,
+  \`vermast\`, \`veralt\`, \`collection\`), as in \[dlw_get_data\].
+
+## Value
+
+If \`path\` is \`NULL\`, the raw bytes of the file, with attributes
+\`filename\`, \`content_type\` and \`status\`. Otherwise, invisibly, a
+list with the \`path\` of the saved file, \`filename\`, \`size\` in
+bytes, \`content_type\` and \`status\`. If the server holds several
+versions of \`filename\` and none could be chosen, a data.table with the
+versions.
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+dlw_download_file("WLD", "WLD_2026_ALL_V02_M_V01_A_GMI_INE.do",
+                  year = 2026, path = tempdir())
+} # }
+```

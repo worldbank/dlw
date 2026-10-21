@@ -50,10 +50,10 @@ names(ctl)
 #> [17] "Module"         "ext"
 ```
 
-The catalog contains all the metadata required to download any dataset
-from the GMD collection, provided you have the necessary access rights.
-For example, let’s examine the data available for Paraguay in 2020
-within the GPWG module:
+The catalog includes data and other file types.
+[`dlw_get_gmd()`](https://worldbank.github.io/dlw/reference/dlw_get_gmd.md)
+uses Stata (`dta`) files from the GMD collection. For example, examine
+the data available for Paraguay in 2020 within the GPWG module:
 
 ``` r
 
@@ -133,11 +133,9 @@ in the console for your reference and verification.
 
 By default,
 [`dlw_get_gmd()`](https://worldbank.github.io/dlw/reference/dlw_get_gmd.md)
-returns the most recent version of the data for a particular year.
-However, if you set the argument `latest_version = FALSE`, the function
-will instead return a list of calls—one for each survey version
-available for that year. This allows you to review and select the
-specific version you wish to download.
+selects the most recent master and alternative versions for each
+matching year. Set `latest_version = FALSE` to get a list of calls for
+all matching versions, which you can review and evaluate selectively.
 
 ``` r
 
@@ -209,13 +207,11 @@ pry23 <- dlw_get_gmd(country_code = "PRY",
 #> )
 ```
 
-### Old version
+### Select a version
 
-It is possible that, depending on the country and module, you may need
-to access an older version of the data. In such cases, you can specify
-the `veralt` argument to indicate which version you want to download.
-For example, if you want to download the second version of the Paraguay
-2020 survey, you can do so as follows:
+To access a specific version, supply `vermast` for the master version,
+`veralt` for the alternative version, or both. For example, select
+alternative version two of the Paraguay 2020 survey:
 
 ``` r
 
@@ -236,3 +232,36 @@ pry20_v2 <- dlw_get_gmd(country_code = "PRY",
 #>   collection = "GMD"
 #> )
 ```
+
+## Other file types
+
+[`dlw_get_data()`](https://worldbank.github.io/dlw/reference/dlw_get_data.md)
+reads `dta`, `sav`, `csv`, `tsv`, `rds`, `parquet`, `xls`, and `xlsx`
+files as tables. Reading Parquet requires the suggested `arrow` package;
+reading Excel files requires `readxl`. Other file types listed in the
+server catalog, such as programs and documents, can be downloaded with
+[`dlw_download_file()`](https://worldbank.github.io/dlw/reference/dlw_download_file.md)
+without being pinned, or with
+[`dlw_get_data()`](https://worldbank.github.io/dlw/reference/dlw_get_data.md)
+to pin them unchanged and return the local path. Both functions require
+the `year` argument.
+
+``` r
+
+# Return an unchanged file as raw bytes
+program <- dlw_download_file(
+  "WLD", "WLD_2026_ALL_V02_M_V01_A_GMI_INE.do", year = 2026
+)
+
+# Save it directly to disk
+dlw_download_file(
+  "WLD", "WLD_2026_ALL_V02_M_V01_A_GMI_INE.do",
+  year = 2026, path = tempdir()
+)
+```
+
+For Support files,
+[`dlw_get_gmd_support()`](https://worldbank.github.io/dlw/reference/dlw_get_gmd_support.md)
+returns the latest matching version by default. Use `vermast` to select
+a master version or `filename` to retrieve another file listed for the
+Support collection.

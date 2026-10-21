@@ -24,4 +24,5 @@ dlw_read(board, pin_name, version = NULL)
 
 ## Value
 
-data.table
+data.table; or the path to the file if the pin is a file that is not a
+table.
